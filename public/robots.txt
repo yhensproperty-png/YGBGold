@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /manage
+Disallow: /add
+Disallow: /edit
+Disallow: /login
+Disallow: /mfa-enroll
+Disallow: /mfa-verify
+
+Sitemap: https://yhensproperty.com/sitemap.xml

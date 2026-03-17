@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Hero text animations ── */
+@keyframes hero-fade-up {
+  0% {
+    opacity: 0;
+    transform: translateY(60px);
+    filter: blur(8px);
+    letter-spacing: 0.4em;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0px);
+    filter: blur(0px);
+    letter-spacing: normal;
+  }
+}
+
+@keyframes hero-gold-glow {
+  0%, 100% { text-shadow: 0 0 20px rgba(212,175,55,0.4), 0 0 40px rgba(212,175,55,0.2); }
+  50%       { text-shadow: 0 0 40px rgba(212,175,55,0.8), 0 0 80px rgba(212,175,55,0.4); }
+}
+
+@keyframes shimmer-gold {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.hero-line-1 {
+  opacity: 0;
+  animation: hero-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards;
+}
+
+.hero-line-2 {
+  opacity: 0;
+  color: #D4AF37;
+  animation: hero-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.6s forwards;
+  text-shadow: 0 0 30px rgba(212, 175, 55, 0.5), 0 2px 8px rgba(0,0,0,0.8);
+}
+
+/* ── Scroll-reveal animations ── */
+@keyframes scroll-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.scroll-reveal {
+  opacity: 0;
+}
+
+.scroll-reveal.visible {
+  animation: scroll-fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+

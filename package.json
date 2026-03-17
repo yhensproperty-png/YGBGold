@@ -1,0 +1,28 @@
+{
+  "name": "yhen's-property",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsx scripts/generate-sitemap.ts && vite build",
+    "preview": "vite preview",
+    "generate-sitemap": "tsx scripts/generate-sitemap.ts"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "@hcaptcha/react-hcaptcha": "^2.0.2",
+    "@supabase/supabase-js": "^2.97.0",
+    "browser-image-compression": "^2.0.2",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-router-dom": "6.22.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "tsx": "^4.7.1",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0"
+  }
+}

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Gold Items & Bars for Sale | YGB Buy Gold & Sell</title>
+    <meta name="description" content="Platform for buying and selling premium gold items, bars, and coins. Direct deals, secure transactions.">
+    <meta property="og:title" content="YGB Buy Gold & Sell">
+    <meta property="og:description" content="Platform for buying and selling premium gold items, bars, and coins. Direct deals, secure transactions.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="YGB Buy Gold & Sell">
+    <meta property="og:image" content="https://ygbgold.com/Image/hero_gold.png">
+    <meta property="og:image:secure_url" content="https://ygbgold.com/Image/hero_gold.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="YGB Buy Gold & Sell - Premium Gold Items">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://yhensproperty.com/Image/Hero_Villa.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/Image/YGB_favicon.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/Image/YGB_favicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/Image/YGB_favicon.png">
+    <link rel="shortcut icon" href="/Image/YGB_favicon.png">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#D4AF37", // Premium Gold
+                        "background-light": "#121212", // Very dark grey
+                        "background-dark": "#050505", // Almost black
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #D4AF37; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #b8960c; }
+
+        .scrollbar-thin::-webkit-scrollbar { width: 8px; }
+        .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+        .scrollbar-thin::-webkit-scrollbar-thumb { background: #D4AF37; border-radius: 4px; }
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover { background: #b8960c; }
+
+        /* ── Hero text animations ── */
+        @keyframes heroFadeUp {
+            0%   { opacity: 0; transform: translateY(35px); filter: blur(12px); }
+            60%  { opacity: 0.8; filter: blur(2px); }
+            100% { opacity: 1; transform: translateY(0);    filter: blur(0px); }
+        }
+
+        .hero-line-1 {
+            opacity: 0;
+            animation: heroFadeUp 1.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.5s forwards;
+        }
+
+        .hero-line-2 {
+            opacity: 0;
+            color: #D4AF37 !important;
+            text-shadow: 0 0 40px rgba(212,175,55,0.6), 0 4px 12px rgba(0,0,0,0.9) !important;
+            animation: heroFadeUp 1.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) 1.0s forwards;
+        }
+
+        /* ── Scroll-reveal animations ── */
+        @keyframes scrollFadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .scroll-reveal { opacity: 0; }
+        .scroll-reveal.visible { animation: scrollFadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.2.0",
+    "react-dom": "https://esm.sh/react-dom@18.2.0",
+    "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+    "react-router-dom": "https://esm.sh/react-router-dom@6.22.3?deps=react@18.2.0,react-dom@18.2.0",
+    "@google/genai": "https://esm.sh/@google/genai@1.0.2",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/"
+  }
+}
+</script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+</body>
+</html>
