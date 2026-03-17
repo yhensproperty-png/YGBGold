@@ -10,7 +10,7 @@ import { supabase } from '../services/supabaseClient.ts';
  * 1. Web3Forms access key provided by user.
  * 2. WhatsApp Business number for instant chat.
  */
-const WEB3FORMS_ACCESS_KEY = "843dc172-4947-4bc8-907a-320244d9f5fa";
+const WEB3FORMS_ACCESS_KEY = "c7934ce9-2cd3-4c34-ba88-dfcc376c3643";
 const WHATSAPP_NUMBER = "639467543767";
 const HCAPTCHA_SITE_KEY = "50b2fe65-b00b-4b9e-ad62-3ba471098be2"; 
 
@@ -139,7 +139,7 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
 
   const handleShareWhatsApp = () => {
     const message = encodeURIComponent(
-      `Check out this property: "${property?.title}" in ${property?.city}\n${window.location.href}`
+      `Interested in this gold item: "${property?.title}" in ${property?.city}\n${window.location.href}`
     );
     window.open(`https://wa.me/${WHATSAPP_NUMBER.replace(/\+/g, '')}?text=${message}`, '_blank');
     setShowShareMenu(false);
@@ -164,7 +164,7 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
   if (!property) {
     return (
       <div className="flex flex-col items-center justify-center py-24 px-6 text-center">
-        <h2 className="text-2xl font-bold mb-4 text-zinc-400">Property not found</h2>
+        <h2 className="text-2xl font-bold mb-4 text-zinc-400">Item not found</h2>
         <Link to="/" className="text-primary font-bold hover:underline">Back to listings</Link>
       </div>
     );
@@ -201,7 +201,7 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
       message: formData.message,
       privacy_consent: formData.privacyConsent,
       marketing_consent: formData.marketingConsent,
-      from_name: "Yhen's Property Pro Website",
+      from_name: "YGB Gold & Sell Website",
       subject: `New Lead: ${property.title}`,
       property_info: `${property.title} in ${property.city}`,
       page_url: window.location.href,
@@ -252,12 +252,12 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
 
   const handleWhatsAppClick = () => {
     const message = encodeURIComponent(
-      `Hi Yhen, I'm interested in "${property.title}" located in ${property.city}. \n\nCheck out the property details here: ${window.location.href}`
+      `Hi, I'm interested in "${property.title}" listed in ${property.city}. \n\nCheck out the details here: ${window.location.href}`
     );
     window.open(`https://wa.me/${WHATSAPP_NUMBER.replace(/\+/g, '')}?text=${message}`, '_blank');
   };
 
-  const isLand = property.type === PropertyType.Land;
+  const isOthers = property.type === PropertyType.Others;
 
   const generateSEOTitle = (): string => {
     const unitType = property.type;
@@ -265,7 +265,7 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
     const location = property.city;
     const buildingName = property.condoName || property.barangay;
 
-    return `${unitType} ${transactionType} in ${location} | ${buildingName} | Yhen's Property`;
+    return `${unitType} ${transactionType} in ${location} | ${buildingName} | YGB Gold`;
   };
 
   const generateSEODescription = (): string => {
@@ -273,15 +273,10 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
     const transactionType = property.listingType === 'sale' ? 'for sale' : 'for rent';
 
     let desc = `${property.type} ${transactionType} in ${property.city} at ${priceFormatted}`;
-
-    if (!isLand) {
-      desc += ` • ${property.beds} bed${property.beds > 1 ? 's' : ''}, ${property.baths} bath${property.baths > 1 ? 's' : ''}`;
-    }
-
-    desc += ` • ${property.sqft.toLocaleString()} sqm`;
+    desc += ` • Karat: ${property.beds}K • Weight: ${property.baths}g`;
 
     if (property.condoName) {
-      desc += ` • Located in ${property.condoName}`;
+      desc += ` • ${property.condoName}`;
     }
 
     if (property.address && property.address !== property.city) {
@@ -301,10 +296,7 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
     const baseDesc = `${property.type} ${property.listingType === 'sale' ? 'for sale' : 'for rent'} in ${property.city}`;
 
     if (imageIndex === 0) {
-      let altText = `${baseDesc}`;
-      if (!isLand) {
-        altText += ` - ${property.beds} bedroom, ${property.baths} bathroom`;
-      }
+      let altText = `${baseDesc} - ${property.beds}K Purity, ${property.baths}g Weight`;
       if (property.condoName) {
         altText += ` at ${property.condoName}`;
       }
@@ -324,7 +316,7 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
   const featuredImageUrl = property.images[featuredIndex] ?? property.images[0];
   const imageUrl = featuredImageUrl
     ? (featuredImageUrl.startsWith('http') ? featuredImageUrl : `${window.location.origin}${featuredImageUrl}`)
-    : `${window.location.origin}/Image/Hero_Villa.png`;
+      : `${window.location.origin}/Image/hero_gold.png`;
   const imageAlt = generateImageAlt(featuredIndex);
 
   const getImageType = (url: string): string => {
@@ -338,7 +330,7 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
 
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": "RealEstateListing",
+    "@type": "Product",
     "name": property.title,
     "description": property.description,
     "url": pageUrl,
@@ -362,28 +354,27 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
       "postalCode": property.zipCode,
       "addressCountry": "PH"
     },
-    "numberOfRooms": !isLand ? property.beds : undefined,
-    "numberOfBathroomsTotal": !isLand ? property.baths : undefined,
-    "floorSize": {
+    "numberOfItems": 1,
+    "weight": {
       "@type": "QuantitativeValue",
-      "value": property.sqft,
-      "unitCode": "MTK"
+      "value": property.baths,
+      "unitCode": "GRM"
     },
     "additionalProperty": [
       {
         "@type": "PropertyValue",
-        "name": "Property Type",
-        "value": property.type
+        "name": "Karat",
+        "value": `${property.beds}K`
       },
       {
         "@type": "PropertyValue",
-        "name": "Listing Type",
-        "value": property.listingType === 'sale' ? 'For Sale' : 'For Rent'
+        "name": "Offer Type",
+        "value": property.listingType === 'sale' ? 'For Sale' : 'Trading'
       },
       {
         "@type": "PropertyValue",
-        "name": "Lot Area",
-        "value": property.lotArea ? `${property.lotArea} sqm` : 'N/A'
+        "name": "Serial Number",
+        "value": property.lotArea || 'N/A'
       }
     ],
     "amenityFeature": property.amenities.map(amenity => ({
@@ -394,21 +385,17 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
     "dateModified": property.dateUpdated || property.dateListed
   };
 
-  const categorySlug = property.listingType === 'rent'
-    ? 'rent'
-    : property.type === PropertyType.House || property.type === PropertyType.Villa
-      ? 'buy-houses'
-      : property.type === PropertyType.Condo
-        ? 'buy-condos'
-        : property.type === PropertyType.Land
-          ? 'buy-land'
-          : '';
+  const categorySlug = property.type === PropertyType.Jewelry
+    ? 'jewelry'
+    : property.type === PropertyType.Coins
+      ? 'coins'
+      : property.type === PropertyType.Bars
+        ? 'bars'
+        : property.type === PropertyType.ScrapGold
+          ? 'scrap-gold'
+          : 'others';
 
-  const categoryName = property.listingType === 'rent'
-    ? `Rent ${property.type}`
-    : property.type === PropertyType.House || property.type === PropertyType.Villa
-      ? 'Buy Houses/Villas'
-      : `Buy ${property.type}s`;
+  const categoryName = `Browse ${property.type}`;
 
   const breadcrumbSchema = {
     "@context": "https://schema.org",
@@ -450,7 +437,7 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
         ogImageHeight="630"
         ogImageAlt={imageAlt}
         ogImageType={imageType}
-        ogSiteName="Yhen's Property"
+        ogSiteName="YGB Gold & Sell"
         ogLocale="en_PH"
         ogPriceAmount={property.price.toString()}
         ogPriceCurrency="PHP"
@@ -472,7 +459,7 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
             </div>
             <div>
               <h2 className="text-3xl font-black dark:text-white mb-2 tracking-tighter">Inquiry Sent!</h2>
-              <p className="text-zinc-500 text-sm max-w-xs leading-relaxed">Your message has been received. Yhen will contact you shortly.</p>
+              <p className="text-zinc-500 text-sm max-w-xs leading-relaxed">Your message has been received. We will contact you shortly.</p>
             </div>
             <button onClick={() => setShowSuccess(false)} className="px-10 py-4 bg-primary text-zinc-900 font-bold rounded-2xl hover:scale-105 transition-all">Done</button>
           </div>
@@ -541,15 +528,10 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
       <div className="mb-6">
         <nav className="flex text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-1.5 gap-2">
           <Link
-            to={property.listingType === 'rent' ? "/category/rent" : (property.type === PropertyType.House || property.type === PropertyType.Villa) ? "/category/buy-houses" : property.type === PropertyType.Condo ? "/category/buy-condos" : property.type === PropertyType.Land ? "/category/buy-land" : "/"}
+            to={`/category/${categorySlug}`}
             className="hover:text-primary transition-colors"
           >
-            {property.listingType === 'rent'
-              ? `RENT ${property.type.toUpperCase()}`
-              : (property.type === PropertyType.House || property.type === PropertyType.Villa)
-                ? 'BUY HOUSES/VILLAS'
-                : `BUY ${property.type.toUpperCase()}S`
-            }
+            {property.type.toUpperCase()}
           </Link>
           <span>/</span>
           <span className="text-zinc-500">{property.city}</span>
@@ -619,7 +601,7 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
           </div>
           {property.condoName && (
             <div className="flex items-center gap-2 text-primary font-semibold">
-              <span className="material-icons text-sm">apartment</span>
+              <span className="material-icons text-sm">inventory</span>
               <span className="text-sm">{property.condoName}</span>
             </div>
           )}
@@ -678,47 +660,24 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
 
               <div className="h-12 w-px bg-zinc-200 dark:bg-zinc-800 hidden md:block"></div>
 
-              <div className={`flex-grow grid ${isLand ? 'grid-cols-3' : 'grid-cols-3 md:grid-cols-5'} gap-4 items-center`}>
-                {!isLand && (
-                  <>
-                    <div className="text-center">
-                      <span className="material-icons text-primary text-xl block mb-0.5">king_bed</span>
-                      <span className="block font-black text-lg dark:text-white leading-none">{property.beds}</span>
-                      <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest">Beds</span>
-                    </div>
-                    <div className="text-center">
-                      <span className="material-icons text-primary text-xl block mb-0.5">bathtub</span>
-                      <span className="block font-black text-lg dark:text-white leading-none">{property.baths}</span>
-                      <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest">Baths</span>
-                    </div>
-                  </>
-                )}
-                {property.type === PropertyType.Warehouse && property.warehouseSize && (
-                  <div className="text-center">
-                    <span className="material-icons text-primary text-xl block mb-0.5">warehouse</span>
-                    <span className="block font-black text-lg dark:text-white leading-none">{property.warehouseSize.toLocaleString()}</span>
-                    <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest">Warehouse sqm</span>
-                  </div>
-                )}
-                {(property.type === PropertyType.Commercial || property.type === PropertyType.Warehouse) && property.officeSpace && (
-                  <div className="text-center">
-                    <span className="material-icons text-primary text-xl block mb-0.5">business_center</span>
-                    <span className="block font-black text-lg dark:text-white leading-none">{property.officeSpace.toLocaleString()}</span>
-                    <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest">Office sqm</span>
-                  </div>
-                )}
+              <div className="flex-grow grid grid-cols-2 md:grid-cols-4 gap-4 items-center">
                 <div className="text-center">
-                  <span className="material-icons text-primary text-xl block mb-0.5">square_foot</span>
-                  <span className="block font-black text-lg dark:text-white leading-none">{property.sqft.toLocaleString()}</span>
-                  <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest">{isLand ? 'Total Area' : 'Living sqm'}</span>
+                  <span className="material-icons text-primary text-xl block mb-0.5">diamond</span>
+                  <span className="block font-black text-lg dark:text-white leading-none">{property.beds}K</span>
+                  <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest">Purity</span>
                 </div>
                 <div className="text-center">
-                  <span className="material-icons text-primary text-xl block mb-0.5">landscape</span>
-                  <span className="block font-black text-lg dark:text-white leading-none">{(property.lotArea || 0).toLocaleString()}</span>
-                  <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest">Lot Sqm</span>
+                  <span className="material-icons text-primary text-xl block mb-0.5">scale</span>
+                  <span className="block font-black text-lg dark:text-white leading-none">{property.baths}g</span>
+                  <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest">Weight</span>
                 </div>
                 <div className="text-center">
-                  <span className="material-icons text-primary text-xl block mb-0.5">apartment</span>
+                  <span className="material-icons text-primary text-xl block mb-0.5">public</span>
+                  <span className="block font-black text-lg dark:text-white leading-none">{property.origin || 'Saudi Gold'}</span>
+                  <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest">Origin</span>
+                </div>
+                <div className="text-center">
+                  <span className="material-icons text-primary text-xl block mb-0.5">category</span>
                   <span className="block font-black text-lg dark:text-white leading-none">{property.type}</span>
                   <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest">Type</span>
                 </div>
@@ -728,7 +687,7 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
 
           <section>
             <h2 className="text-2xl font-black mb-4 flex items-center gap-3 dark:text-white tracking-tighter">
-              <span className="w-1.5 h-8 bg-primary rounded-full"></span> About This Property
+              <span className="w-1.5 h-8 bg-primary rounded-full"></span> About This Item
             </h2>
             <div className="text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium text-base max-w-3xl">
               {property.description}
@@ -737,7 +696,7 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
 
           <section>
             <h2 className="text-2xl font-black mb-4 flex items-center gap-3 dark:text-white tracking-tighter">
-              <span className="w-1.5 h-8 bg-primary rounded-full"></span> Features & Amenities
+              <span className="w-1.5 h-8 bg-primary rounded-full"></span> Details & Features
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {property.amenities.map((amenity, i) => (
@@ -780,7 +739,7 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
                     allowFullScreen
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
-                    title="Property Location Map"
+                    title="Item Location Map"
                   />
                 </div>
               ) : property.googleMapsUrl ? (
@@ -830,7 +789,7 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
                 </div>
                 <div>
                   <h3 className="font-black text-2xl dark:text-white tracking-tighter">Yhen</h3>
-                  <p className="text-[9px] font-black text-zinc-400 uppercase tracking-[0.2em] mt-0.5">Property Specialist</p>
+                  <p className="text-[9px] font-black text-zinc-400 uppercase tracking-[0.2em] mt-0.5">Gold Specialist</p>
                 </div>
               </div>
 
@@ -864,7 +823,7 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
                     value={formData.message}
                     onChange={handleInputChange}
                     className="w-full bg-zinc-50 dark:bg-zinc-800 border-zinc-100 dark:border-zinc-700 rounded-xl p-3 text-sm font-bold focus:ring-primary focus:border-primary min-h-[100px] resize-none placeholder:text-zinc-300"
-                    placeholder="I am interested in this property..."
+                    placeholder="I am interested in this item..."
                     required disabled={isSubmitting}
                   />
                 </div>
@@ -892,7 +851,7 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
                       >
                         Privacy Policy
                       </Link>{' '}
-                      and consent to Yhen's Property processing my data to handle this inquiry.
+                      and consent to YGB Gold processing my data to handle this inquiry.
                     </label>
                   </div>
 
@@ -907,7 +866,7 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
                       className="mt-1 w-4 h-4 rounded border-zinc-300 dark:border-zinc-600 text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer"
                     />
                     <label htmlFor="marketingConsent" className="text-xs text-zinc-500 dark:text-zinc-500 leading-relaxed cursor-pointer">
-                      Keep me updated with new property listings, market reports, and investment opportunities via email.
+                      Keep me updated with new gold inventory items, market reports, and investment opportunities via email.
                     </label>
                   </div>
                 </div>
@@ -916,6 +875,7 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
                   <HCaptcha
                     ref={captchaRef}
                     sitekey={HCAPTCHA_SITE_KEY}
+                    reCaptchaCompat={false}
                     onVerify={(token) => setCaptchaToken(token)}
                     onExpire={() => setCaptchaToken(null)}
                   />
@@ -964,20 +924,20 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
         return featuredProps.length > 0 ? (
           <section className="py-16 border-t border-zinc-200 dark:border-zinc-800 mt-16">
             <div className="mb-12">
-              <span className="text-primary font-bold tracking-[0.4em] text-[11px] mb-4 block uppercase">Featured Properties</span>
+              <span className="text-primary font-bold tracking-[0.4em] text-[11px] mb-4 block uppercase">Featured Items</span>
               <h2 className="text-4xl font-black dark:text-white tracking-tighter">You Might Also Like</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {featuredProps.slice(0, 3).map((prop) => (
                 <Link
                   key={prop.id}
-                  to={`/property/${prop.slug}`}
+                  to={`/item/${prop.slug}`}
                   className="group bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden shadow-sm border border-zinc-100 dark:border-zinc-800 hover:shadow-xl transition-all"
                 >
                   <div className="relative h-40 sm:h-48 overflow-hidden">
                     <img
                       src={prop.images[prop.featuredImageIndex ?? 0] ?? prop.images[0]}
-                      alt={`${prop.type} ${prop.listingType === 'sale' ? 'for sale' : 'for rent'} in ${prop.city}${!isLand && prop.beds ? ` - ${prop.beds} bedroom, ${prop.baths} bathroom` : ''}${prop.condoName ? ` at ${prop.condoName}` : ''}`}
+                      alt={`${prop.type} for sale in ${prop.city} - ${prop.beds}K Purity, ${prop.baths}g Weight`}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                       loading="lazy"
                       width="800"
@@ -1002,22 +962,18 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
                     {prop.condoName && (
                       <p className="text-primary text-[10px] font-semibold mb-3">{prop.condoName}</p>
                     )}
-                    <div className={`flex items-center gap-2 text-xs font-bold text-zinc-500 ${prop.type === PropertyType.Land ? 'justify-between' : 'justify-between'}`}>
-                      {prop.type !== PropertyType.Land && (
-                        <>
-                          <div className="flex items-center gap-1">
-                            <span className="material-icons text-[14px] text-primary">king_bed</span>
-                            <span>{prop.beds}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <span className="material-icons text-[14px] text-primary">bathtub</span>
-                            <span>{prop.baths}</span>
-                          </div>
-                        </>
-                      )}
+                    <div className="flex items-center justify-between text-xs font-bold text-zinc-500">
                       <div className="flex items-center gap-1">
-                        <span className="material-icons text-[14px] text-primary">square_foot</span>
-                        <span>{prop.sqft.toLocaleString()} sqm</span>
+                        <span className="material-icons text-[14px] text-primary">diamond</span>
+                        <span>{prop.beds}K</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <span className="material-icons text-[14px] text-primary">scale</span>
+                        <span>{prop.baths}g</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <span className="material-icons text-[14px] text-primary">percent</span>
+                        <span>{prop.sqft}%</span>
                       </div>
                     </div>
                   </div>

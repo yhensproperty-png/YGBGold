@@ -12,7 +12,7 @@ const Sell: React.FC = () => {
     email: '',
     phoneNumber: '',
     whatsappNumber: '',
-    propertyType: 'residential',
+    itemType: 'coins',
     city: '',
     barangay: '',
     askingPrice: '',
@@ -60,12 +60,12 @@ const Sell: React.FC = () => {
 
     try {
       const submissionData = {
-        access_key: '843dc172-4947-4bc8-907a-320244d9f5fa',
+        access_key: 'c7934ce9-2cd3-4c34-ba88-dfcc376c3643',
         full_name: formData.fullName,
         email: formData.email,
         phone_number: formData.phoneNumber,
         whatsapp_number: formData.whatsappNumber,
-        property_type: formData.propertyType,
+        item_type: formData.itemType,
         city: formData.city,
         barangay: formData.barangay,
         asking_price: formData.askingPrice || 'Not specified',
@@ -74,8 +74,8 @@ const Sell: React.FC = () => {
         urgency: formData.urgency,
         privacy_consent: formData.privacyConsent,
         marketing_consent: formData.marketingConsent,
-        from_name: "Yhen's Property - Seller Inquiry",
-        subject: `New Seller Inquiry: ${formData.propertyType} in ${formData.city}`,
+        from_name: "YGB Gold - Seller Inquiry",
+        subject: `New Seller Inquiry: ${formData.itemType} in ${formData.city}`,
         'h-captcha-response': captchaToken,
       };
 
@@ -102,7 +102,7 @@ const Sell: React.FC = () => {
             email: formData.email,
             phone_number: formData.phoneNumber,
             whatsapp_number: formData.whatsappNumber,
-            property_type: formData.propertyType,
+            item_type: formData.itemType,
             city: formData.city,
             barangay: formData.barangay,
             asking_price: formData.askingPrice ? parseInt(formData.askingPrice.replace(/\D/g, '')) : null,
@@ -131,7 +131,7 @@ const Sell: React.FC = () => {
             email: formData.email,
             phone: formData.phoneNumber,
             whatsapp: formData.whatsappNumber,
-            property_type: formData.propertyType,
+            item_type: formData.itemType,
             city: formData.city,
             barangay: formData.barangay,
             asking_price: formData.askingPrice || null,
@@ -178,10 +178,9 @@ const Sell: React.FC = () => {
   return (
     <>
       <SEO
-        title="List Your Property - Sell Real Estate in the Philippines | Yhen's Property"
-        description="Sell your property with Yhen's Property. Connect with serious buyers across the Philippines. Expert guidance for condos, houses, villas, and land sales."
-        type="website"
-        url="https://yhens-property.com/sell"
+        title="Sell Your Gold - Precious Metals Boutique in the Philippines | YGB Gold"
+        description="Sell your gold with YGB Gold. Get competitive rates for coins, bars, jewelry, and scrap gold in the Philippines. Professional appraisal and secure transactions."
+        url="https://ygbgold.com/sell"
       />
       <div className="min-h-screen bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-950 dark:to-zinc-900">
       {/* Success Modal */}
@@ -203,11 +202,11 @@ const Sell: React.FC = () => {
       <div className="max-w-6xl mx-auto px-6 py-16">
         <div className="text-center mb-16 space-y-4">
           <div className="inline-block">
-            <span className="text-primary font-bold tracking-widest text-[10px] uppercase block mb-2">Ready to Sell?</span>
+            <span className="text-primary font-bold tracking-widest text-[10px] uppercase block mb-2">Ready to Liquidate?</span>
           </div>
-          <h1 className="text-4xl lg:text-5xl font-bold dark:text-white mb-4">List Your Property With Us</h1>
+          <h1 className="text-4xl lg:text-5xl font-bold dark:text-white mb-4">Sell Your Gold With Us</h1>
           <p className="text-lg text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
-            Join Yhen's Property and connect with serious buyers across the Philippines. We handle the details so you can focus on what matters.
+            Join YGB Gold and get the best value for your precious metals. We provide expert appraisal and secure payment for all gold items.
           </p>
         </div>
 
@@ -216,50 +215,50 @@ const Sell: React.FC = () => {
             <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 p-8 shadow-sm">
               <h2 className="text-2xl font-bold mb-8 flex items-center gap-3">
                 <span className="bg-primary/10 p-3 rounded-xl text-primary">
-                  <span className="material-icons text-xl">assignment</span>
+                  <span className="material-icons text-xl">payments</span>
                 </span>
-                Property Information Required
+                Gold Item Information Required
               </h2>
 
               <div className="space-y-6 mb-8">
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="bg-gradient-to-br from-blue-50 to-blue-50/50 dark:from-zinc-800 dark:to-zinc-800/50 p-4 rounded-xl border border-blue-100 dark:border-zinc-700">
-                    <h3 className="font-bold text-blue-900 dark:text-blue-300 mb-2">Documentation</h3>
+                    <h3 className="font-bold text-blue-900 dark:text-blue-300 mb-2">Identification</h3>
                     <ul className="text-sm text-blue-700 dark:text-blue-400 space-y-1">
-                      <li>✓ Certificate of Title (TCT or CCT)</li>
-                      <li>✓ Tax Declaration (Larong Assessment)</li>
-                      <li>✓ Real Property Tax Clearance</li>
-                      <li>✓ Valid Government ID (seller)</li>
+                      <li>✓ Valid Government ID (owner)</li>
+                      <li>✓ Proof of Purchase (if available)</li>
+                      <li>✓ Authenticity Certificates</li>
+                      <li>✓ Contact Details</li>
                     </ul>
                   </div>
 
                   <div className="bg-gradient-to-br from-green-50 to-green-50/50 dark:from-zinc-800 dark:to-zinc-800/50 p-4 rounded-xl border border-green-100 dark:border-zinc-700">
-                    <h3 className="font-bold text-green-900 dark:text-green-300 mb-2">Property Details</h3>
+                    <h3 className="font-bold text-green-900 dark:text-green-300 mb-2">Item Details</h3>
                     <ul className="text-sm text-green-700 dark:text-green-400 space-y-1">
-                      <li>✓ Lot number & lot area</li>
-                      <li>✓ Building area / floor area</li>
-                      <li>✓ Number of bedrooms & bathrooms</li>
-                      <li>✓ Property condition & features</li>
+                      <li>✓ Weight in Grams (g)</li>
+                      <li>✓ Karat/Purity (K)</li>
+                      <li>✓ Hallmarks or Stampings</li>
+                      <li>✓ Condition & Inclusions</li>
                     </ul>
                   </div>
 
                   <div className="bg-gradient-to-br from-amber-50 to-amber-50/50 dark:from-zinc-800 dark:to-zinc-800/50 p-4 rounded-xl border border-amber-100 dark:border-zinc-700">
-                    <h3 className="font-bold text-amber-900 dark:text-amber-300 mb-2">Legal Requirements</h3>
+                    <h3 className="font-bold text-amber-900 dark:text-amber-300 mb-2">Verification</h3>
                     <ul className="text-sm text-amber-700 dark:text-amber-400 space-y-1">
-                      <li>✓ Title free from encumbrances</li>
-                      <li>✓ No lis pendens or adverse claims</li>
-                      <li>✓ All taxes & assessments current</li>
-                      <li>✓ Property classification confirmed</li>
+                      <li>✓ Physical Inspection Required</li>
+                      <li>✓ Acid or XRF Testing</li>
+                      <li>✓ Current Spot Price Analysis</li>
+                      <li>✓ Purity Confirmation</li>
                     </ul>
                   </div>
 
                   <div className="bg-gradient-to-br from-purple-50 to-purple-50/50 dark:from-zinc-800 dark:to-zinc-800/50 p-4 rounded-xl border border-purple-100 dark:border-zinc-700">
-                    <h3 className="font-bold text-purple-900 dark:text-purple-300 mb-2">Marketing Materials</h3>
+                    <h3 className="font-bold text-purple-900 dark:text-purple-300 mb-2">Inquiry Photos</h3>
                     <ul className="text-sm text-purple-700 dark:text-purple-400 space-y-1">
-                      <li>✓ High-quality photos (up to 20)</li>
-                      <li>✓ Property description & highlights</li>
-                      <li>✓ Location map & coordinates</li>
-                      <li>✓ Asking price & sale terms</li>
+                      <li>✓ Clear Close-up Photos</li>
+                      <li>✓ Photo of Hallmarks</li>
+                      <li>✓ Photo on Digital Scale</li>
+                      <li>✓ Natural Lighting</li>
                     </ul>
                   </div>
                 </div>
@@ -269,7 +268,7 @@ const Sell: React.FC = () => {
                     <span className="material-icons text-blue-600 dark:text-blue-400 text-xl flex-shrink-0 mt-0.5">info</span>
                     <div className="text-sm text-blue-700 dark:text-blue-300">
                       <p className="font-semibold mb-1">Important Note:</p>
-                      <p>All sellers must provide valid proof of ownership and government-issued ID. If married, spouse consent is required for sale transactions.</p>
+                      <p>All items must undergo physical verification and testing to confirm purity before final payment is sent.</p>
                     </div>
                   </div>
                 </div>
@@ -297,8 +296,8 @@ const Sell: React.FC = () => {
                   <div className="flex gap-3">
                     <span className="material-icons text-primary text-2xl flex-shrink-0">trending_up</span>
                     <div>
-                      <h4 className="font-bold text-sm mb-1">Market Knowledge</h4>
-                      <p className="text-xs text-zinc-600 dark:text-zinc-400">Expert pricing guidance for PH properties</p>
+                      <h4 className="font-bold text-sm mb-1">Market Rates</h4>
+                      <p className="text-xs text-zinc-600 dark:text-zinc-400">Competitive pricing based on daily spot rates</p>
                     </div>
                   </div>
 
@@ -306,7 +305,7 @@ const Sell: React.FC = () => {
                     <span className="material-icons text-primary text-2xl flex-shrink-0">support_agent</span>
                     <div>
                       <h4 className="font-bold text-sm mb-1">Full Support</h4>
-                      <p className="text-xs text-zinc-600 dark:text-zinc-400">Assistance with documentation & negotiations</p>
+                      <p className="text-xs text-zinc-600 dark:text-zinc-400">Assistance with appraisal & secure liquidation</p>
                     </div>
                   </div>
                 </div>
@@ -316,36 +315,36 @@ const Sell: React.FC = () => {
 
           <div className="lg:col-span-1">
             <div className="sticky top-24 bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 p-8 shadow-lg">
-              <h3 className="text-xl font-bold mb-2">Quick Stats</h3>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-6">Philippine Real Estate 2026</p>
+              <h3 className="text-xl font-bold mb-2">Market Overview</h3>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-6">Gold & Precious Metals 2026</p>
 
               <div className="space-y-4">
                 <div className="border-b border-zinc-100 dark:border-zinc-800 pb-4">
-                  <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-1">Average Processing Time</p>
-                  <p className="text-lg font-bold text-primary">4-8 weeks</p>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">Metro Manila condo resale (foreign buyers)</p>
+                  <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-1">Liquidation Speed</p>
+                  <p className="text-lg font-bold text-primary">24-48 Hours</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">Post-verification and appraisal</p>
                 </div>
 
                 <div className="border-b border-zinc-100 dark:border-zinc-800 pb-4">
-                  <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-1">Market Demand</p>
-                  <p className="text-lg font-bold text-primary">Moderate to Improving</p>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">Buyer-friendly with promos & discounts</p>
+                  <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-1">Gold Demand</p>
+                  <p className="text-lg font-bold text-primary">Strong / High Bullion Demand</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">Active trading for investment-grade bars & coins</p>
                 </div>
 
                 <div className="border-b border-zinc-100 dark:border-zinc-800 pb-4">
-                  <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-1">Top Locations</p>
+                  <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-1">Accepted Purity</p>
                   <div className="text-xs text-zinc-700 dark:text-zinc-300 space-y-1">
-                    <span className="block">BGC / Fort Bonifacio</span>
-                    <span className="block">Makati CBD, Ortigas Center</span>
-                    <span className="block">Quezon City (C5/Katipunan)</span>
-                    <span className="block">Pasig, Parañaque</span>
-                    <span className="block text-zinc-500 dark:text-zinc-400 italic">Emerging: Eastwood, Rockwell</span>
+                    <span className="block">24K Bullion / .999 Fine</span>
+                    <span className="block">22K / 21K Saudi & Dubai Gold</span>
+                    <span className="block">18K / 14K / 10K Jewelry</span>
+                    <span className="block">Scrap Gold & Nuggets</span>
+                    <span className="block text-zinc-500 dark:text-zinc-400 italic">White, Rose, and Yellow Gold</span>
                   </div>
                 </div>
 
                 <div className="pt-4">
-                  <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-3">Need Help?</p>
-                  <a href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Hi Yhen, I'd like to sell my property.")}`}
+                  <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-3">Instant Quote?</p>
+                  <a href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Hi Yhen, I'd like to get an appraisal for my gold items.")}`}
                     target="_blank" rel="noopener noreferrer"
                     className="w-full flex items-center justify-center gap-2 bg-[#25D366] text-white py-3 rounded-xl font-bold text-sm hover:brightness-110 transition-all shadow-lg shadow-green-500/20">
                     <svg className="w-4 h-4 fill-white" viewBox="0 0 24 24">
@@ -362,9 +361,9 @@ const Sell: React.FC = () => {
         <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 p-8 shadow-sm">
           <h2 className="text-2xl font-bold mb-8 flex items-center gap-3">
             <span className="bg-primary/10 p-3 rounded-xl text-primary">
-              <span className="material-icons text-xl">mail</span>
+              <span className="material-icons text-xl">scale</span>
             </span>
-            Tell Us About Your Property
+            Tell Us About Your Gold Items
           </h2>
 
           {submitMessage && submitMessage.type === 'error' && (
@@ -431,18 +430,18 @@ const Sell: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">Property Type</label>
+                <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">Item Type</label>
                 <select
-                  name="propertyType"
-                  value={formData.propertyType}
+                  name="itemType"
+                  value={formData.itemType}
                   onChange={handleChange}
                   className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent dark:text-white transition-all"
                 >
-                  <option value="residential">Residential (House/Villa)</option>
-                  <option value="condo">Condo/Apartment</option>
-                  <option value="land">Land Plot</option>
-                  <option value="commercial">Commercial</option>
-                  <option value="other">Other</option>
+                  <option value="coins">Gold Coins</option>
+                  <option value="bars">Gold Bars / Bullion</option>
+                  <option value="jewelry">Jewelry / Watches</option>
+                  <option value="scrap">Scrap Gold / Nuggets</option>
+                  <option value="other">Other Precious Metals</option>
                 </select>
               </div>
 
@@ -495,15 +494,15 @@ const Sell: React.FC = () => {
 
             <div className="grid sm:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">Do you have a Certificate of Title?</label>
+                <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">Do you have an Authenticity Certificate?</label>
                 <select
                   name="hasTitle"
                   value={formData.hasTitle}
                   onChange={handleChange}
                   className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent dark:text-white transition-all"
                 >
-                  <option value="yes">Yes</option>
-                  <option value="no">No, but I have other documents</option>
+                  <option value="yes">Yes, I have certificates (GIA, etc.)</option>
+                  <option value="no">No certificates</option>
                   <option value="unsure">I'm not sure</option>
                 </select>
               </div>
@@ -516,21 +515,21 @@ const Sell: React.FC = () => {
                   onChange={handleChange}
                   className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent dark:text-white transition-all"
                 >
-                  <option value="not-urgent">Not urgent</option>
-                  <option value="moderate">Moderate</option>
-                  <option value="urgent">Urgent (ASAP)</option>
+                  <option value="not-urgent">Not urgent (Testing later)</option>
+                  <option value="moderate">Coordinate soon</option>
+                  <option value="urgent">Urgent Liquidation (ASAP)</option>
                 </select>
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">Property Description & Details</label>
+              <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">Item Description & Details</label>
               <textarea
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
                 className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent dark:text-white transition-all min-h-[120px] resize-none"
-                placeholder="Tell us about your property - size, bedrooms, bathrooms, condition, special features, etc."
+                placeholder="Tell us about your items - weight, purity, hallmarks, condition, etc."
               />
             </div>
 
@@ -557,7 +556,7 @@ const Sell: React.FC = () => {
                   >
                     Privacy Policy
                   </Link>{' '}
-                  and consent to Yhen's Property processing my data to handle this inquiry.
+                  and consent to YGB Gold processing my data to handle this inquiry.
                 </label>
               </div>
 
@@ -572,7 +571,7 @@ const Sell: React.FC = () => {
                   className="mt-1 w-4 h-4 rounded border-zinc-300 dark:border-zinc-600 text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer"
                 />
                 <label htmlFor="marketingConsent" className="text-xs text-zinc-500 dark:text-zinc-500 leading-relaxed cursor-pointer">
-                  Keep me updated with new property listings, market reports, and investment opportunities via email.
+                    Keep me updated with new gold inventory items, market reports, and investment opportunities via email.
                 </label>
               </div>
             </div>
@@ -581,13 +580,14 @@ const Sell: React.FC = () => {
               <HCaptcha
                 ref={captchaRef}
                 sitekey={HCAPTCHA_SITE_KEY}
+                reCaptchaCompat={false}
                 onVerify={(token) => setCaptchaToken(token)}
                 onExpire={() => setCaptchaToken(null)}
               />
             </div>
 
             <div className="space-y-3">
-              <a href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Hi Yhen, I'd like to sell my property.")}`}
+              <a href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Hi Yhen, I'd like to sell my gold items.")}`}
                 target="_blank" rel="noopener noreferrer"
                 className="w-full flex items-center justify-center gap-2 bg-[#25D366] text-white py-4 rounded-xl font-bold text-lg hover:brightness-110 transition-all shadow-lg shadow-green-500/20">
                 <svg className="w-5 h-5 fill-white" viewBox="0 0 24 24">

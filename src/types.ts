@@ -1,12 +1,11 @@
 
 export enum PropertyType {
-  Condo = 'Condo',
-  House = 'House',
-  Land = 'Land',
-  Apartment = 'Apartment',
-  Villa = 'Villa',
-  Commercial = 'Commercial',
-  Warehouse = 'Warehouse'
+  Coins = 'Coins',
+  Bars = 'Bars',
+  Jewelry = 'Jewelry',
+  Collectibles = 'Collectibles',
+  ScrapGold = 'Scrap Gold',
+  Others = 'Others'
 }
 
 export interface PropertyListing {
@@ -40,6 +39,7 @@ export interface PropertyListing {
   dateListed: string;
   dateUpdated?: string;
   agent?: 'Yhen' | 'Daphne' | 'Abby' | 'Juvy';
+  origin?: 'Saudi Gold' | 'Japan Gold' | 'Chinese Gold' | 'Hongkong Gold';
 }
 
 export interface Commission {

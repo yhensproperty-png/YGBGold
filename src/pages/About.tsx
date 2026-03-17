@@ -8,10 +8,9 @@ const About: React.FC = () => {
   return (
     <>
       <SEO
-        title="About Yhen - Experienced Real Estate Agent in the Philippines | Yhen's Property"
-        description="Meet Yhen Oria, founder of Yhen's Property. With 6 years of experience in Philippine real estate, offering boutique personal service for buying and selling premium properties."
-        type="website"
-        url="https://yhens-property.com/about"
+        title="About Yhen - Expert Gold Merchant in the Philippines | YGB Gold"
+        description="Meet Yhen Oria, founder of YGB Gold. Offering boutique personal service for buying and selling premium gold, coins, and precious metals in the Philippines."
+        url="https://ygbgold.com/about"
       />
       <div className="w-full bg-white dark:bg-zinc-950 min-h-screen">
       {/* Signature Split Hero Section */}
@@ -57,7 +56,7 @@ const About: React.FC = () => {
           <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
 
           <div className="relative z-10 text-center">
-            <h1 className="sr-only">About Yhen's Property - Boutique Personal Driven Expertise</h1>
+            <h1 className="sr-only">About YGB Gold - Boutique Personal Driven Expertise</h1>
             <div className="flex items-center justify-center gap-6 md:gap-8 mb-12">
               <div className="w-1 bg-primary" style={{height: '240px'}}></div>
               <div className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[1.1] tracking-tight" aria-hidden="true">
@@ -75,8 +74,8 @@ const About: React.FC = () => {
                 <p className="text-[9px] sm:text-[10px] text-zinc-500 uppercase tracking-[0.2em] sm:tracking-[0.3em] font-black mt-1 sm:mt-2">Experience</p>
               </div>
               <div>
-                <h4 className="text-2xl sm:text-3xl md:text-4xl font-black dark:text-white tracking-tighter">Licensed</h4>
-                <p className="text-[9px] sm:text-[10px] text-zinc-500 uppercase tracking-[0.2em] sm:tracking-[0.3em] font-black mt-1 sm:mt-2">Local Real Estate Agent</p>
+                <h4 className="text-2xl sm:text-3xl md:text-4xl font-black dark:text-white tracking-tighter">Gold Specialist</h4>
+                <p className="text-[9px] sm:text-[10px] text-zinc-500 uppercase tracking-[0.2em] sm:tracking-[0.3em] font-black mt-1 sm:mt-2">Expert Precious Metals Specialist</p>
               </div>
             </div>
           </div>
@@ -88,15 +87,14 @@ const About: React.FC = () => {
         <div className="max-w-4xl mx-auto px-6 md:px-12 lg:px-20">
           <div className="space-y-6">
             <p className="text-xl md:text-2xl text-primary dark:text-primary font-bold leading-relaxed tracking-tight mb-8 italic">
-              "Specialising in helping expats and foreigners buy property legally since 2019."
+              "Specialising in helping clients secure, verify, and liquidate gold investments since 2019."
             </p>
 
             <p className="text-base md:text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium tracking-tight">
-              As the founder of YhensProperty, Yhen Oria is a dedicated force in the real estate industry, committed to bridging the gap between high-value investments and the people seeking them.
+              As the founder of YGB Gold, Yhen Oria is a dedicated force in the precious metals industry, committed to bridging the gap between high-value bullion and the people seeking to secure their wealth.
             </p>
-
             <p className="text-base md:text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium tracking-tight">
-              With a sharp eye for market potential and a reputation for integrity, she provides clients with a seamless, end-to-end experience—whether they are searching for a dream home or liquidating a strategic property investment.
+              With a sharp eye for market potential and a reputation for integrity, she provides clients with a seamless, end-to-end experience—whether they are searching for investment-grade coins or liquidating a strategic gold portfolio.
             </p>
 
             <p className="text-base md:text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium tracking-tight">

@@ -143,7 +143,7 @@ const AppContent: React.FC = () => {
               <AdminDashboard />
             </ProtectedRoute>
           } />
-          <Route path="/property/:id" element={<PropertyDetails properties={properties} />} />
+          <Route path="/item/:id" element={<PropertyDetails properties={properties} />} />
           <Route path="/category/:category" element={<CategoryListings properties={properties} />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />

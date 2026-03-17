@@ -12,7 +12,7 @@ const Login: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const logoUrl = "/Image/LimeLogo2.png";
+  const logoUrl = "/Image/YGB_Logo_Trimmed.png";
 
   if (!authLoading && user) {
     navigate('/manage', { replace: true });
@@ -50,11 +50,11 @@ const Login: React.FC = () => {
           <div className="flex flex-col items-center mb-10">
             <img
               src={logoUrl}
-              alt="Yhen's Property"
+              alt="YGB Buy Gold & Sell"
               className="h-14 w-auto object-contain rounded-xl mb-6"
             />
             <h1 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight">Admin Portal</h1>
-            <p className="text-sm text-zinc-500 mt-1">Sign in to manage your property listings</p>
+            <p className="text-sm text-zinc-500 mt-1">Sign in to manage your gold listings</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">

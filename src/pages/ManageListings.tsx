@@ -68,7 +68,7 @@ function PropertyTable({
                   </p>
                   <p className="font-bold dark:text-white text-sm">₱{property.price.toLocaleString()}</p>
                   <div className="mt-1 space-y-0.5">
-                    <p className="text-[10px] text-zinc-400 uppercase tracking-wider font-medium">Property Type</p>
+                    <p className="text-[10px] text-zinc-400 uppercase tracking-wider font-medium">Item Type</p>
                     <p className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">{property.type}</p>
                   </div>
                   <div className="mt-1 space-y-0.5">
@@ -130,7 +130,7 @@ function PropertyTable({
         <table className="w-full text-left">
           <thead>
             <tr className="bg-zinc-50 dark:bg-zinc-800/50 border-b border-zinc-200 dark:border-zinc-800">
-              <th className="pl-6 pr-3 py-5 text-xs font-bold uppercase tracking-wider text-zinc-500">Property</th>
+              <th className="pl-6 pr-3 py-5 text-xs font-bold uppercase tracking-wider text-zinc-500">Item</th>
               <th className="px-2 py-5 text-xs font-bold uppercase tracking-wider text-zinc-500">Price</th>
               <th className="px-2 py-5 text-xs font-bold uppercase tracking-wider text-zinc-500">Type</th>
               <th className="px-2 py-5 text-xs font-bold uppercase tracking-wider text-zinc-500">Listing</th>
@@ -449,8 +449,8 @@ const ManageListings: React.FC<ManageListingsProps> = ({ properties, onUpdate, o
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-6">
         <div>
-          <h1 className="text-4xl font-bold dark:text-white">Manage Listings</h1>
-          <p className="text-zinc-500 mt-1">Review and manage your property portfolio</p>
+          <h1 className="text-4xl font-bold dark:text-white">Manage Items</h1>
+          <p className="text-zinc-500 mt-1">Review and manage your inventory</p>
         </div>
         <div className="flex items-center gap-3 flex-wrap">
           <Link
@@ -465,7 +465,7 @@ const ManageListings: React.FC<ManageListingsProps> = ({ properties, onUpdate, o
       {/* View Tabs */}
       <div className="flex items-center gap-2 flex-wrap border-b border-zinc-200 dark:border-zinc-800 pb-0 -mb-6">
         {([
-          { view: 'active' as View, label: 'Active', icon: 'home', count: activeListings.length, activeColor: 'border-primary text-primary', dotColor: 'bg-primary', adminOnly: false },
+          { view: 'active' as View, label: 'Active', icon: 'inventory_2', count: activeListings.length, activeColor: 'border-primary text-primary', dotColor: 'bg-primary', adminOnly: false },
           { view: 'rented' as View, label: 'Rented', icon: 'key', count: rentedListings.length, activeColor: 'border-sky-500 text-sky-600', dotColor: 'bg-sky-500', adminOnly: false },
           { view: 'sold' as View, label: 'Sold', icon: 'sell', count: soldListings.length, activeColor: 'border-emerald-500 text-emerald-600', dotColor: 'bg-emerald-500', adminOnly: false },
           { view: 'commission' as View, label: 'Commission', icon: 'payments', count: commissions.length, activeColor: 'border-purple-500 text-purple-600', dotColor: 'bg-purple-500', adminOnly: true },
@@ -496,7 +496,7 @@ const ManageListings: React.FC<ManageListingsProps> = ({ properties, onUpdate, o
         <section>
           <PropertyTable
             items={activeListings}
-            onView={(property) => navigate(`/property/${property.slug}`)}
+            onView={(property) => navigate(`/item/${property.slug}`)}
             onEdit={(id) => navigate(`/edit/${id}`)}
             onDelete={handleDelete}
             actions={activeActions}
@@ -516,7 +516,7 @@ const ManageListings: React.FC<ManageListingsProps> = ({ properties, onUpdate, o
           ) : (
             <PropertyTable
               items={rentedListings}
-              onView={(property) => navigate(`/property/${property.slug}`)}
+              onView={(property) => navigate(`/item/${property.slug}`)}
               onEdit={(id) => navigate(`/edit/${id}`)}
               onDelete={handleDelete}
               actions={rentedActions}
@@ -537,7 +537,7 @@ const ManageListings: React.FC<ManageListingsProps> = ({ properties, onUpdate, o
           ) : (
             <PropertyTable
               items={soldListings}
-              onView={(property) => navigate(`/property/${property.slug}`)}
+              onView={(property) => navigate(`/item/${property.slug}`)}
               onEdit={(id) => navigate(`/edit/${id}`)}
               onDelete={handleDelete}
               actions={soldActions}
@@ -576,7 +576,7 @@ const ManageListings: React.FC<ManageListingsProps> = ({ properties, onUpdate, o
           ) : (
             <PropertyTable
               items={archivedListings}
-              onView={(property) => navigate(`/property/${property.slug}`)}
+              onView={(property) => navigate(`/item/${property.slug}`)}
               onEdit={(id) => navigate(`/edit/${id}`)}
               onDelete={handleDelete}
               actions={archivedActions}

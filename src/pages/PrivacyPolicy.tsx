@@ -5,7 +5,7 @@ export default function PrivacyPolicy() {
     <>
       <SEO
         title="Privacy Policy"
-        description="Privacy policy for Yhen's Property - Learn how we collect, use, and protect your personal information."
+        description="Privacy policy for YGB Gold - Learn how we collect, use, and protect your personal information."
       />
       <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto bg-white shadow-sm rounded-lg p-8 md:p-12">
@@ -16,7 +16,7 @@ export default function PrivacyPolicy() {
             <section>
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Introduction</h2>
               <p>
-                Welcome to Yhen's Property. We respect your privacy and are committed to protecting your personal data.
+                Welcome to YGB Gold. We respect your privacy and are committed to protecting your personal data.
                 This privacy policy explains how we collect, use, and safeguard your information when you visit our website
                 and use our real estate listing services.
               </p>
@@ -139,8 +139,7 @@ export default function PrivacyPolicy() {
                 please contact us at:
               </p>
               <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="font-semibold">Yhen's Property</p>
-                <p className="mt-2">Email: privacy@yhensproperty.com</p>
+                <p className="mt-2">Email: ygbgoldbuysell@gmail.com</p>
                 <p>Phone: [Your Phone Number]</p>
                 <p>Address: [Your Business Address]</p>
               </div>

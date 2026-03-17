@@ -14,7 +14,7 @@ function toRow(p: PropertyListing, ownerId?: string | null) {
     address: p.address,
     barangay: p.barangay ?? '',
     city: p.city,
-    state: '',
+    state: p.origin ?? '',
     condo_name: p.condoName ?? null,
     zip_code: p.zipCode,
     beds: p.beds ?? null,
@@ -70,6 +70,7 @@ function fromRow(row: any): PropertyListing {
     status: row.status,
     dateListed: row.date_listed,
     dateUpdated: row.date_updated ?? undefined,
+    origin: row.state as any,
   };
 }
 

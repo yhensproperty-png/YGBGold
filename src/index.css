@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Global layout scale ── */
+html {
+  font-size: 13px; /* scale everything down from default 16px */
+}
+
 /* ── Hero text animations ── */
 @keyframes hero-fade-up {
   0% {

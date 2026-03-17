@@ -5,7 +5,7 @@ export default function TermsOfService() {
     <>
       <SEO
         title="Terms of Service"
-        description="Terms of Service for Yhen's Property - Review the terms and conditions for using our real estate listing platform."
+        description="Terms of Service for YGB Gold - Review the terms and conditions for using our real estate listing platform."
       />
       <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto bg-white shadow-sm rounded-lg p-8 md:p-12">
@@ -16,7 +16,7 @@ export default function TermsOfService() {
             <section>
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Acceptance of Terms</h2>
               <p>
-                Welcome to Yhen's Property. By accessing or using our website and services, you agree to be bound by these
+                Welcome to YGB Gold. By accessing or using our website and services, you agree to be bound by these
                 Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms,
                 you are prohibited from using or accessing this site.
               </p>
@@ -24,7 +24,7 @@ export default function TermsOfService() {
 
             <section>
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">2. Description of Services</h2>
-              <p className="mb-3">Yhen's Property provides:</p>
+              <p className="mb-3">YGB Gold provides:</p>
               <ul className="list-disc pl-6 space-y-2">
                 <li>An online platform for viewing real estate property listings</li>
                 <li>Tools for property search and filtering</li>
@@ -61,7 +61,7 @@ export default function TermsOfService() {
                   <h3 className="text-lg font-semibold mb-2">4.1 Listing Accuracy</h3>
                   <p>
                     All property information, including descriptions, prices, images, and availability, is provided by property
-                    owners or their authorized representatives. While we strive to ensure accuracy, Yhen's Property does not
+                    owners or their authorized representatives. While we strive to ensure accuracy, YGB Gold does not
                     guarantee the completeness or reliability of any listing information.
                   </p>
                 </div>
@@ -106,7 +106,7 @@ export default function TermsOfService() {
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">6. Intellectual Property Rights</h2>
               <p className="mb-3">
                 The content on this website, including text, graphics, logos, images, and software, is the property of
-                Yhen's Property or its content suppliers and is protected by intellectual property laws.
+                YGB Gold or its content suppliers and is protected by intellectual property laws.
               </p>
               <p className="mb-3">
                 You may not reproduce, distribute, modify, or create derivative works from our content without express
@@ -118,7 +118,7 @@ export default function TermsOfService() {
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">7. User-Generated Content</h2>
               <p className="mb-3">
                 By submitting content to our platform (including property listings, reviews, or comments), you grant
-                Yhen's Property a non-exclusive, worldwide, royalty-free license to use, reproduce, modify, and display
+                YGB Gold a non-exclusive, worldwide, royalty-free license to use, reproduce, modify, and display
                 such content in connection with our services.
               </p>
               <p>
@@ -148,7 +148,7 @@ export default function TermsOfService() {
                 <div>
                   <h3 className="text-lg font-semibold mb-2">9.2 Real Estate Transactions</h3>
                   <p>
-                    Yhen's Property is a listing platform only. We are not a party to any real estate transaction between
+                    YGB Gold is a listing platform only. We are not a party to any real estate transaction between
                     buyers and sellers. We do not provide real estate brokerage, legal, or financial advice. All transactions
                     are between the buyer and seller, and we recommend consulting qualified professionals.
                   </p>
@@ -156,7 +156,7 @@ export default function TermsOfService() {
                 <div>
                   <h3 className="text-lg font-semibold mb-2">9.3 Limitation of Liability</h3>
                   <p>
-                    To the fullest extent permitted by law, Yhen's Property shall not be liable for any indirect, incidental,
+                    To the fullest extent permitted by law, YGB Gold shall not be liable for any indirect, incidental,
                     special, consequential, or punitive damages arising from your use of our services, including but not limited
                     to property transactions, lost profits, or data loss.
                   </p>
@@ -167,7 +167,7 @@ export default function TermsOfService() {
             <section>
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">10. Indemnification</h2>
               <p>
-                You agree to indemnify and hold harmless Yhen's Property, its affiliates, officers, directors, employees,
+                You agree to indemnify and hold harmless YGB Gold, its affiliates, officers, directors, employees,
                 and agents from any claims, damages, losses, liabilities, and expenses (including legal fees) arising from
                 your use of the service, violation of these terms, or infringement of any third-party rights.
               </p>
@@ -215,7 +215,7 @@ export default function TermsOfService() {
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">15. Entire Agreement</h2>
               <p>
                 These Terms of Service, together with our Privacy Policy, constitute the entire agreement between you and
-                Yhen's Property regarding the use of our services.
+                YGB Gold regarding the use of our services.
               </p>
             </section>
 
@@ -225,8 +225,7 @@ export default function TermsOfService() {
                 For questions or concerns about these Terms of Service, please contact us at:
               </p>
               <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="font-semibold">Yhen's Property</p>
-                <p className="mt-2">Email: legal@yhensproperty.com</p>
+                <p className="mt-2">Email: ygbgoldbuysell@gmail.com</p>
                 <p>Phone: [Your Phone Number]</p>
                 <p>Address: [Your Business Address]</p>
               </div>
@@ -234,7 +233,7 @@ export default function TermsOfService() {
 
             <section className="border-t pt-6 mt-8">
               <p className="text-sm text-gray-600">
-                By using Yhen's Property, you acknowledge that you have read, understood, and agree to be bound by these
+                By using YGB Gold, you acknowledge that you have read, understood, and agree to be bound by these
                 Terms of Service.
               </p>
             </section>

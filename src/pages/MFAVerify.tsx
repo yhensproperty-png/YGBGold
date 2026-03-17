@@ -70,7 +70,7 @@ const MFAVerify: React.FC = () => {
       <div className="w-full max-w-md">
         <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-2xl p-10">
           <div className="flex flex-col items-center mb-10">
-            <img src={logoUrl} alt="Yhen's Property" className="h-14 w-auto object-contain rounded-xl mb-6" />
+            <img src={logoUrl} alt="YGB Gold" className="h-14 w-auto object-contain rounded-xl mb-6" />
             <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mb-4">
               <span className="material-icons text-emerald-600 dark:text-emerald-400 text-2xl">phonelink_lock</span>
             </div>

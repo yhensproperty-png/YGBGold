@@ -10,62 +10,28 @@ interface CategoryListingsProps {
 }
 
 const CATEGORY_MAP: Record<string, { title: string; types?: PropertyType[]; listingType?: 'sale' | 'rent' }> = {
-  'condominiums': {
-    title: 'Condominiums',
-    types: [PropertyType.Condo, PropertyType.Apartment]
+  'coins': {
+    title: 'Gold Coins',
+    types: [PropertyType.Coins]
   },
-  'houses': {
-    title: 'Houses',
-    types: [PropertyType.House, PropertyType.Villa]
+  'bars': {
+    title: 'Gold Bars',
+    types: [PropertyType.Bars]
   },
-  'land': {
-    title: 'Land Plots',
-    types: [PropertyType.Land]
+  'jewelry': {
+    title: 'Gold Jewelry',
+    types: [PropertyType.Jewelry]
+  },
+  'scrap-gold': {
+    title: 'Scrap Gold',
+    types: [PropertyType.ScrapGold]
+  },
+  'others': {
+    title: 'Other Gold Items',
+    types: [PropertyType.Others]
   },
   'rent': {
-    title: 'Rent Condos, Houses, Land & Commercial',
-    listingType: 'rent'
-  },
-  // Specific Buy Categories
-  'buy-condos': {
-    title: 'Condos for Sale',
-    types: [PropertyType.Condo, PropertyType.Apartment],
-    listingType: 'sale'
-  },
-  'buy-houses': {
-    title: 'House/Villas for Sale',
-    types: [PropertyType.House, PropertyType.Villa],
-    listingType: 'sale'
-  },
-  'buy-land': {
-    title: 'Land for Sale',
-    types: [PropertyType.Land],
-    listingType: 'sale'
-  },
-  'buy-commercial': {
-    title: 'Commercial for Sale',
-    types: [PropertyType.Commercial, PropertyType.Warehouse],
-    listingType: 'sale'
-  },
-  // Specific Rent Categories
-  'rent-condos': {
-    title: 'Condos for Rent',
-    types: [PropertyType.Condo, PropertyType.Apartment],
-    listingType: 'rent'
-  },
-  'rent-houses': {
-    title: 'Houses for Rent',
-    types: [PropertyType.House, PropertyType.Villa],
-    listingType: 'rent'
-  },
-  'rent-land': {
-    title: 'Land for Rent',
-    types: [PropertyType.Land],
-    listingType: 'rent'
-  },
-  'rent-commercial': {
-    title: 'Commercial for Rent',
-    types: [PropertyType.Commercial, PropertyType.Warehouse],
+    title: 'Trading & Safe Keeping',
     listingType: 'rent'
   }
 };
@@ -93,8 +59,7 @@ const CategoryListings: React.FC<CategoryListingsProps> = ({ properties }) => {
     maxPrice: '',
     amenities: [] as string[],
     keywords: '',
-    minSqft: '',
-    maxSqft: '',
+    origin: '',
     minLotSize: '',
     maxLotSize: '',
     dateFilter: '',
@@ -111,8 +76,7 @@ const CategoryListings: React.FC<CategoryListingsProps> = ({ properties }) => {
     maxPrice: '',
     amenities: [] as string[],
     keywords: '',
-    minSqft: '',
-    maxSqft: '',
+    origin: '',
     minLotSize: '',
     maxLotSize: '',
     dateFilter: '',
@@ -136,7 +100,7 @@ const CategoryListings: React.FC<CategoryListingsProps> = ({ properties }) => {
   // Normalize category key to handle case sensitivity
   const categoryKey = category?.toLowerCase() || '';
   const categoryConfig = CATEGORY_MAP[categoryKey];
-  const displayTitle = categoryConfig?.title || 'Properties';
+  const displayTitle = categoryConfig?.title || 'Items';
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -197,11 +161,7 @@ const CategoryListings: React.FC<CategoryListingsProps> = ({ properties }) => {
       if (appliedFilters.minPrice && p.price < parseInt(appliedFilters.minPrice)) return false;
       if (appliedFilters.maxPrice && p.price > parseInt(appliedFilters.maxPrice)) return false;
 
-      if (appliedFilters.minSqft && p.sqft < parseInt(appliedFilters.minSqft)) return false;
-      if (appliedFilters.maxSqft && p.sqft > parseInt(appliedFilters.maxSqft)) return false;
-
-      if (appliedFilters.minLotSize && (p.lotArea || 0) < parseInt(appliedFilters.minLotSize)) return false;
-      if (appliedFilters.maxLotSize && (p.lotArea || 0) > parseInt(appliedFilters.maxLotSize)) return false;
+      if (appliedFilters.origin && p.origin !== appliedFilters.origin) return false;
 
       if (appliedFilters.dateFilter) {
         if (!p.dateListed) return false;
@@ -231,14 +191,6 @@ const CategoryListings: React.FC<CategoryListingsProps> = ({ properties }) => {
     if (appliedFilters.sortBy) {
       results = [...results].sort((a, b) => {
         switch (appliedFilters.sortBy) {
-          case 'price-low':
-            return a.price - b.price;
-          case 'price-high':
-            return b.price - a.price;
-          case 'newest':
-            return new Date(b.dateListed || 0).getTime() - new Date(a.dateListed || 0).getTime();
-          case 'sqft':
-            return b.sqft - a.sqft;
           case 'beds':
             return b.beds - a.beds;
           case 'baths':
@@ -263,47 +215,31 @@ const CategoryListings: React.FC<CategoryListingsProps> = ({ properties }) => {
   const isRentCategory = categoryConfig?.listingType === 'rent' || categoryKey === 'rent';
 
   const categoryDescriptions: Record<string, { title: string; description: string }> = {
-    'buy-condos': {
-      title: 'Condos for Sale in the Philippines',
-      description: 'Browse premium condominiums and apartments available for purchase. Find your ideal urban living space with our curated selection of luxury condos.'
+    'coins': {
+      title: 'Premium Gold Coins in the Philippines',
+      description: 'Explore our collection of investment-grade gold coins. From historical sovereigns to modern bullion coins, find the perfect addition to your portfolio.'
     },
-    'buy-houses': {
-      title: 'Houses and Villas for Sale in the Philippines',
-      description: 'Discover beautiful houses and villas for sale. Explore family homes and luxury residences in premium locations across the Philippines.'
+    'bars': {
+      title: 'Investment Gold Bars in the Philippines',
+      description: 'Secure your wealth with fine gold bars. We offer various weights from accredited refiners, ensuring purity and liquidity for your investment.'
     },
-    'buy-land': {
-      title: 'Land Plots for Sale in the Philippines',
-      description: 'Invest in prime land opportunities. Browse available land plots and real estate investments in strategic locations.'
+    'jewelry': {
+      title: 'Exquisite Gold Jewelry in the Philippines',
+      description: 'Discover our curated selection of stunning gold jewelry. From 18k and 21k pieces to unique heirloom items, experience luxury and craftsmanship.'
     },
-    'buy-commercial': {
-      title: 'Commercial for Sale in the Philippines',
-      description: 'Discover commercial properties and warehouses for sale. Find office spaces, retail locations, and business facilities for your investment and business needs.'
+    'scrap-gold': {
+      title: 'Gold Scrap & Nuggets',
+      description: 'Inventory of scrap gold and raw nuggets. Ideal for jewelers or collectors looking for gold in its elemental form.'
     },
-    'rent': {
-      title: 'Rent Condos, Houses, Land & Commercial in the Philippines',
-      description: 'Find rental properties including condominiums, houses, land, and commercial spaces. Explore flexible lease options for your lifestyle and business needs.'
-    },
-    'condominiums': {
-      title: 'Condominiums - Real Estate in the Philippines',
-      description: 'Explore our collection of condominiums. Modern apartments and condo units in prime locations.'
-    },
-    'houses': {
-      title: 'Houses - Real Estate in the Philippines',
-      description: 'Browse beautiful houses and residential properties. Find your dream home in the Philippines.'
-    },
-    'land': {
-      title: 'Land Plots - Real Estate Investments in the Philippines',
-      description: 'Discover available land for development and investment. Prime real estate opportunities in strategic locations.'
-    },
-    'rent-commercial': {
-      title: 'Commercial for Rent in the Philippines',
-      description: 'Find commercial properties for rent including office spaces, warehouses, retail locations, and business facilities. Explore flexible lease options for your business needs.'
+    'others': {
+      title: 'Unique Gold Antiquities & Items',
+      description: 'A collection of rare and unique gold items, antiquities, and miscellaneous precious metal objects.'
     }
   };
 
   const pageInfo = categoryDescriptions[categoryKey] || {
     title: displayTitle,
-    description: `Browse ${displayTitle.toLowerCase()} in the Philippines. Discover premium properties from our trusted real estate agency.`
+    description: `Browse ${displayTitle.toLowerCase()} in the Philippines. Discover premium gold items from our trusted boutique.`
   };
 
   const categoryStructuredData = {
@@ -314,12 +250,12 @@ const CategoryListings: React.FC<CategoryListingsProps> = ({ properties }) => {
     "url": window.location.href,
     "isPartOf": {
       "@type": "WebSite",
-      "name": "Yhen's Property"
+      "name": "YGB Gold"
     },
     "mainEntity": {
-      "@type": "RealEstateAgent",
-      "name": "Yhen's Property",
-      "description": "Premium Philippine real estate agency"
+      "@type": "Store",
+      "name": "YGB Gold",
+      "description": "Premium Philippine gold and precious metals boutique"
     }
   };
 
@@ -333,8 +269,8 @@ const CategoryListings: React.FC<CategoryListingsProps> = ({ properties }) => {
         ogTitle={pageInfo.title}
         ogDescription={pageInfo.description}
         ogUrl={window.location.href}
-        ogImage={`${window.location.origin}/Image/Yhen_Property_Favikan.png`}
-        ogSiteName="Yhen's Property"
+        ogImage={`${window.location.origin}/Image/YGB_favicon.png`}
+        ogSiteName="YGB Gold"
         ogLocale="en_PH"
         twitterCard="summary_large_image"
         twitterTitle={pageInfo.title}
@@ -364,7 +300,7 @@ const CategoryListings: React.FC<CategoryListingsProps> = ({ properties }) => {
               <span className="material-icons text-lg">{isRentCategory ? 'key' : 'sell'}</span>
             </div>
             <span className="text-white text-[10px] font-black tracking-[0.25em] uppercase">
-              {isRentCategory ? 'RENTAL SEARCH' : categoryKey === 'buy-land' ? 'LAND SEARCH' : categoryKey === 'buy-houses' ? 'HOUSE/VILLA SEARCH' : categoryKey === 'buy-condos' ? 'CONDO SEARCH' : categoryKey === 'rent-commercial' ? 'RENTAL SEARCH' : 'PURCHASE SEARCH'}
+              {isRentCategory ? 'TRADING SEARCH' : categoryKey === 'scrap-gold' ? 'SCRAP SEARCH' : categoryKey === 'jewelry' ? 'JEWELRY SEARCH' : categoryKey === 'coins' ? 'COIN SEARCH' : categoryKey === 'bars' ? 'BAR SEARCH' : 'INVENTORY SEARCH'}
             </span>
           </div>
 
@@ -403,7 +339,7 @@ const CategoryListings: React.FC<CategoryListingsProps> = ({ properties }) => {
               style={{ backgroundImage: 'none' }}
               className="w-full h-full bg-white/5 border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/20 text-white/80 rounded-xl py-3 px-4 !appearance-none transition-all cursor-pointer text-sm font-medium pr-10"
             >
-              <option value="" className="bg-zinc-900">Any Type</option>
+              <option value="" className="bg-zinc-900">Any Category</option>
               {Object.values(PropertyType).map(t => (
                 <option key={t} value={t} className="bg-zinc-900">{t}</option>
               ))}
@@ -420,11 +356,10 @@ const CategoryListings: React.FC<CategoryListingsProps> = ({ properties }) => {
               style={{ backgroundImage: 'none' }}
               className="w-full h-full bg-white/5 border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/20 text-white/80 rounded-xl py-3 px-4 !appearance-none transition-all cursor-pointer text-sm font-medium pr-10"
             >
-              <option value="" className="bg-zinc-900">Any Beds</option>
-              {[1, 2, 3, 4].map(n => <option key={n} value={n} className="bg-zinc-900">{n}+ Beds</option>)}
-              <option value="5+" className="bg-zinc-900">5+ Beds</option>
+              <option value="" className="bg-zinc-900">Min Karat</option>
+              {[10, 14, 18, 21, 22, 24].map(n => <option key={n} value={n} className="bg-zinc-900">{n}K+</option>)}
             </select>
-            <span className="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none text-lg">bed</span>
+            <span className="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none text-lg">diamond</span>
           </div>
 
           {/* Baths selection */}
@@ -436,37 +371,28 @@ const CategoryListings: React.FC<CategoryListingsProps> = ({ properties }) => {
               style={{ backgroundImage: 'none' }}
               className="w-full h-full bg-white/5 border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/20 text-white/80 rounded-xl py-3 px-4 !appearance-none transition-all cursor-pointer text-sm font-medium pr-10"
             >
-              <option value="" className="bg-zinc-900">Any Baths</option>
-              {[1, 2, 3, 4].map(n => <option key={n} value={n} className="bg-zinc-900">{n}+ Baths</option>)}
-              <option value="5+" className="bg-zinc-900">5+ Baths</option>
+              <option value="" className="bg-zinc-900">Min Weight</option>
+              {[1, 5, 10, 20, 50, 100].map(n => <option key={n} value={n} className="bg-zinc-900">{n}g+</option>)}
             </select>
-            <span className="material-icons-outlined absolute right-3 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none text-lg">bathtub</span>
+            <span className="material-icons-outlined absolute right-3 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none text-lg">scale</span>
           </div>
 
-          {/* Price Range Fields */}
-          <div className="sm:col-span-2 md:col-span-6 lg:col-span-2 flex flex-col sm:flex-row lg:flex-col gap-2">
-            <div className="relative group">
-              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-white/40 text-[11px] font-bold pointer-events-none group-focus-within:text-primary transition-colors">₱</span>
-              <input
-                name="minPrice"
-                value={formatWithCommas(searchFilters.minPrice)}
-                onChange={handleFilterChange}
-                className="w-full bg-white/5 border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/20 text-white pl-6 pr-2.5 rounded-lg py-2 placeholder:text-white/30 text-xs font-bold transition-all"
-                placeholder="Min Price"
-                type="text"
-              />
-            </div>
-            <div className="relative group">
-              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-white/40 text-[11px] font-bold pointer-events-none group-focus-within:text-primary transition-colors">₱</span>
-              <input
-                name="maxPrice"
-                value={formatWithCommas(searchFilters.maxPrice)}
-                onChange={handleFilterChange}
-                className="w-full bg-white/5 border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/20 text-white pl-6 pr-2.5 rounded-lg py-2 placeholder:text-white/30 text-xs font-bold transition-all"
-                placeholder="Max Price"
-                type="text"
-              />
-            </div>
+          {/* Origin selection */}
+          <div className="md:col-span-2 lg:col-span-2 relative">
+            <select
+              name="origin"
+              value={searchFilters.origin}
+              onChange={handleFilterChange}
+              style={{ backgroundImage: 'none' }}
+              className="w-full h-full bg-white/5 border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/20 text-white/80 rounded-xl py-3 px-4 !appearance-none transition-all cursor-pointer text-sm font-medium pr-10"
+            >
+              <option value="" className="bg-zinc-900">Any Origin</option>
+              <option value="Saudi Gold" className="bg-zinc-900">Saudi Gold</option>
+              <option value="Japan Gold" className="bg-zinc-900">Japan Gold</option>
+              <option value="Chinese Gold" className="bg-zinc-900">Chinese Gold</option>
+              <option value="Hongkong Gold" className="bg-zinc-900">Hongkong Gold</option>
+            </select>
+            <span className="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none text-lg">public</span>
           </div>
 
           {/* Advanced Filters Modal */}
@@ -502,36 +428,11 @@ const CategoryListings: React.FC<CategoryListingsProps> = ({ properties }) => {
                 </div>
               </div>
 
-              {/* Property Size Range */}
-              <div>
-                <label className="text-white/70 text-xs font-bold mb-2 block">SQUARE FOOTAGE (SQM)</label>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="relative group">
-                    <input
-                      name="minSqft"
-                      value={formatWithCommas(searchFilters.minSqft)}
-                      onChange={handleFilterChange}
-                      className="w-full bg-white/5 border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/20 text-white px-3 rounded-xl py-2.5 placeholder:text-white/30 transition-all text-sm font-medium"
-                      placeholder="Min sqm"
-                      type="text"
-                    />
-                  </div>
-                  <div className="relative group">
-                    <input
-                      name="maxSqft"
-                      value={formatWithCommas(searchFilters.maxSqft)}
-                      onChange={handleFilterChange}
-                      className="w-full bg-white/5 border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/20 text-white px-3 rounded-xl py-2.5 placeholder:text-white/30 transition-all text-sm font-medium"
-                      placeholder="Max sqm"
-                      type="text"
-                    />
-                  </div>
-                </div>
-              </div>
+              {/* Remove Purity Percentage section as it was replaced by Karat dropdown */}
 
               {/* Lot Size Range */}
               <div>
-                <label className="text-white/70 text-xs font-bold mb-2 block">LOT SIZE (SQM)</label>
+                <label className="text-white/70 text-xs font-bold mb-2 block">REFERENCE / SERIAL ID</label>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="relative group">
                     <input
@@ -588,9 +489,8 @@ const CategoryListings: React.FC<CategoryListingsProps> = ({ properties }) => {
                   <option value="price-low" className="bg-zinc-900">Price: Low to High</option>
                   <option value="price-high" className="bg-zinc-900">Price: High to Low</option>
                   <option value="newest" className="bg-zinc-900">Newest First</option>
-                  <option value="sqft" className="bg-zinc-900">Largest Square Footage</option>
-                  <option value="beds" className="bg-zinc-900">Most Bedrooms</option>
-                  <option value="baths" className="bg-zinc-900">Most Bathrooms</option>
+                  <option value="beds" className="bg-zinc-900">Highest Karat</option>
+                  <option value="baths" className="bg-zinc-900">Highest Weight</option>
                 </select>
                 <span className="material-icons absolute right-2.5 bottom-2.5 text-white/30 pointer-events-none text-base">expand_more</span>
               </div>
@@ -729,7 +629,7 @@ const CategoryListings: React.FC<CategoryListingsProps> = ({ properties }) => {
               <div>
                 <span className="text-primary font-bold tracking-[0.4em] text-[10px] uppercase block mb-2">FEATURED LISTINGS</span>
                 <h2 className="text-3xl sm:text-4xl md:text-5xl font-black dark:text-white tracking-tighter">Our Premium Selection</h2>
-                <p className="text-zinc-500 text-sm mt-2 font-medium">Hand-picked properties you won't want to miss</p>
+                <p className="text-zinc-500 text-sm mt-2 font-medium">Hand-picked items you won't want to miss</p>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">

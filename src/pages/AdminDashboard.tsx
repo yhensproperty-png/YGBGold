@@ -221,7 +221,7 @@ const AdminDashboard: React.FC = () => {
       <header className="bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <img src="/Image/LimeLogo2.png" alt="Yhen's Property" className="h-10 w-auto rounded-lg" />
+            <img src="/Image/YGB_Logo_Trimmed.png" alt="YGB Buy Gold & Sell" className="h-10 w-auto rounded-lg" />
             <div>
               <h1 className="text-lg font-black text-zinc-900 dark:text-white">Admin Dashboard</h1>
               <p className="text-xs text-zinc-400">Signed in as <span className="font-bold text-primary">{currentProfile?.email}</span></p>
@@ -472,7 +472,7 @@ const AdminDashboard: React.FC = () => {
           <span className="material-icons text-amber-500 text-xl mt-0.5">info</span>
           <div>
             <p className="text-sm font-bold text-amber-800 dark:text-amber-300">Listings are preserved when users are deleted</p>
-            <p className="text-xs text-amber-700 dark:text-amber-400 mt-1">When you delete a user account, all of their property listings remain in the database and will still be visible on the site. They will no longer be linked to any account.</p>
+            <p className="text-xs text-amber-700 dark:text-amber-400 mt-1">When you delete a user account, all of their gold listings remain in the database and will still be visible on the site. They will no longer be linked to any account.</p>
           </div>
         </div>
       </div>

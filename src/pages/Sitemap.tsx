@@ -14,12 +14,14 @@ const Sitemap: React.FC<SitemapProps> = ({ properties }) => {
       { loc: `${domain}/`, priority: '1.0', changefreq: 'daily' },
       { loc: `${domain}/about`, priority: '0.6', changefreq: 'monthly' },
       { loc: `${domain}/sell`, priority: '0.6', changefreq: 'monthly' },
-      { loc: `${domain}/category/buy-houses`, priority: '0.7', changefreq: 'daily' },
-      { loc: `${domain}/category/buy-condos`, priority: '0.7', changefreq: 'daily' },
-      { loc: `${domain}/category/buy-land`, priority: '0.7', changefreq: 'daily' },
+      { loc: `${domain}/category/coins`, priority: '0.7', changefreq: 'daily' },
+      { loc: `${domain}/category/bars`, priority: '0.7', changefreq: 'daily' },
+      { loc: `${domain}/category/jewelry`, priority: '0.7', changefreq: 'daily' },
+      { loc: `${domain}/category/scrap-gold`, priority: '0.7', changefreq: 'daily' },
+      { loc: `${domain}/category/others`, priority: '0.7', changefreq: 'daily' },
       { loc: `${domain}/category/rent`, priority: '0.7', changefreq: 'daily' },
       ...activeProperties.map(property => ({
-        loc: `${domain}/property/${property.slug}`,
+        loc: `${domain}/item/${property.slug}`,
         priority: '0.8',
         changefreq: 'weekly',
         lastmod: property.dateUpdated || property.dateListed
@@ -47,7 +49,7 @@ ${urls.map(url => `  <url>
     document.body.innerHTML = `
       <div style="font-family: system-ui; max-width: 800px; margin: 50px auto; padding: 20px;">
         <h1>Sitemap Generator</h1>
-        <p>Your sitemap.xml has been generated with ${activeProperties.length} properties.</p>
+        <p>Your sitemap.xml has been generated with ${activeProperties.length} items.</p>
         <pre style="background: #f5f5f5; padding: 20px; overflow: auto; border-radius: 8px;">${sitemapXml}</pre>
         <div style="margin-top: 20px;">
           <a href="${url}" download="sitemap.xml" style="display: inline-block; padding: 10px 20px; background: #4CAF50; color: white; text-decoration: none; border-radius: 4px;">Download sitemap.xml</a>

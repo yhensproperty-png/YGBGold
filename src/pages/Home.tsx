@@ -27,7 +27,6 @@ export const PropertyCard: React.FC<{ property: PropertyListing }> = ({ property
     ? new Date(property.dateUpdated).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
     : null;
 
-  const isLand = property.type === PropertyType.Land;
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [copied, setCopied] = useState(false);
   const shareRef = useRef<HTMLDivElement>(null);
@@ -42,7 +41,7 @@ export const PropertyCard: React.FC<{ property: PropertyListing }> = ({ property
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showShareMenu]);
 
-  const propertyUrl = `${window.location.origin}/property/${property.slug}`;
+  const propertyUrl = `${window.location.origin}/item/${property.slug}`;
 
   const handleCopyLink = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -56,7 +55,7 @@ export const PropertyCard: React.FC<{ property: PropertyListing }> = ({ property
   const handleWhatsApp = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const msg = encodeURIComponent(`Check out this property: "${property.title}" in ${property.city}\n${propertyUrl}`);
+    const msg = encodeURIComponent(`Check out this item: "${property.title}" in ${property.city}\n${propertyUrl}`);
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, '_blank');
     setShowShareMenu(false);
   };
@@ -77,7 +76,7 @@ export const PropertyCard: React.FC<{ property: PropertyListing }> = ({ property
 
   return (
     <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-zinc-100 dark:border-zinc-800 hover:shadow-xl transition-all flex flex-col h-full group">
-      <Link to={`/property/${property.slug}`} className="block">
+      <Link to={`/item/${property.slug}`} className="block">
         <div className="relative h-48 sm:h-56 md:h-64 shrink-0 overflow-hidden rounded-t-2xl">
           <img
             src={property.images[property.featuredImageIndex ?? 0] ?? property.images[0]}
@@ -129,7 +128,7 @@ export const PropertyCard: React.FC<{ property: PropertyListing }> = ({ property
           </div>
         </div>
         <div className="flex items-start justify-between gap-2 mb-4">
-          <Link to={`/property/${property.slug}`} className="flex-1 min-w-0">
+          <Link to={`/item/${property.slug}`} className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <h3 className="text-lg sm:text-xl font-bold dark:text-white truncate hover:text-primary transition-colors">{property.title}</h3>
               <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded flex-shrink-0">#{property.listing_id}</span>
@@ -176,30 +175,26 @@ export const PropertyCard: React.FC<{ property: PropertyListing }> = ({ property
             )}
           </div>
         </div>
-        <div className={`grid ${isLand ? 'grid-cols-2' : 'grid-cols-4'} gap-4 pt-4 mt-auto border-t border-zinc-100 dark:border-zinc-800`}>
-          {!isLand && (
-            <>
-              <div className="text-center">
-                <span className="material-icons text-primary text-xl block mb-0.5">king_bed</span>
-                <span className="block font-black text-lg dark:text-white leading-none">{property.beds}</span>
-                <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest">Beds</span>
-              </div>
-              <div className="text-center">
-                <span className="material-icons text-primary text-xl block mb-0.5">bathtub</span>
-                <span className="block font-black text-lg dark:text-white leading-none">{property.baths}</span>
-                <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest">Baths</span>
-              </div>
-            </>
-          )}
+        <div className="grid grid-cols-4 gap-4 pt-4 mt-auto border-t border-zinc-100 dark:border-zinc-800">
           <div className="text-center">
-            <span className="material-icons text-primary text-xl block mb-0.5">square_foot</span>
-            <span className="block font-black text-lg dark:text-white leading-none">{property.sqft.toLocaleString()}</span>
-            <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest">Living sqm</span>
+            <span className="material-icons text-primary text-xl block mb-0.5">diamond</span>
+            <span className="block font-black text-lg dark:text-white leading-none">{property.beds}K</span>
+            <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest">Purity</span>
           </div>
           <div className="text-center">
-            <span className="material-icons text-primary text-xl block mb-0.5">landscape</span>
-            <span className="block font-black text-lg dark:text-white leading-none">{(property.lotArea || 0).toLocaleString()}</span>
-            <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest">Lot Sqm</span>
+            <span className="material-icons text-primary text-xl block mb-0.5">scale</span>
+            <span className="block font-black text-lg dark:text-white leading-none">{property.baths}g</span>
+            <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest">Weight</span>
+          </div>
+          <div className="text-center">
+            <span className="material-icons text-primary text-xl block mb-0.5">public</span>
+            <span className="block font-black text-lg dark:text-white leading-none text-xs truncate max-w-[60px] mx-auto">{property.origin || 'Saudi'}</span>
+            <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest">Origin</span>
+          </div>
+          <div className="text-center">
+            <span className="material-icons text-primary text-xl block mb-0.5">inventory_2</span>
+            <span className="block font-black text-lg dark:text-white leading-none text-xs truncate max-w-[60px] mx-auto">{(property.lotArea || 'N/A')}</span>
+            <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest">Ref ID</span>
           </div>
         </div>
       </div>
@@ -222,12 +217,11 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
     type: '',
     beds: '',
     baths: '',
+    keywords: '',
     minPrice: '',
     maxPrice: '',
+    origin: '',
     amenities: [] as string[],
-    keywords: '',
-    minSqft: '',
-    maxSqft: '',
     minLotSize: '',
     maxLotSize: '',
     dateFilter: '',
@@ -278,7 +272,7 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
 
-    if (name === 'minPrice' || name === 'maxPrice' || name === 'minSqft' || name === 'maxSqft' || name === 'minLotSize' || name === 'maxLotSize') {
+    if (name === 'minPrice' || name === 'maxPrice' || name === 'minLotSize' || name === 'maxLotSize') {
       const numericValue = value.replace(/\D/g, '');
       setSearchFilters(prev => ({ ...prev, [name]: numericValue }));
     } else {
@@ -339,11 +333,7 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
         if (searchFilters.minPrice && p.price < parseInt(searchFilters.minPrice)) return false;
         if (searchFilters.maxPrice && p.price > parseInt(searchFilters.maxPrice)) return false;
 
-        if (searchFilters.minSqft && p.sqft < parseInt(searchFilters.minSqft)) return false;
-        if (searchFilters.maxSqft && p.sqft > parseInt(searchFilters.maxSqft)) return false;
-
-        if (searchFilters.minLotSize && (p.lotArea || 0) < parseInt(searchFilters.minLotSize)) return false;
-        if (searchFilters.maxLotSize && (p.lotArea || 0) > parseInt(searchFilters.maxLotSize)) return false;
+        if (searchFilters.origin && p.origin !== searchFilters.origin) return false;
 
         if (searchFilters.dateFilter) {
           if (!p.dateListed) return false;
@@ -379,8 +369,6 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
               return b.price - a.price;
             case 'newest':
               return new Date(b.dateListed || 0).getTime() - new Date(a.dateListed || 0).getTime();
-            case 'sqft':
-              return b.sqft - a.sqft;
             case 'beds':
               return b.beds - a.beds;
             case 'baths':
@@ -444,13 +432,13 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
         ogTitle="YGB Buy Gold & Sell - Premium Gold Items"
         ogDescription="Premium platform offering luxury gold items for sale and lease."
         ogUrl={window.location.origin}
-        ogImage={`${window.location.origin}/Image/Yhen_Property_Favikan.png`}
+        ogImage={`${window.location.origin}/Image/YGB_favicon.png`}
         ogSiteName="YGB Buy Gold & Sell"
         ogLocale="en_US"
         twitterCard="summary_large_image"
         twitterTitle="YGB Buy Gold & Sell"
         twitterDescription="Discover premium gold items"
-        twitterImage={`${window.location.origin}/Image/Yhen_Property_Favikan.png`}
+        twitterImage={`${window.location.origin}/Image/YGB_favicon.png`}
         structuredData={homeStructuredData}
       />
       {/* Hero Section */}
@@ -489,7 +477,7 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
               onClick={() => setShowSearchBox(true)}
               className="bg-primary text-zinc-900 font-black py-4 px-12 rounded-full hover:brightness-110 active:scale-95 transition-all shadow-2xl shadow-primary/30 text-lg md:text-xl tracking-wider uppercase mb-8"
             >
-              Buy gold now
+              Invest in Gold
             </button>
           ) : (
           <div className="bg-zinc-900/60 backdrop-blur-3xl p-4 md:p-6 rounded-2xl md:rounded-3xl border border-white/10 shadow-2xl max-w-5xl mx-auto relative">
@@ -562,7 +550,7 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
                 <span className="material-icons absolute right-2.5 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none text-base">expand_more</span>
               </div>
 
-              {/* Beds selection */}
+              {/* Purity selection */}
               <div className="md:col-span-2 lg:col-span-2 relative">
                 <select
                   name="beds"
@@ -571,14 +559,13 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
                   style={{ backgroundImage: 'none' }}
                   className="w-full h-full bg-white/5 border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/20 text-white/80 rounded-xl py-3 px-3 !appearance-none transition-all cursor-pointer text-sm font-medium pr-9"
                 >
-                  <option value="" className="bg-zinc-900">Any Beds</option>
-                  {[1, 2, 3, 4].map(n => <option key={n} value={n} className="bg-zinc-900">{n}+ Beds</option>)}
-                  <option value="5+" className="bg-zinc-900">5+ Beds</option>
+                  <option value="" className="bg-zinc-900">Any Purity</option>
+                  {[18, 21, 22, 24].map(n => <option key={n} value={n} className="bg-zinc-900">{n}K+</option>)}
                 </select>
-                <span className="material-icons absolute right-2.5 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none text-base">bed</span>
+                <span className="material-icons absolute right-2.5 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none text-base">diamond</span>
               </div>
 
-              {/* Baths selection */}
+              {/* Weight selection */}
               <div className="md:col-span-2 lg:col-span-2 relative">
                 <select
                   name="baths"
@@ -587,11 +574,10 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
                   style={{ backgroundImage: 'none' }}
                   className="w-full h-full bg-white/5 border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/20 text-white/80 rounded-xl py-3 px-3 !appearance-none transition-all cursor-pointer text-sm font-medium pr-9"
                 >
-                  <option value="" className="bg-zinc-900">Any Baths</option>
-                  {[1, 2, 3, 4].map(n => <option key={n} value={n} className="bg-zinc-900">{n}+ Baths</option>)}
-                  <option value="5+" className="bg-zinc-900">5+ Baths</option>
+                  <option value="" className="bg-zinc-900">Any Weight</option>
+                  {[1, 5, 10, 50, 100].map(n => <option key={n} value={n} className="bg-zinc-900">{n}g+</option>)}
                 </select>
-                <span className="material-icons-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none text-base">bathtub</span>
+                <span className="material-icons-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none text-base">scale</span>
               </div>
 
               {/* Price Range Fields - Formatted with Symbol */}
@@ -655,34 +641,24 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
 
                   {/* Property Size Range */}
                   <div>
-                    <label className="text-white/70 text-xs font-bold mb-2 block">SQUARE FOOTAGE (SQM)</label>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="relative group">
-                        <input
-                          name="minSqft"
-                          value={formatWithCommas(searchFilters.minSqft)}
-                          onChange={handleFilterChange}
-                          className="w-full bg-white/5 border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/20 text-white px-3 rounded-xl py-2.5 placeholder:text-white/30 transition-all text-sm font-medium"
-                          placeholder="Min sqm"
-                          type="text"
-                        />
-                      </div>
-                      <div className="relative group">
-                        <input
-                          name="maxSqft"
-                          value={formatWithCommas(searchFilters.maxSqft)}
-                          onChange={handleFilterChange}
-                          className="w-full bg-white/5 border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/20 text-white px-3 rounded-xl py-2.5 placeholder:text-white/30 transition-all text-sm font-medium"
-                          placeholder="Max sqm"
-                          type="text"
-                        />
-                      </div>
-                    </div>
+                    <label className="text-white/70 text-xs font-bold mb-2 block">ORIGIN</label>
+                    <select
+                      name="origin"
+                      className="w-full bg-white/5 border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/20 text-white px-3 rounded-xl py-2.5 transition-all text-sm font-medium"
+                      value={searchFilters.origin}
+                      onChange={handleFilterChange}
+                    >
+                      <option value="" className="bg-zinc-900">Any Origin</option>
+                      <option value="Saudi Gold" className="bg-zinc-900">Saudi Gold</option>
+                      <option value="Japan Gold" className="bg-zinc-900">Japan Gold</option>
+                      <option value="Chinese Gold" className="bg-zinc-900">Chinese Gold</option>
+                      <option value="Hongkong Gold" className="bg-zinc-900">Hongkong Gold</option>
+                    </select>
                   </div>
 
-                  {/* Lot Size Range */}
+                  {/* Reference / Serial ID Range */}
                   <div>
-                    <label className="text-white/70 text-xs font-bold mb-2 block">LOT SIZE (SQM)</label>
+                    <label className="text-white/70 text-xs font-bold mb-2 block">REFERENCE / SERIAL ID</label>
                     <div className="grid grid-cols-2 gap-3">
                       <div className="relative group">
                         <input
@@ -690,7 +666,7 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
                           value={formatWithCommas(searchFilters.minLotSize)}
                           onChange={handleFilterChange}
                           className="w-full bg-white/5 border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/20 text-white px-3 rounded-xl py-2.5 placeholder:text-white/30 transition-all text-sm font-medium"
-                          placeholder="Min lot sqm"
+                          placeholder="Min ID"
                           type="text"
                         />
                       </div>
@@ -700,7 +676,7 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
                           value={formatWithCommas(searchFilters.maxLotSize)}
                           onChange={handleFilterChange}
                           className="w-full bg-white/5 border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/20 text-white px-3 rounded-xl py-2.5 placeholder:text-white/30 transition-all text-sm font-medium"
-                          placeholder="Max lot sqm"
+                          placeholder="Max ID"
                           type="text"
                         />
                       </div>
@@ -739,9 +715,8 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
                       <option value="price-low" className="bg-zinc-900">Price: Low to High</option>
                       <option value="price-high" className="bg-zinc-900">Price: High to Low</option>
                       <option value="newest" className="bg-zinc-900">Newest First</option>
-                      <option value="sqft" className="bg-zinc-900">Largest Square Footage</option>
-                      <option value="beds" className="bg-zinc-900">Most Bedrooms</option>
-                      <option value="baths" className="bg-zinc-900">Most Bathrooms</option>
+                      <option value="beds" className="bg-zinc-900">Highest Karat</option>
+                      <option value="baths" className="bg-zinc-900">Highest Weight</option>
                     </select>
                     <span className="material-icons absolute right-2.5 bottom-2.5 text-white/30 pointer-events-none text-base">expand_more</span>
                   </div>
@@ -988,7 +963,7 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
           ) : newProperties.length === 0 ? (
             <div className="text-center py-32 bg-white dark:bg-zinc-900 rounded-[48px] border border-dashed border-zinc-200 dark:border-zinc-800">
               <span className="material-icons text-7xl text-zinc-300 mb-6">search_off</span>
-              <p className="text-zinc-500 text-xl font-medium">No new properties in the last 30 days. Check back soon!</p>
+              <p className="text-zinc-500 text-xl font-medium">No new items in the last 30 days. Check back soon!</p>
               <Link to="/add" className="mt-8 inline-block px-10 py-4 bg-primary text-zinc-900 font-bold rounded-2xl hover:scale-105 transition-transform shadow-xl shadow-primary/20">Start Listing</Link>
             </div>
           ) : (

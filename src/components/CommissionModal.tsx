@@ -186,7 +186,7 @@ const CommissionModal: React.FC<CommissionModalProps> = ({
 
         <div className="p-6 space-y-6">
           <div className="bg-zinc-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-zinc-200 dark:border-zinc-700">
-            <h3 className="font-bold text-sm text-zinc-500 uppercase tracking-wider mb-2">Property Information</h3>
+            <h3 className="font-bold text-sm text-zinc-500 uppercase tracking-wider mb-2">Item Information</h3>
             <div className="flex items-start gap-4">
               {property.images[property.featuredImageIndex ?? 0] && (
                 <img

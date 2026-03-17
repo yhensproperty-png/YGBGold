@@ -4,7 +4,7 @@ import HCaptcha from '@hcaptcha/react-hcaptcha';
 import { supabase } from '../services/supabaseClient.ts';
 import { SEO } from '../components/SEO.tsx';
 
-const WEB3FORMS_ACCESS_KEY = "843dc172-4947-4bc8-907a-320244d9f5fa";
+const WEB3FORMS_ACCESS_KEY = "c7934ce9-2cd3-4c34-ba88-dfcc376c3643";
 const HCAPTCHA_SITE_KEY = "50b2fe65-b00b-4b9e-ad62-3ba471098be2";
 
 const Contact: React.FC = () => {
@@ -21,7 +21,7 @@ const Contact: React.FC = () => {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const captchaRef = useRef<HCaptcha>(null);
 
-  const email = "yhenproperty@gmail.com";
+  const email = "ygbgoldbuysell@gmail.com";
   const phone = "+639467543767";
   const whatsappNumber = "639467543767";
 
@@ -100,10 +100,9 @@ const Contact: React.FC = () => {
   return (
     <>
       <SEO
-        title="Contact Us - Yhen's Property"
-        description="Get in touch with Yhen's Property. We're here to help you find your dream home or sell your property in the Philippines. Contact us via phone, email, or WhatsApp."
-        type="website"
-        url="https://yhens-property.com/contact"
+        title="Contact Us - YGB Gold"
+        description="Get in touch with YGB Gold. We're here to help you secure and liquidate gold investments in the Philippines. Contact us via phone, email, or WhatsApp."
+        ogUrl="https://ygbgold.com/contact"
       />
       <div className="w-full bg-white dark:bg-zinc-950 min-h-screen">
       <div className="max-w-7xl mx-auto px-6 py-20">
@@ -113,7 +112,7 @@ const Contact: React.FC = () => {
             Let's Start a <span className="text-primary italic">Conversation</span>
           </h1>
           <p className="text-lg text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto font-medium">
-            Whether you're looking to buy, sell, or rent, we're here to help you every step of the way.
+            Whether you're looking to buy, sell, or trade, we're here to help you every step of the way.
           </p>
         </div>
 
@@ -158,7 +157,7 @@ const Contact: React.FC = () => {
                   <h3 className="text-xl font-black dark:text-white mb-3 tracking-tight">WhatsApp</h3>
                   <p className="text-zinc-600 dark:text-zinc-400 mb-3 font-medium">{phone}</p>
                   <a
-                    href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Hi Yhen, I'm reaching out from the website. I'd like to inquire about your properties.")}`}
+                    href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Hi Yhen, I'm reaching out from the website. I'd like to inquire about your gold inventory.")}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-6 py-3 bg-[#25D366] text-white font-bold rounded-xl hover:brightness-110 transition-all shadow-lg hover:scale-105"
@@ -252,7 +251,7 @@ const Contact: React.FC = () => {
                   required
                   rows={5}
                   className="w-full px-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none"
-                  placeholder="Tell us about your property needs..."
+                  placeholder="Tell us about your gold investment needs..."
                 />
               </div>
 
@@ -279,7 +278,7 @@ const Contact: React.FC = () => {
                     >
                       Privacy Policy
                     </Link>{' '}
-                    and consent to Yhen's Property processing my data to handle this inquiry.
+                    and consent to YGB Gold processing my data to handle this inquiry.
                   </label>
                 </div>
 
@@ -294,7 +293,7 @@ const Contact: React.FC = () => {
                     className="mt-1 w-4 h-4 rounded border-zinc-300 dark:border-zinc-600 text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer"
                   />
                   <label htmlFor="marketingConsent" className="text-xs text-zinc-500 dark:text-zinc-500 leading-relaxed cursor-pointer">
-                    Keep me updated with new property listings, market reports, and investment opportunities via email.
+                    Keep me updated with new gold inventory items, market reports, and investment opportunities via email.
                   </label>
                 </div>
               </div>
@@ -303,6 +302,7 @@ const Contact: React.FC = () => {
                 <HCaptcha
                   ref={captchaRef}
                   sitekey={HCAPTCHA_SITE_KEY}
+                  reCaptchaCompat={false}
                   onVerify={(token) => setCaptchaToken(token)}
                   onExpire={() => setCaptchaToken(null)}
                 />
