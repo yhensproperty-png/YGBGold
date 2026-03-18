@@ -61,21 +61,18 @@ function PropertyTable({
                   <img src={property.images[property.featuredImageIndex ?? 0] ?? property.images[0]} alt={`${property.title} preview`} className="w-full h-full object-cover" loading="lazy" width="800" height="600" />
                 </div>
                 <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[10px] font-black bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded text-zinc-500">#{property.listing_id}</span>
+                    <p className="text-xs text-zinc-500 flex items-center gap-1">
+                      <span className="material-icons text-[12px]">place</span>
+                      {property.city}, {property.state}
+                    </p>
+                  </div>
                   <p className="font-bold dark:text-white text-sm line-clamp-2 mb-1">{property.title}</p>
-                  <p className="text-xs text-zinc-500 flex items-center gap-1 mb-2">
-                    <span className="material-icons text-[12px]">place</span>
-                    {property.city}, {property.state}
-                  </p>
                   <p className="font-bold dark:text-white text-sm">₱{property.price.toLocaleString()}</p>
                   <div className="mt-1 space-y-0.5">
                     <p className="text-[10px] text-zinc-400 uppercase tracking-wider font-medium">Item Type</p>
                     <p className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">{property.type}</p>
-                  </div>
-                  <div className="mt-1 space-y-0.5">
-                    <p className="text-[10px] text-zinc-400 uppercase tracking-wider font-medium">Listing</p>
-                    <p className={`text-xs font-bold ${property.listingType === 'rent' ? 'text-sky-500' : 'text-emerald-600'}`}>
-                      {property.listingType === 'rent' ? 'For Rent' : 'For Sale'}
-                    </p>
                   </div>
                 </div>
               </div>
@@ -131,9 +128,9 @@ function PropertyTable({
           <thead>
             <tr className="bg-zinc-50 dark:bg-zinc-800/50 border-b border-zinc-200 dark:border-zinc-800">
               <th className="pl-6 pr-3 py-5 text-xs font-bold uppercase tracking-wider text-zinc-500">Item</th>
+              <th className="px-2 py-5 text-xs font-bold uppercase tracking-wider text-zinc-500">Listing ID</th>
               <th className="px-2 py-5 text-xs font-bold uppercase tracking-wider text-zinc-500">Price</th>
               <th className="px-2 py-5 text-xs font-bold uppercase tracking-wider text-zinc-500">Type</th>
-              <th className="px-2 py-5 text-xs font-bold uppercase tracking-wider text-zinc-500">Listing</th>
               <th className="px-2 py-5 text-xs font-bold uppercase tracking-wider text-zinc-500">Agent</th>
               <th className="px-2 py-5 text-xs font-bold uppercase tracking-wider text-zinc-500">Status</th>
               <th className="pl-2 pr-6 py-5 text-xs font-bold uppercase tracking-wider text-zinc-500 text-right">Actions</th>
@@ -165,19 +162,13 @@ function PropertyTable({
                     </div>
                   </td>
                   <td className="px-2 py-5">
+                    <span className="text-sm font-bold bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded text-zinc-600 dark:text-zinc-400">#{property.listing_id}</span>
+                  </td>
+                  <td className="px-2 py-5">
                     <p className="font-bold dark:text-white text-sm whitespace-nowrap">₱{property.price.toLocaleString()}</p>
                   </td>
                   <td className="px-2 py-5">
                     <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">{property.type}</p>
-                  </td>
-                  <td className="px-2 py-5">
-                    <span className={`inline-flex items-center whitespace-nowrap px-2.5 py-1 rounded-full text-xs font-bold border ${
-                      property.listingType === 'rent'
-                        ? 'bg-sky-50 text-sky-600 border-sky-200 dark:bg-sky-900/20 dark:border-sky-800'
-                        : 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800'
-                    }`}>
-                      {property.listingType === 'rent' ? 'For Rent' : 'For Sale'}
-                    </span>
                   </td>
                   <td className="px-2 py-5">
                     <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 truncate">{property.agent || '-'}</p>
@@ -296,7 +287,6 @@ const ManageListings: React.FC<ManageListingsProps> = ({ properties, onUpdate, o
   const activeListings = useMemo(() => properties.filter(p => p.status === 'active' || p.status === 'draft'), [properties]);
   const soldListings = useMemo(() => properties.filter(p => p.status === 'sold'), [properties]);
   const archivedListings = useMemo(() => properties.filter(p => p.status === 'archived'), [properties]);
-  const rentedListings = useMemo(() => properties.filter(p => p.status === 'rented'), [properties]);
 
   const loadCommissions = async () => {
     if (!isAdmin) return;
@@ -367,13 +357,6 @@ const ManageListings: React.FC<ManageListingsProps> = ({ properties, onUpdate, o
         title="Mark as Sold"
       >
         <span className="material-icons text-sm">sell</span>
-      </button>
-      <button
-        onClick={() => handleMarkRented(property)}
-        className="w-9 h-9 flex items-center justify-center rounded-xl border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:text-sky-600 hover:border-sky-400 transition-all flex-shrink-0"
-        title="Mark as Rented"
-      >
-        <span className="material-icons text-sm">key</span>
       </button>
       <button
         onClick={() => handleArchive(property)}
@@ -466,7 +449,6 @@ const ManageListings: React.FC<ManageListingsProps> = ({ properties, onUpdate, o
       <div className="flex items-center gap-2 flex-wrap border-b border-zinc-200 dark:border-zinc-800 pb-0 -mb-6">
         {([
           { view: 'active' as View, label: 'Active', icon: 'inventory_2', count: activeListings.length, activeColor: 'border-primary text-primary', dotColor: 'bg-primary', adminOnly: false },
-          { view: 'rented' as View, label: 'Rented', icon: 'key', count: rentedListings.length, activeColor: 'border-sky-500 text-sky-600', dotColor: 'bg-sky-500', adminOnly: false },
           { view: 'sold' as View, label: 'Sold', icon: 'sell', count: soldListings.length, activeColor: 'border-emerald-500 text-emerald-600', dotColor: 'bg-emerald-500', adminOnly: false },
           { view: 'commission' as View, label: 'Commission', icon: 'payments', count: commissions.length, activeColor: 'border-purple-500 text-purple-600', dotColor: 'bg-purple-500', adminOnly: true },
           { view: 'archived' as View, label: 'Archived', icon: 'inventory_2', count: archivedListings.length, activeColor: 'border-zinc-500 text-zinc-600', dotColor: 'bg-zinc-400', adminOnly: false },
@@ -505,26 +487,6 @@ const ManageListings: React.FC<ManageListingsProps> = ({ properties, onUpdate, o
         </section>
       )}
 
-      {/* Rented Listings */}
-      {activeView === 'rented' && (
-        <section>
-          {rentedListings.length === 0 ? (
-            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 px-8 py-16 text-center text-zinc-400 shadow-xl">
-              <span className="material-icons text-4xl block mb-2 text-zinc-300">key</span>
-              No rented listings yet.
-            </div>
-          ) : (
-            <PropertyTable
-              items={rentedListings}
-              onView={(property) => navigate(`/item/${property.slug}`)}
-              onEdit={(id) => navigate(`/edit/${id}`)}
-              onDelete={handleDelete}
-              actions={rentedActions}
-              canDelete={isAdmin}
-            />
-          )}
-        </section>
-      )}
 
       {/* Sold Listings */}
       {activeView === 'sold' && (

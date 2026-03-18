@@ -661,25 +661,37 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
               <div className="h-12 w-px bg-zinc-200 dark:bg-zinc-800 hidden md:block"></div>
 
               <div className="flex-grow grid grid-cols-2 md:grid-cols-4 gap-4 items-center">
-                <div className="text-center">
-                  <span className="material-icons text-primary text-xl block mb-0.5">diamond</span>
-                  <span className="block font-black text-lg dark:text-white leading-none">{property.beds}K</span>
-                  <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest">Purity</span>
+                <div className="flex flex-col items-center text-center">
+                  <span className="material-icons text-primary text-xl block mb-1">diamond</span>
+                  <div className="h-6 flex items-center justify-center w-full">
+                    <span className="font-black text-lg dark:text-white leading-none whitespace-nowrap">{property.beds}K</span>
+                  </div>
+                  <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest mt-1">Purity</span>
                 </div>
-                <div className="text-center">
-                  <span className="material-icons text-primary text-xl block mb-0.5">scale</span>
-                  <span className="block font-black text-lg dark:text-white leading-none">{property.baths}g</span>
-                  <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest">Weight</span>
+                <div className="flex flex-col items-center text-center">
+                  <span className="material-icons text-primary text-xl block mb-1">scale</span>
+                  <div className="h-6 flex items-center justify-center w-full">
+                    <span className="font-black text-lg dark:text-white leading-none whitespace-nowrap">{property.baths}g</span>
+                  </div>
+                  <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest mt-1">Weight</span>
                 </div>
-                <div className="text-center">
-                  <span className="material-icons text-primary text-xl block mb-0.5">public</span>
-                  <span className="block font-black text-lg dark:text-white leading-none">{property.origin || 'Saudi Gold'}</span>
-                  <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest">Origin</span>
+                <div className="flex flex-col items-center text-center">
+                  <span className="material-icons text-primary text-xl block mb-1">public</span>
+                  <div className="h-6 flex items-center justify-center w-full px-2">
+                    <span className="font-black text-sm dark:text-white leading-tight truncate w-full" title={property.origin || 'Saudi Gold'}>
+                      {property.origin || 'Saudi Gold'}
+                    </span>
+                  </div>
+                  <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest mt-1">Origin</span>
                 </div>
-                <div className="text-center">
-                  <span className="material-icons text-primary text-xl block mb-0.5">category</span>
-                  <span className="block font-black text-lg dark:text-white leading-none">{property.type}</span>
-                  <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest">Type</span>
+                <div className="flex flex-col items-center text-center">
+                  <span className="material-icons text-primary text-xl block mb-1">category</span>
+                  <div className="h-6 flex items-center justify-center w-full px-2">
+                    <span className="font-black text-sm dark:text-white leading-tight truncate w-full" title={property.type}>
+                      {property.type}
+                    </span>
+                  </div>
+                  <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest mt-1">Type</span>
                 </div>
               </div>
             </div>

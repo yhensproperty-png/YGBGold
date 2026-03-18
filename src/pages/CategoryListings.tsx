@@ -10,30 +10,17 @@ interface CategoryListingsProps {
 }
 
 const CATEGORY_MAP: Record<string, { title: string; types?: PropertyType[]; listingType?: 'sale' | 'rent' }> = {
-  'coins': {
-    title: 'Gold Coins',
-    types: [PropertyType.Coins]
-  },
-  'bars': {
-    title: 'Gold Bars',
-    types: [PropertyType.Bars]
-  },
-  'jewelry': {
-    title: 'Gold Jewelry',
-    types: [PropertyType.Jewelry]
-  },
-  'scrap-gold': {
-    title: 'Scrap Gold',
-    types: [PropertyType.ScrapGold]
-  },
-  'others': {
-    title: 'Other Gold Items',
-    types: [PropertyType.Others]
-  },
-  'rent': {
-    title: 'Trading & Safe Keeping',
-    listingType: 'rent'
-  }
+  'coins': { title: 'Gold Coins', types: [PropertyType.Coins] },
+  'bars': { title: 'Gold Bars', types: [PropertyType.Bars] },
+  'jewelry': { title: 'Gold Jewelry', types: [PropertyType.Jewelry] },
+  'collectibles': { title: 'Collectibles', types: [PropertyType.Collectibles] },
+  'scrap-gold': { title: 'Scrap Gold', types: [PropertyType.ScrapGold] },
+  'others': { title: 'Others', types: [PropertyType.Others] },
+  'rent-jewelry': { title: 'Jewelry (Lease)', types: [PropertyType.Jewelry], listingType: 'rent' },
+  'rent-coins': { title: 'Gold Coins (Lease)', types: [PropertyType.Coins], listingType: 'rent' },
+  'rent-bars': { title: 'Gold Bars (Lease)', types: [PropertyType.Bars], listingType: 'rent' },
+  'rent-collectibles': { title: 'Collectibles (Lease)', types: [PropertyType.Collectibles], listingType: 'rent' },
+  'rent': { title: 'All Rentals', listingType: 'rent' }
 };
 
 // Utility to format number with commas

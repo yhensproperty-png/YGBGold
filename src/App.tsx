@@ -196,7 +196,6 @@ const AppContent: React.FC = () => {
                 <h3 className="font-bold text-[10px] uppercase tracking-[0.3em] text-zinc-400 mb-8">Explore</h3>
                 <ul className="space-y-4">
                   <li><Link to="/" className="text-sm font-bold text-zinc-600 dark:text-zinc-400 hover:text-primary transition-colors">Buy Items</Link></li>
-                  <li><Link to="/category/rent" className="text-sm font-bold text-zinc-600 dark:text-zinc-400 hover:text-primary transition-colors">Rentals</Link></li>
                   <li><Link to="/about" className="text-sm font-bold text-zinc-600 dark:text-zinc-400 hover:text-primary transition-colors">Our Story</Link></li>
                 </ul>
               </div>

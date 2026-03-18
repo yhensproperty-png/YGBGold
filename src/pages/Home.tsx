@@ -175,26 +175,38 @@ export const PropertyCard: React.FC<{ property: PropertyListing }> = ({ property
             )}
           </div>
         </div>
-        <div className="grid grid-cols-4 gap-4 pt-4 mt-auto border-t border-zinc-100 dark:border-zinc-800">
-          <div className="text-center">
-            <span className="material-icons text-primary text-xl block mb-0.5">diamond</span>
-            <span className="block font-black text-lg dark:text-white leading-none">{property.beds}K</span>
-            <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest">Purity</span>
+        <div className="grid grid-cols-4 gap-1 pt-4 mt-auto border-t border-zinc-100 dark:border-zinc-800">
+          <div className="flex flex-col items-center text-center px-1">
+            <span className="material-icons text-primary text-xl block mb-1">diamond</span>
+            <div className="h-6 flex items-center justify-center w-full">
+              <span className="font-black text-sm dark:text-white leading-none">{property.beds}K</span>
+            </div>
+            <span className="text-[8px] text-zinc-400 uppercase font-black tracking-widest mt-1">Purity</span>
           </div>
-          <div className="text-center">
-            <span className="material-icons text-primary text-xl block mb-0.5">scale</span>
-            <span className="block font-black text-lg dark:text-white leading-none">{property.baths}g</span>
-            <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest">Weight</span>
+          <div className="flex flex-col items-center text-center px-1">
+            <span className="material-icons text-primary text-xl block mb-1">scale</span>
+            <div className="h-6 flex items-center justify-center w-full">
+              <span className="font-black text-sm dark:text-white leading-none">{property.baths}g</span>
+            </div>
+            <span className="text-[8px] text-zinc-400 uppercase font-black tracking-widest mt-1">Weight</span>
           </div>
-          <div className="text-center">
-            <span className="material-icons text-primary text-xl block mb-0.5">public</span>
-            <span className="block font-black text-lg dark:text-white leading-none text-xs truncate max-w-[60px] mx-auto">{property.origin || 'Saudi'}</span>
-            <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest">Origin</span>
+          <div className="flex flex-col items-center text-center px-1">
+            <span className="material-icons text-primary text-xl block mb-1">public</span>
+            <div className="h-6 flex items-center justify-center w-full">
+              <span className="font-black text-[10px] dark:text-white leading-tight truncate w-full" title={property.origin || 'Saudi Gold'}>
+                {property.origin || 'Saudi Gold'}
+              </span>
+            </div>
+            <span className="text-[8px] text-zinc-400 uppercase font-black tracking-widest mt-1">Origin</span>
           </div>
-          <div className="text-center">
-            <span className="material-icons text-primary text-xl block mb-0.5">inventory_2</span>
-            <span className="block font-black text-lg dark:text-white leading-none text-xs truncate max-w-[60px] mx-auto">{(property.lotArea || 'N/A')}</span>
-            <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest">Ref ID</span>
+          <div className="flex flex-col items-center text-center px-1">
+            <span className="material-icons text-primary text-xl block mb-1">inventory_2</span>
+            <div className="h-6 flex items-center justify-center w-full">
+              <span className="font-black text-[10px] dark:text-white leading-tight truncate w-full" title={property.lotArea || 'N/A'}>
+                {(property.lotArea || 'N/A')}
+              </span>
+            </div>
+            <span className="text-[8px] text-zinc-400 uppercase font-black tracking-widest mt-1">Ref ID</span>
           </div>
         </div>
       </div>
@@ -885,13 +897,13 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {[
-            { slug: 'buy-condos', icon: 'apartment', label: 'Buy Condos', img: '/Image/the_rise_manila_1.png' },
-            { slug: 'buy-houses', icon: 'home', label: 'Buy Houses', img: '/Image/fancy_house_1_manila.png' },
-            { slug: 'buy-land', icon: 'landscape', label: 'Buy Land Plots', img: '/Image/Rice_field_land_small_size.png' },
-            { slug: 'rent', icon: 'vpn_key', label: 'Rent Condos, Houses, Land & Commercial', img: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&q=80&w=800' }
+            { slug: 'jewelry', icon: 'diamond', label: 'Gold Jewelry', img: 'https://images.unsplash.com/photo-1611085583191-a3b1a30a8a3a?auto=format&fit=crop&q=80&w=800' },
+            { slug: 'coins', icon: 'monetization_on', label: 'Gold Coins', img: 'https://images.unsplash.com/photo-1589753123714-c9711681a2da?auto=format&fit=crop&q=80&w=800' },
+            { slug: 'bars', icon: 'view_week', label: 'Gold Bars', img: 'https://images.unsplash.com/photo-1589753123714-c9711681a2da?auto=format&fit=crop&q=80&w=800' },
+            { slug: 'collectibles', icon: 'category', label: 'Collectibles', img: 'https://images.unsplash.com/photo-1611085583191-a3b1a30a8a3a?auto=format&fit=crop&q=80&w=800' }
           ].map((cat, i) => (
             <Link key={i} to={`/category/${cat.slug}`} className="group relative h-96 rounded-[40px] overflow-hidden cursor-pointer block border border-zinc-100 dark:border-zinc-800 shadow-2xl">
-              {cat.img && <img src={cat.img} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" alt={`${cat.label} category - Browse properties`} loading="lazy" width="800" height="600" />}
+              {cat.img && <img src={cat.img} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" alt={`${cat.label} category - Browse gold items`} loading="lazy" width="800" height="600" />}
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-8">
                 <div className="flex items-center gap-4">
                   <div className="bg-primary p-3 rounded-2xl text-zinc-900 shadow-xl shadow-primary/30 group-hover:rotate-12 transition-transform duration-500">

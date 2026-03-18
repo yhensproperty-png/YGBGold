@@ -42,19 +42,19 @@ const Navbar: React.FC = () => {
             </button>
             <div className={`absolute top-full left-0 w-56 pt-2 transition-all duration-200 origin-top-left ${isBuyOpen ? 'opacity-100 scale-100 translate-y-0 visible' : 'opacity-0 scale-95 -translate-y-2 invisible'}`}>
               <div className="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden py-2 p-1.5 ring-1 ring-black/5">
-                <Link to="/category/buy-condos" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 group/item transition-colors" onClick={() => setIsBuyOpen(false)}>
-                  <div className="bg-primary/10 p-2 rounded-lg text-primary group-hover/item:bg-primary group-hover/item:text-zinc-900 transition-colors"><span className="material-icons text-sm">monetization_on</span></div>
-                  <span className="text-sm font-semibold dark:text-zinc-300">Buy Gold Coins</span>
-                </Link>
-                <Link to="/category/buy-houses" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 group/item transition-colors" onClick={() => setIsBuyOpen(false)}>
-                  <div className="bg-primary/10 p-2 rounded-lg text-primary group-hover/item:bg-primary group-hover/item:text-zinc-900 transition-colors"><span className="material-icons text-sm">view_week</span></div>
-                  <span className="text-sm font-semibold dark:text-zinc-300">Buy Gold Bars</span>
-                </Link>
-                <Link to="/category/buy-land" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 group/item transition-colors" onClick={() => setIsBuyOpen(false)}>
+                <Link to="/category/jewelry" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 group/item transition-colors" onClick={() => setIsBuyOpen(false)}>
                   <div className="bg-primary/10 p-2 rounded-lg text-primary group-hover/item:bg-primary group-hover/item:text-zinc-900 transition-colors"><span className="material-icons text-sm">diamond</span></div>
                   <span className="text-sm font-semibold dark:text-zinc-300">Buy Jewelry</span>
                 </Link>
-                <Link to="/category/buy-commercial" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 group/item transition-colors" onClick={() => setIsBuyOpen(false)}>
+                <Link to="/category/coins" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 group/item transition-colors" onClick={() => setIsBuyOpen(false)}>
+                  <div className="bg-primary/10 p-2 rounded-lg text-primary group-hover/item:bg-primary group-hover/item:text-zinc-900 transition-colors"><span className="material-icons text-sm">monetization_on</span></div>
+                  <span className="text-sm font-semibold dark:text-zinc-300">Buy Gold Coins</span>
+                </Link>
+                <Link to="/category/bars" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 group/item transition-colors" onClick={() => setIsBuyOpen(false)}>
+                  <div className="bg-primary/10 p-2 rounded-lg text-primary group-hover/item:bg-primary group-hover/item:text-zinc-900 transition-colors"><span className="material-icons text-sm">view_week</span></div>
+                  <span className="text-sm font-semibold dark:text-zinc-300">Buy Gold Bars</span>
+                </Link>
+                <Link to="/category/collectibles" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 group/item transition-colors" onClick={() => setIsBuyOpen(false)}>
                   <div className="bg-primary/10 p-2 rounded-lg text-primary group-hover/item:bg-primary group-hover/item:text-zinc-900 transition-colors"><span className="material-icons text-sm">category</span></div>
                   <span className="text-sm font-semibold dark:text-zinc-300">Buy Collectibles</span>
                 </Link>
@@ -74,19 +74,19 @@ const Navbar: React.FC = () => {
             </button>
             <div className={`absolute top-full left-0 w-56 pt-2 transition-all duration-200 origin-top-left ${isRentOpen ? 'opacity-100 scale-100 translate-y-0 visible' : 'opacity-0 scale-95 -translate-y-2 invisible'}`}>
               <div className="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden py-2 p-1.5 ring-1 ring-black/5">
-                <Link to="/category/rent-condos" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 group/item transition-colors" onClick={() => setIsRentOpen(false)}>
-                  <div className="bg-primary/10 p-2 rounded-lg text-primary group-hover/item:bg-primary group-hover/item:text-zinc-900 transition-colors"><span className="material-icons text-sm">monetization_on</span></div>
-                  <span className="text-sm font-semibold dark:text-zinc-300">Lease Gold Coins</span>
-                </Link>
-                <Link to="/category/rent-houses" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 group/item transition-colors" onClick={() => setIsRentOpen(false)}>
-                  <div className="bg-primary/10 p-2 rounded-lg text-primary group-hover/item:bg-primary group-hover/item:text-zinc-900 transition-colors"><span className="material-icons text-sm">view_week</span></div>
-                  <span className="text-sm font-semibold dark:text-zinc-300">Lease Gold Bars</span>
-                </Link>
-                <Link to="/category/rent-land" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 group/item transition-colors" onClick={() => setIsRentOpen(false)}>
+                <Link to="/category/rent-jewelry" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 group/item transition-colors" onClick={() => setIsRentOpen(false)}>
                   <div className="bg-primary/10 p-2 rounded-lg text-primary group-hover/item:bg-primary group-hover/item:text-zinc-900 transition-colors"><span className="material-icons text-sm">diamond</span></div>
                   <span className="text-sm font-semibold dark:text-zinc-300">Lease Jewelry</span>
                 </Link>
-                <Link to="/category/rent-commercial" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 group/item transition-colors" onClick={() => setIsRentOpen(false)}>
+                <Link to="/category/rent-coins" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 group/item transition-colors" onClick={() => setIsRentOpen(false)}>
+                  <div className="bg-primary/10 p-2 rounded-lg text-primary group-hover/item:bg-primary group-hover/item:text-zinc-900 transition-colors"><span className="material-icons text-sm">monetization_on</span></div>
+                  <span className="text-sm font-semibold dark:text-zinc-300">Lease Gold Coins</span>
+                </Link>
+                <Link to="/category/rent-bars" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 group/item transition-colors" onClick={() => setIsRentOpen(false)}>
+                  <div className="bg-primary/10 p-2 rounded-lg text-primary group-hover/item:bg-primary group-hover/item:text-zinc-900 transition-colors"><span className="material-icons text-sm">view_week</span></div>
+                  <span className="text-sm font-semibold dark:text-zinc-300">Lease Gold Bars</span>
+                </Link>
+                <Link to="/category/rent-collectibles" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 group/item transition-colors" onClick={() => setIsRentOpen(false)}>
                   <div className="bg-primary/10 p-2 rounded-lg text-primary group-hover/item:bg-primary group-hover/item:text-zinc-900 transition-colors"><span className="material-icons text-sm">category</span></div>
                   <span className="text-sm font-semibold dark:text-zinc-300">Lease Collectibles</span>
                 </Link>
@@ -168,16 +168,16 @@ const Navbar: React.FC = () => {
             </button>
             <div className={`overflow-hidden transition-all duration-200 ${isBuyOpen ? 'max-h-64' : 'max-h-0'}`}>
               <div className="pl-4 space-y-1 mt-1">
-                <Link to="/category/buy-condos" className="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800" onClick={() => setIsMobileMenuOpen(false)}>
+                <Link to="/category/coins" className="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800" onClick={() => setIsMobileMenuOpen(false)}>
                   <span className="material-icons text-sm text-primary">monetization_on</span><span className="text-sm">Buy Gold Coins</span>
                 </Link>
-                <Link to="/category/buy-houses" className="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800" onClick={() => setIsMobileMenuOpen(false)}>
+                <Link to="/category/bars" className="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800" onClick={() => setIsMobileMenuOpen(false)}>
                   <span className="material-icons text-sm text-primary">view_week</span><span className="text-sm">Buy Gold Bars</span>
                 </Link>
-                <Link to="/category/buy-land" className="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800" onClick={() => setIsMobileMenuOpen(false)}>
+                <Link to="/category/jewelry" className="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800" onClick={() => setIsMobileMenuOpen(false)}>
                   <span className="material-icons text-sm text-primary">diamond</span><span className="text-sm">Buy Jewelry</span>
                 </Link>
-                <Link to="/category/buy-commercial" className="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800" onClick={() => setIsMobileMenuOpen(false)}>
+                <Link to="/category/collectibles" className="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800" onClick={() => setIsMobileMenuOpen(false)}>
                   <span className="material-icons text-sm text-primary">category</span><span className="text-sm">Buy Collectibles</span>
                 </Link>
               </div>
@@ -194,16 +194,16 @@ const Navbar: React.FC = () => {
             </button>
             <div className={`overflow-hidden transition-all duration-200 ${isRentOpen ? 'max-h-64' : 'max-h-0'}`}>
               <div className="pl-4 space-y-1 mt-1">
-                <Link to="/category/rent-condos" className="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800" onClick={() => setIsMobileMenuOpen(false)}>
+                <Link to="/category/rent-coins" className="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800" onClick={() => setIsMobileMenuOpen(false)}>
                   <span className="material-icons text-sm text-primary">monetization_on</span><span className="text-sm">Lease Gold Coins</span>
                 </Link>
-                <Link to="/category/rent-houses" className="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800" onClick={() => setIsMobileMenuOpen(false)}>
+                <Link to="/category/rent-bars" className="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800" onClick={() => setIsMobileMenuOpen(false)}>
                   <span className="material-icons text-sm text-primary">view_week</span><span className="text-sm">Lease Gold Bars</span>
                 </Link>
-                <Link to="/category/rent-land" className="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800" onClick={() => setIsMobileMenuOpen(false)}>
+                <Link to="/category/rent-jewelry" className="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800" onClick={() => setIsMobileMenuOpen(false)}>
                   <span className="material-icons text-sm text-primary">diamond</span><span className="text-sm">Lease Jewelry</span>
                 </Link>
-                <Link to="/category/rent-commercial" className="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800" onClick={() => setIsMobileMenuOpen(false)}>
+                <Link to="/category/rent-collectibles" className="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800" onClick={() => setIsMobileMenuOpen(false)}>
                   <span className="material-icons text-sm text-primary">category</span><span className="text-sm">Lease Collectibles</span>
                 </Link>
               </div>

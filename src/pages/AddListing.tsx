@@ -13,78 +13,13 @@ interface AddListingProps {
 }
 
 const ICON_KEYWORD_MAP: { keywords: string[]; icon: string }[] = [
-  { keywords: ['pool', 'swim'], icon: 'pool' },
-  { keywords: ['gym', 'fitness', 'workout', 'exercise'], icon: 'fitness_center' },
-  { keywords: ['garage', 'car', 'vehicle'], icon: 'directions_car' },
-  { keywords: ['covered', 'parking'], icon: 'garage' },
-  { keywords: ['garden', 'yard', 'lawn', 'grass'], icon: 'yard' },
-  { keywords: ['landscape'], icon: 'park' },
-  { keywords: ['security', 'alarm', 'safe'], icon: 'security' },
-  { keywords: ['cctv', 'surveillance', 'camera'], icon: 'videocam' },
-  { keywords: ['biometric', 'fingerprint'], icon: 'fingerprint' },
-  { keywords: ['wifi', 'internet', 'fiber', 'network', 'broadband'], icon: 'wifi' },
-  { keywords: ['solar', 'panel', 'energy'], icon: 'solar_power' },
-  { keywords: ['fireplace', 'hearth'], icon: 'fireplace' },
-  { keywords: ['fire', 'alarm'], icon: 'local_fire_department' },
-  { keywords: ['elevator', 'lift'], icon: 'elevator' },
-  { keywords: ['balcony'], icon: 'balcony' },
-  { keywords: ['lanai', 'terrace', 'deck', 'patio', 'porch'], icon: 'deck' },
-  { keywords: ['roof', 'rooftop'], icon: 'roofing' },
-  { keywords: ['water', 'lake', 'river', 'ocean', 'sea', 'beach', 'waterfront'], icon: 'water' },
-  { keywords: ['mountain', 'view', 'vista'], icon: 'landscape' },
-  { keywords: ['smart', 'home', 'automation', 'remote'], icon: 'settings_remote' },
-  { keywords: ['wine', 'cellar', 'bar'], icon: 'wine_bar' },
-  { keywords: ['air', 'ac', 'cooling', 'conditioning'], icon: 'ac_unit' },
-  { keywords: ['gate', 'gated', 'community'], icon: 'lock' },
-  { keywords: ['fence', 'perimeter', 'wall'], icon: 'fence' },
-  { keywords: ['pet', 'dog', 'cat', 'animal'], icon: 'pets' },
-  { keywords: ['floor', 'hardwood', 'wood'], icon: 'layers' },
-  { keywords: ['marble', 'granite', 'countertop'], icon: 'countertops' },
-  { keywords: ['ceiling', 'high'], icon: 'unfold_more' },
-  { keywords: ['window', 'light', 'natural'], icon: 'wb_sunny' },
-  { keywords: ['closet', 'walk-in'], icon: 'checkroom' },
-  { keywords: ['wardrobe', 'built-in'], icon: 'storage' },
-  { keywords: ['study', 'office'], icon: 'menu_book' },
-  { keywords: ['powder', 'room'], icon: 'wc' },
-  { keywords: ['bathroom', 'bath'], icon: 'bathroom' },
-  { keywords: ['service', 'dirty'], icon: 'kitchen' },
-  { keywords: ['storage'], icon: 'inventory_2' },
-  { keywords: ['road', 'access', 'driveway'], icon: 'add_road' },
-  { keywords: ['power', 'electric', 'utility', 'utilities'], icon: 'power' },
-  { keywords: ['generator', 'backup'], icon: 'power' },
-  { keywords: ['heater', 'hot'], icon: 'hot_tub' },
-  { keywords: ['meter', 'water'], icon: 'water_drop' },
-  { keywords: ['meter', 'electric'], icon: 'electrical_services' },
-  { keywords: ['cable', 'tv', 'television'], icon: 'tv' },
-  { keywords: ['phone', 'telephone', 'line'], icon: 'phone' },
-  { keywords: ['kitchen', 'modern'], icon: 'kitchen' },
-  { keywords: ['island'], icon: 'countertops' },
-  { keywords: ['dishwasher'], icon: 'local_laundry_service' },
-  { keywords: ['refrigerator', 'fridge'], icon: 'kitchen' },
-  { keywords: ['microwave'], icon: 'microwave' },
-  { keywords: ['hood', 'air'], icon: 'air' },
-  { keywords: ['gas', 'stove', 'range'], icon: 'gas_meter' },
-  { keywords: ['playground', 'children', 'kids'], icon: 'child_care' },
-  { keywords: ['basketball', 'court'], icon: 'sports_basketball' },
-  { keywords: ['jogging', 'path', 'walk'], icon: 'directions_walk' },
-  { keywords: ['function', 'hall', 'clubhouse', 'club'], icon: 'meeting_room' },
-  { keywords: ['concierge'], icon: 'support_agent' },
-  { keywords: ['package', 'receiving'], icon: 'inventory' },
-  { keywords: ['sky', 'lounge'], icon: 'apartment' },
-  { keywords: ['coworking', 'co-working'], icon: 'work' },
-  { keywords: ['business', 'center'], icon: 'business_center' },
-  { keywords: ['theater', 'cinema', 'movie'], icon: 'theaters' },
-  { keywords: ['game', 'room'], icon: 'sports_esports' },
-  { keywords: ['transport', 'bus', 'train'], icon: 'directions_bus' },
-  { keywords: ['school', 'education'], icon: 'school' },
-  { keywords: ['shopping', 'mall', 'store'], icon: 'shopping_cart' },
-  { keywords: ['hospital', 'medical', 'clinic'], icon: 'local_hospital' },
-  { keywords: ['maid', 'helper'], icon: 'meeting_room' },
-  { keywords: ['furnished', 'furniture'], icon: 'chair' },
-  { keywords: ['semi', 'partial'], icon: 'weekend' },
-  { keywords: ['renovate', 'renovated', 'renovation', 'new'], icon: 'construction' },
-  { keywords: ['parking', 'street'], icon: 'local_parking' },
-  { keywords: ['visitor'], icon: 'local_parking' },
+  { keywords: ['gold', 'karat', 'k', 'pure', 'purity'], icon: 'diamond' },
+  { keywords: ['cert', 'verify', 'legal', 'official'], icon: 'verified' },
+  { keywords: ['stamp', 'hallmark', 'mark'], icon: 'approval' },
+  { keywords: ['new', 'mint', 'perfect'], icon: 'new_releases' },
+  { keywords: ['watch', 'rolex'], icon: 'watch' },
+  { keywords: ['ring'], icon: 'fiber_manual_record' },
+  { keywords: ['safe', 'secure', 'box'], icon: 'lock' },
 ];
 
 function inferIconFromLabel(label: string): string {
@@ -94,8 +29,9 @@ function inferIconFromLabel(label: string): string {
       return entry.icon;
     }
   }
-  return 'star';
+  return 'label'; // Default generic tag icon
 }
+
 
 async function loadCustomAmenities(): Promise<{ id: string; label: string; icon: string }[]> {
   const { data, error } = await supabase
@@ -118,6 +54,13 @@ const formatWithCommas = (value: string | number) => {
   if (value === undefined || value === null || value === '') return '';
   const num = value.toString().replace(/\D/g, '');
   return num.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
+const slugify = (text: string) => {
+  return text
+    .toLowerCase()
+    .replace(/[^\w ]+/g, '')
+    .replace(/ +/g, '-');
 };
 
 const AddListing: React.FC<AddListingProps> = ({ onAdd, isEdit }) => {
@@ -290,8 +233,38 @@ const AddListing: React.FC<AddListingProps> = ({ onAdd, isEdit }) => {
     setIsSubmitting(true);
 
     try {
+      const propertyId = formData.id || crypto.randomUUID();
+      const slug = formData.slug || `${slugify(formData.title || 'item')}-${propertyId.slice(0, 8)}`;
+      
+      let listingId = formData.listing_id;
+      if (!listingId) {
+        // Fetch all properties to find the highest number
+        try {
+          const allProps = await PropertyService.getAll();
+          // Filter for listing IDs that are purely numeric 3-digit format (or close to it)
+          const maxNum = allProps.reduce((max, p) => {
+            // Check if it's a 3-digit-like number (001, 002, etc)
+            const match = p.listing_id?.match(/^\d+$/);
+            if (match) {
+              const num = parseInt(match[0]);
+              // Ignore high random numbers like 5147 to let it start from 001
+              if (num > 500) return max; 
+              return num > max ? num : max;
+            }
+            return max;
+          }, 0);
+          listingId = (maxNum + 1).toString().padStart(3, '0');
+        } catch (err) {
+          console.error("Failed to fetch existing listings for ID generation:", err);
+          listingId = `001`; // Fallback
+        }
+      }
+
       const propertyData = {
         ...formData,
+        id: propertyId,
+        slug: slug,
+        listing_id: listingId,
         dateListed: formData.dateListed || new Date().toISOString(),
         dateUpdated: new Date().toISOString(),
         featuredUntil: formData.featured 
@@ -299,19 +272,16 @@ const AddListing: React.FC<AddListingProps> = ({ onAdd, isEdit }) => {
           : null
       } as PropertyListing;
 
-      if (isEdit && id) {
-        await PropertyService.update(id, propertyData);
-      } else {
-        await PropertyService.add(propertyData);
-      }
+      // Use the onAdd prop which handles both Add/Update and state refresh in App.tsx
+      await onAdd(propertyData);
 
       setShowSuccess(true);
       setTimeout(() => {
         navigate('/manage');
       }, 2000);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Submission failed:", err);
-      alert("There was an error saving your listing. Please try again.");
+      alert(`Error saving listing: ${err.message || "Unknown error"}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -369,7 +339,7 @@ const AddListing: React.FC<AddListingProps> = ({ onAdd, isEdit }) => {
                   <span className="material-icons text-primary">info</span> General Information
                 </h2>
                 <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 gap-6">
                     <div className="flex flex-col gap-2">
                       <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">Listing Title</label>
                       <input 
@@ -381,21 +351,6 @@ const AddListing: React.FC<AddListingProps> = ({ onAdd, isEdit }) => {
                         type="text" 
                         required 
                       />
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">Listing Type</label>
-                      <div className="grid grid-cols-2 gap-2">
-                        {['sale', 'rent'].map((type) => (
-                          <button
-                            key={type}
-                            type="button"
-                            onClick={() => setFormData(prev => ({...prev, listingType: type as any}))}
-                            className={`py-3 rounded-xl border font-bold text-xs transition-all ${formData.listingType === type ? 'bg-primary text-zinc-900 border-primary' : 'bg-zinc-50 dark:bg-zinc-800 border-zinc-100 dark:border-zinc-700 text-zinc-500'}`}
-                          >
-                            FOR {type.toUpperCase()}
-                          </button>
-                        ))}
-                      </div>
                     </div>
                   </div>
 
@@ -592,7 +547,6 @@ const AddListing: React.FC<AddListingProps> = ({ onAdd, isEdit }) => {
                   </p>
                   <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
                     <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{formData.type}</span>
-                    <span className="text-[10px] font-bold text-primary uppercase tracking-widest">FOR {formData.listingType?.toUpperCase()}</span>
                   </div>
                 </div>
               </div>

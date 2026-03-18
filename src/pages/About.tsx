@@ -98,7 +98,7 @@ const About: React.FC = () => {
             </p>
 
             <p className="text-base md:text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium tracking-tight">
-              Beyond the brokerage, Yhen's expertise in property is bolstered by her role as the CEO and Founder of Yhen Airbnb Manila, where she manages a portfolio of premium staycation experiences.
+              Beyond the trade, Yhen's expertise is bolstered by her role as a serial entrepreneur, where she manages multiple premium service portfolios.
             </p>
 
             <p className="text-base md:text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium tracking-tight">

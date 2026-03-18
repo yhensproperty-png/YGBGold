@@ -29,7 +29,7 @@ Deno.serve(async (req: Request) => {
     .eq("slug", slug)
     .maybeSingle();
 
-  const siteUrl = "https://yhensproperty.com";
+  const siteUrl = "https://ygbgold.com";
 
   // Use featured_image_index if set, otherwise default to first image (index 0)
   const featuredIndex = property?.featured_image_index ?? 0;
@@ -52,14 +52,14 @@ Deno.serve(async (req: Request) => {
   const imageType = getImageType(ogImage);
 
   const rawTitle = property
-    ? `${property.title.trim()} | Yhen's Property`
-    : "Yhen's Property - Premium Real Estate";
+    ? `${property.title.trim()} | YGB Gold`
+    : "YGB Gold - Premium Gold Items";
 
   const rawDesc = property?.description
     ? property.description.slice(0, 200)
     : property
-    ? `${property.type} for ${property.listing_type === "rent" ? "Rent" : "Sale"} in ${property.city ?? ""} - Yhen's Property`
-    : "Boutique Philippine real estate agency offering luxury properties for sale and rent.";
+    ? `${property.type} for Sale in ${property.city ?? ""} - YGB Gold`
+    : "Boutique Philippine gold trader offering premium gold items, bars, and coins.";
 
   const esc = (s: string) =>
     s
@@ -91,7 +91,7 @@ Deno.serve(async (req: Request) => {
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="${ogTitle}" />
   <meta property="og:image:type" content="${imageType}" />
-  <meta property="og:site_name" content="Yhen's Property" />
+  <meta property="og:site_name" content="YGB Gold" />
   <meta property="og:locale" content="en_PH" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="${ogTitle}" />
