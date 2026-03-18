@@ -419,7 +419,7 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
     "@context": "https://schema.org",
     "@type": "Store",
     "name": "YGB Buy Gold & Sell",
-    "description": "Premium platform specializing in luxury gold items, bars, and coins for sale and rent",
+    "description": "Premium platform specializing in luxury gold items, bars, and coins for sale",
     "url": window.location.origin,
     "image": `${window.location.origin}/Image/Yhen_Property_Favikan.png`,
     "areaServed": {
@@ -433,11 +433,11 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
     <div>
       <SEO
         title="Premium Gold Coins, Bars & Jewelry for Buying and Selling | YGB Buy Gold & Sell"
-        description="Direct agent helping you buy or lease gold coins, bars, jewelry and collectibles. Direct deals, legal guidance, focus on premium quality."
+        description="Direct agent helping you buy gold coins, bars, jewelry and collectibles. Direct deals, legal guidance, focus on premium quality."
         canonical={window.location.origin}
         ogType="website"
         ogTitle="YGB Buy Gold & Sell - Premium Gold Items"
-        ogDescription="Premium platform offering luxury gold items for sale and lease."
+        ogDescription="Premium platform offering luxury gold items for sale."
         ogUrl={window.location.origin}
         ogImage={`${window.location.origin}/Image/YGB_favicon.png`}
         ogSiteName="YGB Buy Gold & Sell"
