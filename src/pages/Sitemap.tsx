@@ -19,7 +19,6 @@ const Sitemap: React.FC<SitemapProps> = ({ properties }) => {
       { loc: `${domain}/category/jewelry`, priority: '0.7', changefreq: 'daily' },
       { loc: `${domain}/category/scrap-gold`, priority: '0.7', changefreq: 'daily' },
       { loc: `${domain}/category/others`, priority: '0.7', changefreq: 'daily' },
-      { loc: `${domain}/category/rent`, priority: '0.7', changefreq: 'daily' },
       ...activeProperties.map(property => ({
         loc: `${domain}/item/${property.slug}`,
         priority: '0.8',

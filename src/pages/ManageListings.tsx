@@ -15,7 +15,7 @@ interface ManageListingsProps {
   onDelete: (id: string) => void;
 }
 
-type View = 'active' | 'sold' | 'rented' | 'commission' | 'archived';
+type View = 'active' | 'sold' | 'commission' | 'archived';
 
 function PropertyTable({
   items,
@@ -84,8 +84,6 @@ function PropertyTable({
                     ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
                     : property.status === 'archived'
                     ? 'bg-zinc-100 text-zinc-500 border border-zinc-200'
-                    : property.status === 'rented'
-                    ? 'bg-sky-50 text-sky-600 border border-sky-200'
                     : 'bg-yellow-100 text-yellow-600 border border-yellow-200'
                 }`}>
                   {property.status}
@@ -181,8 +179,6 @@ function PropertyTable({
                         ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
                         : property.status === 'archived'
                         ? 'bg-zinc-100 text-zinc-500 border border-zinc-200'
-                        : property.status === 'rented'
-                        ? 'bg-sky-50 text-sky-600 border border-sky-200'
                         : 'bg-yellow-100 text-yellow-600 border border-yellow-200'
                     }`}>
                       {property.status}
@@ -335,14 +331,6 @@ const ManageListings: React.FC<ManageListingsProps> = ({ properties, onUpdate, o
     onUpdate({ ...property, status: 'active' });
   };
 
-  const handleMarkRented = (property: PropertyListing) => {
-    onUpdate({ ...property, status: 'rented' });
-  };
-
-  const handleUnmarkRented = (property: PropertyListing) => {
-    onUpdate({ ...property, status: 'active' });
-  };
-
   const handleDelete = (id: string) => {
     if (window.confirm('Are you sure you want to delete this listing? This action cannot be undone.')) {
       onDelete(id);
@@ -394,15 +382,7 @@ const ManageListings: React.FC<ManageListingsProps> = ({ properties, onUpdate, o
     </>
   );
 
-  const rentedActions = (property: PropertyListing) => (
-    <button
-      onClick={() => handleUnmarkRented(property)}
-      className="w-9 h-9 flex items-center justify-center rounded-xl border border-sky-200 text-sky-600 hover:bg-sky-50 transition-all flex-shrink-0"
-      title="Restore to Active"
-    >
-      <span className="material-icons text-sm">undo</span>
-    </button>
-  );
+
 
   const archivedActions = (property: PropertyListing) => (
     <button

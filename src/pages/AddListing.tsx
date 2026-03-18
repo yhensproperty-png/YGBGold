@@ -73,7 +73,6 @@ const AddListing: React.FC<AddListingProps> = ({ onAdd, isEdit }) => {
   const [formData, setFormData] = useState<Partial<PropertyListing>>({
     title: '',
     type: PropertyType.Jewelry,
-    listingType: 'sale',
     price: 0,
     description: '',
     address: '',

@@ -9,18 +9,13 @@ interface CategoryListingsProps {
   properties: PropertyListing[];
 }
 
-const CATEGORY_MAP: Record<string, { title: string; types?: PropertyType[]; listingType?: 'sale' | 'rent' }> = {
+const CATEGORY_MAP: Record<string, { title: string; types?: PropertyType[] }> = {
   'coins': { title: 'Gold Coins', types: [PropertyType.Coins] },
   'bars': { title: 'Gold Bars', types: [PropertyType.Bars] },
   'jewelry': { title: 'Gold Jewelry', types: [PropertyType.Jewelry] },
   'collectibles': { title: 'Collectibles', types: [PropertyType.Collectibles] },
   'scrap-gold': { title: 'Scrap Gold', types: [PropertyType.ScrapGold] },
-  'others': { title: 'Others', types: [PropertyType.Others] },
-  'rent-jewelry': { title: 'Jewelry (Lease)', types: [PropertyType.Jewelry], listingType: 'rent' },
-  'rent-coins': { title: 'Gold Coins (Lease)', types: [PropertyType.Coins], listingType: 'rent' },
-  'rent-bars': { title: 'Gold Bars (Lease)', types: [PropertyType.Bars], listingType: 'rent' },
-  'rent-collectibles': { title: 'Collectibles (Lease)', types: [PropertyType.Collectibles], listingType: 'rent' },
-  'rent': { title: 'All Rentals', listingType: 'rent' }
+  'others': { title: 'Others', types: [PropertyType.Others] }
 };
 
 // Utility to format number with commas
@@ -114,7 +109,6 @@ const CategoryListings: React.FC<CategoryListingsProps> = ({ properties }) => {
     let base = categoryConfig
       ? properties.filter(p => {
           if (p.status !== 'active' && p.status !== 'draft') return false;
-          if (categoryConfig.listingType && p.listingType !== categoryConfig.listingType) return false;
           if (categoryConfig.types && !categoryConfig.types.includes(p.type)) return false;
           return true;
         })
@@ -199,7 +193,7 @@ const CategoryListings: React.FC<CategoryListingsProps> = ({ properties }) => {
     setTimeout(() => setIsSearching(false), 600);
   };
 
-  const isRentCategory = categoryConfig?.listingType === 'rent' || categoryKey === 'rent';
+
 
   const categoryDescriptions: Record<string, { title: string; description: string }> = {
     'coins': {
@@ -283,11 +277,11 @@ const CategoryListings: React.FC<CategoryListingsProps> = ({ properties }) => {
         {/* Type Indicator */}
         <div className="flex justify-between items-start mb-5">
           <div className="inline-flex items-center gap-3 px-4 py-2 bg-white/5 backdrop-blur-md rounded-xl border border-white/10">
-            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isRentCategory ? 'bg-primary/20 text-primary' : 'bg-primary text-zinc-900 shadow-lg shadow-primary/20'}`}>
-              <span className="material-icons text-lg">{isRentCategory ? 'key' : 'sell'}</span>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary text-zinc-900 shadow-lg shadow-primary/20">
+              <span className="material-icons text-lg">sell</span>
             </div>
             <span className="text-white text-[10px] font-black tracking-[0.25em] uppercase">
-              {isRentCategory ? 'TRADING SEARCH' : categoryKey === 'scrap-gold' ? 'SCRAP SEARCH' : categoryKey === 'jewelry' ? 'JEWELRY SEARCH' : categoryKey === 'coins' ? 'COIN SEARCH' : categoryKey === 'bars' ? 'BAR SEARCH' : 'INVENTORY SEARCH'}
+              {categoryKey === 'scrap-gold' ? 'SCRAP SEARCH' : categoryKey === 'jewelry' ? 'JEWELRY SEARCH' : categoryKey === 'coins' ? 'COIN SEARCH' : categoryKey === 'bars' ? 'BAR SEARCH' : 'INVENTORY SEARCH'}
             </span>
           </div>
 

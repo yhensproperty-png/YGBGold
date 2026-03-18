@@ -90,9 +90,6 @@ export const PropertyCard: React.FC<{ property: PropertyListing }> = ({ property
             <div className="bg-primary text-zinc-900 font-bold px-3 py-1 rounded-full text-[10px] tracking-wider">
               {property.status.toUpperCase()}
             </div>
-            <div className="bg-white text-zinc-900 font-bold px-3 py-1 rounded-full text-[10px] tracking-wider shadow-sm">
-              FOR {property.listingType?.toUpperCase() || 'SALE'}
-            </div>
           </div>
           {property.featured && (
             <div className="absolute top-4 right-4 bg-zinc-900/80 backdrop-blur text-primary border border-primary/30 font-bold px-3 py-1 rounded-full text-[10px] tracking-widest shadow-lg">
@@ -101,7 +98,7 @@ export const PropertyCard: React.FC<{ property: PropertyListing }> = ({ property
           )}
           <div className="absolute bottom-4 right-4 bg-white/90 dark:bg-zinc-900/90 backdrop-blur px-3 py-1 rounded-lg">
             <span className="font-bold dark:text-white">
-              ₱{property.price.toLocaleString()}{property.listingType === 'rent' ? '/mo' : ''}
+              ₱{property.price.toLocaleString()}
             </span>
           </div>
         </div>
@@ -216,7 +213,6 @@ export const PropertyCard: React.FC<{ property: PropertyListing }> = ({ property
 
 const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
   const resultsRef = useRef<HTMLDivElement>(null);
-  const [listingType, setListingType] = useState<'sale' | 'rent'>('sale');
   const [isSearching, setIsSearching] = useState(false);
   const [filteredResults, setFilteredResults] = useState<PropertyListing[] | null>(null);
   const [availableAmenities, setAvailableAmenities] = useState<{ id: string; label: string; icon: string }[]>([]);
@@ -308,7 +304,6 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
 
     setTimeout(() => {
       let results = activeProperties.filter(p => {
-        if (p.listingType !== listingType) return false;
 
         if (searchFilters.location.trim()) {
           const loc = searchFilters.location.toLowerCase().trim();
@@ -494,32 +489,8 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
           ) : (
           <div className="bg-zinc-900/60 backdrop-blur-3xl p-4 md:p-6 rounded-2xl md:rounded-3xl border border-white/10 shadow-2xl max-w-5xl mx-auto relative">
 
-            {/* Buy / Rent Toggle */}
-            <div className="flex justify-between items-start mb-5">
-              <div className="inline-flex p-1 bg-white/5 backdrop-blur-md rounded-xl border border-white/10">
-                <button
-                  onClick={() => setListingType('sale')}
-                  className={`px-5 md:px-8 py-2 md:py-2.5 rounded-lg text-xs font-black tracking-widest transition-all duration-300 ${
-                    listingType === 'sale'
-                      ? 'bg-primary text-zinc-900 shadow-lg shadow-primary/20'
-                      : 'text-white/40 hover:text-white/70'
-                  }`}
-                >
-                  BUY
-                </button>
-                <button
-                  onClick={() => setListingType('rent')}
-                  className={`px-5 md:px-8 py-2 md:py-2.5 rounded-lg text-xs font-black tracking-widest transition-all duration-300 ${
-                    listingType === 'rent'
-                      ? 'bg-primary text-zinc-900 shadow-lg shadow-primary/20'
-                      : 'text-white/40 hover:text-white/70'
-                  }`}
-                >
-                  RENT
-                </button>
-              </div>
-
-              {/* Advanced Filters Button - Next to Toggle */}
+            {/* Advanced Filters Button */}
+            <div className="flex justify-end mb-5">
               <button
                 type="button"
                 onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}

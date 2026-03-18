@@ -14,7 +14,7 @@ export interface PropertyListing {
   slug: string;
   title: string;
   type: PropertyType;
-  listingType: 'sale' | 'rent';
+  listingType: 'sale';
   price: number;
   description: string;
   address: string;
@@ -35,7 +35,7 @@ export interface PropertyListing {
   featured?: boolean;
   featuredUntil?: string;
   featuredImageIndex?: number;
-  status: 'active' | 'draft' | 'sold' | 'archived' | 'rented';
+  status: 'active' | 'draft' | 'sold' | 'archived';
   dateListed: string;
   dateUpdated?: string;
   agent?: 'Yhen' | 'Daphne' | 'Abby' | 'Juvy';

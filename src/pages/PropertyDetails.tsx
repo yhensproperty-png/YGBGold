@@ -261,18 +261,16 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
 
   const generateSEOTitle = (): string => {
     const unitType = property.type;
-    const transactionType = property.listingType === 'sale' ? 'for Sale' : 'for Rent';
     const location = property.city;
     const buildingName = property.condoName || property.barangay;
 
-    return `${unitType} ${transactionType} in ${location} | ${buildingName} | YGB Gold`;
+    return `${unitType} in ${location} | ${buildingName} | YGB Gold`;
   };
 
   const generateSEODescription = (): string => {
     const priceFormatted = `₱${property.price.toLocaleString()}`;
-    const transactionType = property.listingType === 'sale' ? 'for sale' : 'for rent';
 
-    let desc = `${property.type} ${transactionType} in ${property.city} at ${priceFormatted}`;
+    let desc = `${property.type} in ${property.city} at ${priceFormatted}`;
     desc += ` • Karat: ${property.beds}K • Weight: ${property.baths}g`;
 
     if (property.condoName) {
@@ -293,7 +291,7 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
   };
 
   const generateImageAlt = (imageIndex: number): string => {
-    const baseDesc = `${property.type} ${property.listingType === 'sale' ? 'for sale' : 'for rent'} in ${property.city}`;
+    const baseDesc = `${property.type} in ${property.city}`;
 
     if (imageIndex === 0) {
       let altText = `${baseDesc} - ${property.beds}K Purity, ${property.baths}g Weight`;
@@ -369,7 +367,7 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
       {
         "@type": "PropertyValue",
         "name": "Offer Type",
-        "value": property.listingType === 'sale' ? 'For Sale' : 'Trading'
+        "value": "For Sale"
       },
       {
         "@type": "PropertyValue",
@@ -654,7 +652,7 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
               <div className="flex-1 min-w-[200px]">
                 <span className="text-[9px] font-black text-zinc-400 uppercase tracking-[0.2em] block mb-1">Listing Price</span>
                 <div className="text-2xl sm:text-3xl lg:text-4xl font-black dark:text-white tracking-tighter">
-                  ₱{property.price.toLocaleString()}{property.listingType === 'rent' ? '/mo' : ''}
+                  ₱{property.price.toLocaleString()}
                 </div>
               </div>
 
@@ -960,7 +958,7 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
                     </div>
                     <div className="absolute bottom-3 right-3 bg-white/90 dark:bg-zinc-900/90 backdrop-blur px-2.5 py-1 rounded-lg">
                       <span className="font-bold dark:text-white text-sm">
-                        ₱{prop.price.toLocaleString()}{prop.listingType === 'rent' ? '/mo' : ''}
+                        ₱{prop.price.toLocaleString()}
                       </span>
                     </div>
                   </div>
