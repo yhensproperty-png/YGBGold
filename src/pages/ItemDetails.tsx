@@ -4,6 +4,8 @@ import HCaptcha from '@hcaptcha/react-hcaptcha';
 import { SEO } from '../components/SEO.tsx';
 import { PropertyListing, PropertyType } from '../types.ts';
 import { supabase } from '../services/supabaseClient.ts';
+import { useAuth } from '../context/AuthContext.tsx';
+import { OrderService } from '../services/orderService.ts';
 
 /**
  * CONFIGURATION:
@@ -14,7 +16,7 @@ const WEB3FORMS_ACCESS_KEY = "c7934ce9-2cd3-4c34-ba88-dfcc376c3643";
 const WHATSAPP_NUMBER = "639467543767";
 const HCAPTCHA_SITE_KEY = "50b2fe65-b00b-4b9e-ad62-3ba471098be2"; 
 
-interface PropertyDetailsProps {
+interface ItemDetailsProps {
   properties: PropertyListing[];
 }
 
@@ -97,12 +99,33 @@ const AMENITY_MAP: Record<string, string> = {
   'Newly Renovated': 'construction'
 };
 
-const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
+const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
   const { id } = useParams<{ id: string }>();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+
+  const { user, profile } = useAuth();
+  
+  const [showBuyModal, setShowBuyModal] = useState(false);
+  const [isOrdering, setIsOrdering] = useState(false);
+  const [buyFormData, setBuyFormData] = useState({
+    customer_name: '',
+    customer_email: '',
+    customer_phone: '',
+    shipping_address: ''
+  });
+
+  useEffect(() => {
+    if (user || profile) {
+      setBuyFormData(prev => ({
+        ...prev,
+        customer_name: prev.customer_name || profile?.display_name || '',
+        customer_email: prev.customer_email || user?.email || '',
+      }));
+    }
+  }, [user, profile]);
 
   const property = properties.find(p => p.id === id || p.slug === id || p.listing_id === id);
 
@@ -182,6 +205,33 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
     setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+  };
+
+  const handleBuyInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setBuyFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleBuySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!property) return;
+
+    setIsOrdering(true);
+    try {
+      await OrderService.addOrder(
+        property.id,
+        property.price,
+        buyFormData,
+        user?.id
+      );
+      setShowBuyModal(false);
+      alert('Buy request submitted successfully! We will contact you shortly to confirm your order.');
+    } catch (error) {
+      console.error('Error submitting buy request:', error);
+      alert('There was an error submitting your request. Please try again.');
+    } finally {
+      setIsOrdering(false);
+    }
   };
 
   const handleInquirySubmit = async (e: React.FormEvent) => {
@@ -460,6 +510,77 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
               <p className="text-zinc-500 text-sm max-w-xs leading-relaxed">Your message has been received. We will contact you shortly.</p>
             </div>
             <button onClick={() => setShowSuccess(false)} className="px-10 py-4 bg-primary text-zinc-900 font-bold rounded-2xl hover:scale-105 transition-all">Done</button>
+          </div>
+        </div>
+      )}
+
+      {/* Buy Request Modal */}
+      {showBuyModal && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-zinc-950/90 backdrop-blur-xl animate-in fade-in duration-300 p-4">
+          <div className="bg-white dark:bg-zinc-900 p-8 rounded-3xl shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-500 relative border border-zinc-200 dark:border-zinc-800">
+            <button
+              onClick={() => setShowBuyModal(false)}
+              className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors"
+            >
+              <span className="material-icons">close</span>
+            </button>
+            <h2 className="text-2xl font-black dark:text-white tracking-tighter mb-1">Request to Buy</h2>
+            <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-6">{property.title} - ₱{property.price.toLocaleString()}</p>
+            
+            <form className="space-y-4" onSubmit={handleBuySubmit}>
+              <div>
+                <label className="block text-[9px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-2 px-1">Full Name</label>
+                <input
+                  name="customer_name"
+                  value={buyFormData.customer_name}
+                  onChange={handleBuyInputChange}
+                  className="w-full bg-zinc-50 dark:bg-zinc-800 border-zinc-100 dark:border-zinc-700 rounded-xl p-3 text-sm font-bold focus:ring-primary focus:border-primary transition-all placeholder:text-zinc-300"
+                  type="text" required disabled={isOrdering}
+                />
+              </div>
+              <div>
+                <label className="block text-[9px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-2 px-1">Email Address</label>
+                <input
+                  name="customer_email"
+                  value={buyFormData.customer_email}
+                  onChange={handleBuyInputChange}
+                  className="w-full bg-zinc-50 dark:bg-zinc-800 border-zinc-100 dark:border-zinc-700 rounded-xl p-3 text-sm font-bold focus:ring-primary focus:border-primary transition-all placeholder:text-zinc-300"
+                  type="email" required disabled={isOrdering}
+                />
+              </div>
+              <div>
+                <label className="block text-[9px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-2 px-1">Phone Number</label>
+                <input
+                  name="customer_phone"
+                  value={buyFormData.customer_phone}
+                  onChange={handleBuyInputChange}
+                  className="w-full bg-zinc-50 dark:bg-zinc-800 border-zinc-100 dark:border-zinc-700 rounded-xl p-3 text-sm font-bold focus:ring-primary focus:border-primary transition-all placeholder:text-zinc-300"
+                  type="tel" required disabled={isOrdering}
+                />
+              </div>
+              <div>
+                <label className="block text-[9px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-2 px-1">Shipping Address</label>
+                <textarea
+                  name="shipping_address"
+                  value={buyFormData.shipping_address}
+                  onChange={handleBuyInputChange}
+                  className="w-full bg-zinc-50 dark:bg-zinc-800 border-zinc-100 dark:border-zinc-700 rounded-xl p-3 text-sm font-bold focus:ring-primary focus:border-primary min-h-[80px] resize-none placeholder:text-zinc-300"
+                  required disabled={isOrdering}
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={isOrdering}
+                className="w-full bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-black py-4 rounded-xl shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-2 disabled:opacity-50"
+              >
+                {isOrdering ? (
+                  <span className="material-icons animate-spin text-lg">sync</span>
+                ) : (
+                   <span className="material-icons text-lg">shopping_cart_checkout</span>
+                )}
+                <span className="text-lg">{isOrdering ? 'Submitting...' : 'Confirm Request'}</span>
+              </button>
+            </form>
           </div>
         </div>
       )}
@@ -795,12 +916,26 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
             <div className="bg-white dark:bg-zinc-900 p-6 rounded-3xl shadow-2xl border border-zinc-200 dark:border-zinc-800 ring-1 ring-black/5">
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center shadow-xl shadow-primary/20">
-                  <span className="material-icons text-zinc-900 text-3xl font-black">home_work</span>
+                  <span className="material-icons text-zinc-900 text-3xl font-black">diamond</span>
                 </div>
                 <div>
                   <h3 className="font-black text-2xl dark:text-white tracking-tighter">Yhen</h3>
                   <p className="text-[9px] font-black text-zinc-400 uppercase tracking-[0.2em] mt-0.5">Gold Specialist</p>
                 </div>
+              </div>
+
+              <button
+                onClick={() => setShowBuyModal(true)}
+                className="w-full bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-black py-4 rounded-xl shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 mb-6 border border-zinc-800 dark:border-zinc-200"
+              >
+                <span className="material-icons text-xl">shopping_cart</span>
+                <span className="text-lg">Request to Buy</span>
+              </button>
+
+              <div className="flex items-center gap-3 mb-6">
+                <div className="h-px bg-zinc-200 dark:bg-zinc-800 flex-1"></div>
+                <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Or Inquiry</span>
+                <div className="h-px bg-zinc-200 dark:bg-zinc-800 flex-1"></div>
               </div>
 
               <form className="space-y-4" onSubmit={handleInquirySubmit}>
@@ -998,4 +1133,4 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ properties }) => {
   );
 };
 
-export default PropertyDetails;
+export default ItemDetails;

@@ -90,7 +90,8 @@ const AddListing: React.FC<AddListingProps> = ({ onAdd, isEdit }) => {
     images: [],
     featured: false,
     agent: 'Yhen',
-    status: 'active'
+    status: 'active',
+    inventoryAmount: 1
   });
 
   const [customAmenityOptions, setCustomAmenityOptions] = useState<{ id: string; label: string; icon: string }[]>([]);
@@ -122,7 +123,7 @@ const AddListing: React.FC<AddListingProps> = ({ onAdd, isEdit }) => {
     if (name === 'price') {
       const numValue = parseInt(value.replace(/\D/g, '')) || 0;
       setFormData(prev => ({ ...prev, [name]: numValue }));
-    } else if (name === 'beds' || name === 'baths' || name === 'sqft' || name === 'lotArea') {
+    } else if (name === 'beds' || name === 'baths' || name === 'sqft' || name === 'lotArea' || name === 'inventoryAmount') {
       const numValue = name === 'baths' ? parseFloat(value) : parseInt(value);
       setFormData(prev => ({ ...prev, [name]: isNaN(numValue) ? 0 : numValue }));
     } else {
@@ -423,6 +424,20 @@ const AddListing: React.FC<AddListingProps> = ({ onAdd, isEdit }) => {
                     <div className="flex flex-col gap-2">
                       <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">Serial/ID</label>
                       <input name="lotArea" value={formData.lotArea || ''} onChange={handleChange} className="w-full bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 rounded-xl focus:ring-primary focus:border-primary" type="text" placeholder="Optional" />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">Inventory Amount</label>
+                      <input 
+                        name="inventoryAmount" 
+                        value={formData.inventoryAmount} 
+                        onChange={handleChange} 
+                        className="w-full bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 rounded-xl focus:ring-primary focus:border-primary" 
+                        type="number" 
+                        min="0" 
+                        required 
+                        placeholder="In Stock"
+                      />
+                      <p className="text-[10px] text-zinc-400 font-medium italic">Internal inventory tracking (Not shown to clients)</p>
                     </div>
                   </div>
 

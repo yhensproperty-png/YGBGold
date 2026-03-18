@@ -1,11 +1,9 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { PropertyListing, Commission } from '../types.ts';
+import { PropertyListing } from '../types.ts';
 import { useAuth } from '../context/AuthContext.tsx';
-import { commissionService } from '../services/commissionService.ts';
-import CommissionList from '../components/CommissionList.tsx';
-import CommissionModal from '../components/CommissionModal.tsx';
+import OrderManagement from '../components/OrderManagement.tsx';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -15,7 +13,7 @@ interface ManageListingsProps {
   onDelete: (id: string) => void;
 }
 
-type View = 'active' | 'sold' | 'commission' | 'archived';
+type View = 'active' | 'sold' | 'archived' | 'orders';
 
 function PropertyTable({
   items,
@@ -72,7 +70,7 @@ function PropertyTable({
                   <p className="font-bold dark:text-white text-sm">₱{property.price.toLocaleString()}</p>
                   <div className="mt-1 space-y-0.5">
                     <p className="text-[10px] text-zinc-400 uppercase tracking-wider font-medium">Item Type</p>
-                    <p className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">{property.type}</p>
+                    <p className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">{property.status} • {property.inventoryAmount || 0} in stock</p>
                   </div>
                 </div>
               </div>
@@ -130,7 +128,8 @@ function PropertyTable({
               <th className="px-2 py-5 text-xs font-bold uppercase tracking-wider text-zinc-500">Price</th>
               <th className="px-2 py-5 text-xs font-bold uppercase tracking-wider text-zinc-500">Type</th>
               <th className="px-2 py-5 text-xs font-bold uppercase tracking-wider text-zinc-500">Agent</th>
-              <th className="px-2 py-5 text-xs font-bold uppercase tracking-wider text-zinc-500">Status</th>
+              <th className="px-2 py-5 text-xs font-bold uppercase tracking-wider text-zinc-500">Stock</th>
+              <th className="px-2 py-5 text-xs font-bold uppercase tracking-wider text-zinc-500 text-right">Status</th>
               <th className="pl-2 pr-6 py-5 text-xs font-bold uppercase tracking-wider text-zinc-500 text-right">Actions</th>
             </tr>
           </thead>
@@ -171,7 +170,10 @@ function PropertyTable({
                   <td className="px-2 py-5">
                     <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 truncate">{property.agent || '-'}</p>
                   </td>
-                  <td className="px-2 py-5">
+                  <td className="px-2 py-5 text-right">
+                    <p className="text-sm font-bold text-zinc-700 dark:text-zinc-300">{property.inventoryAmount || 0}</p>
+                  </td>
+                  <td className="px-2 py-5 text-right">
                     <span className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider whitespace-nowrap ${
                       property.status === 'active'
                         ? 'bg-primary/10 text-primary border border-primary/20'
@@ -274,34 +276,11 @@ const ManageListings: React.FC<ManageListingsProps> = ({ properties, onUpdate, o
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
   const [activeView, setActiveView] = useState<View>('active');
-  const [commissions, setCommissions] = useState<Commission[]>([]);
-  const [selectedCommission, setSelectedCommission] = useState<Commission | null>(null);
-  const [selectedProperty, setSelectedProperty] = useState<PropertyListing | null>(null);
-  const [isCommissionModalOpen, setIsCommissionModalOpen] = useState(false);
-  const [isLoadingCommissions, setIsLoadingCommissions] = useState(false);
 
   const activeListings = useMemo(() => properties.filter(p => p.status === 'active' || p.status === 'draft'), [properties]);
   const soldListings = useMemo(() => properties.filter(p => p.status === 'sold'), [properties]);
   const archivedListings = useMemo(() => properties.filter(p => p.status === 'archived'), [properties]);
 
-  const loadCommissions = async () => {
-    if (!isAdmin) return;
-    setIsLoadingCommissions(true);
-    try {
-      const data = await commissionService.getAllCommissions();
-      setCommissions(data);
-    } catch (error) {
-      console.error('Error loading commissions:', error);
-    } finally {
-      setIsLoadingCommissions(false);
-    }
-  };
-
-  useEffect(() => {
-    if (isAdmin) {
-      loadCommissions();
-    }
-  }, [isAdmin]);
 
   const handleArchive = (property: PropertyListing) => {
     onUpdate({ ...property, status: 'archived' });
@@ -313,18 +292,6 @@ const ManageListings: React.FC<ManageListingsProps> = ({ properties, onUpdate, o
 
   const handleMarkSold = async (property: PropertyListing) => {
     onUpdate({ ...property, status: 'sold' });
-
-    if (isAdmin) {
-      try {
-        const existingCommission = await commissionService.getCommissionByPropertyId(property.id);
-        if (!existingCommission) {
-          await commissionService.createCommission(property.id, property.listing_id, property.title);
-          await loadCommissions();
-        }
-      } catch (error) {
-        console.error('Error creating commission record:', error);
-      }
-    }
   };
 
   const handleUnmarkSold = (property: PropertyListing) => {
@@ -358,20 +325,6 @@ const ManageListings: React.FC<ManageListingsProps> = ({ properties, onUpdate, o
 
   const soldActions = (property: PropertyListing) => (
     <>
-      {isAdmin && (
-        <button
-          onClick={async () => {
-            const commission = await commissionService.getCommissionByPropertyId(property.id);
-            setSelectedProperty(property);
-            setSelectedCommission(commission);
-            setIsCommissionModalOpen(true);
-          }}
-          className="w-9 h-9 flex items-center justify-center rounded-xl border border-purple-200 text-purple-600 hover:bg-purple-50 transition-all flex-shrink-0"
-          title="Manage Commission"
-        >
-          <span className="material-icons text-sm">payments</span>
-        </button>
-      )}
       <button
         onClick={() => handleUnmarkSold(property)}
         className="w-9 h-9 flex items-center justify-center rounded-xl border border-emerald-200 text-emerald-600 hover:bg-emerald-50 transition-all flex-shrink-0"
@@ -394,18 +347,6 @@ const ManageListings: React.FC<ManageListingsProps> = ({ properties, onUpdate, o
     </button>
   );
 
-  const handleManageCommission = async (commission: Commission) => {
-    const property = properties.find(p => p.id === commission.property_id);
-    if (property) {
-      setSelectedProperty(property);
-      setSelectedCommission(commission);
-      setIsCommissionModalOpen(true);
-    }
-  };
-
-  const handleCommissionSaved = () => {
-    loadCommissions();
-  };
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12 space-y-12">
@@ -430,8 +371,8 @@ const ManageListings: React.FC<ManageListingsProps> = ({ properties, onUpdate, o
         {([
           { view: 'active' as View, label: 'Active', icon: 'inventory_2', count: activeListings.length, activeColor: 'border-primary text-primary', dotColor: 'bg-primary', adminOnly: false },
           { view: 'sold' as View, label: 'Sold', icon: 'sell', count: soldListings.length, activeColor: 'border-emerald-500 text-emerald-600', dotColor: 'bg-emerald-500', adminOnly: false },
-          { view: 'commission' as View, label: 'Commission', icon: 'payments', count: commissions.length, activeColor: 'border-purple-500 text-purple-600', dotColor: 'bg-purple-500', adminOnly: true },
           { view: 'archived' as View, label: 'Archived', icon: 'inventory_2', count: archivedListings.length, activeColor: 'border-zinc-500 text-zinc-600', dotColor: 'bg-zinc-400', adminOnly: false },
+          { view: 'orders' as View, label: 'Orders', icon: 'shopping_bag', count: undefined, activeColor: 'border-blue-500 text-blue-600', dotColor: 'bg-blue-500', adminOnly: true },
         ]).filter(tab => !tab.adminOnly || isAdmin).map(tab => (
           <button
             key={tab.view}
@@ -444,11 +385,13 @@ const ManageListings: React.FC<ManageListingsProps> = ({ properties, onUpdate, o
           >
             <span className="material-icons text-base">{tab.icon}</span>
             {tab.label}
-            <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-black ${
-              activeView === tab.view ? 'bg-current/10' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500'
-            }`}>
-              {tab.count}
-            </span>
+            {tab.count !== undefined && (
+              <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-black ${
+                activeView === tab.view ? 'bg-current/10' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500'
+              }`}>
+                {tab.count}
+              </span>
+            )}
           </button>
         ))}
       </div>
@@ -489,23 +432,6 @@ const ManageListings: React.FC<ManageListingsProps> = ({ properties, onUpdate, o
         </section>
       )}
 
-      {/* Commission Records */}
-      {activeView === 'commission' && isAdmin && (
-        <section>
-          {isLoadingCommissions ? (
-            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 px-8 py-16 text-center text-zinc-400 shadow-xl">
-              <span className="material-icons text-4xl block mb-2 text-zinc-300 animate-spin">sync</span>
-              Loading commissions...
-            </div>
-          ) : (
-            <CommissionList
-              commissions={commissions}
-              properties={properties}
-              onManageCommission={handleManageCommission}
-            />
-          )}
-        </section>
-      )}
 
       {/* Archived Listings */}
       {activeView === 'archived' && (
@@ -528,18 +454,15 @@ const ManageListings: React.FC<ManageListingsProps> = ({ properties, onUpdate, o
         </section>
       )}
 
-      {/* Commission Modal */}
-      <CommissionModal
-        isOpen={isCommissionModalOpen}
-        onClose={() => {
-          setIsCommissionModalOpen(false);
-          setSelectedCommission(null);
-          setSelectedProperty(null);
-        }}
-        property={selectedProperty}
-        commission={selectedCommission}
-        onSave={handleCommissionSaved}
-      />
+      {/* Orders */}
+      {activeView === 'orders' && (
+        <section>
+          <div className="-mt-8">
+            <OrderManagement />
+          </div>
+        </section>
+      )}
+
     </div>
   );
 };

@@ -34,6 +34,7 @@ function toRow(p: PropertyListing, ownerId?: string | null) {
     status: p.status,
     date_listed: p.dateListed,
     date_updated: p.dateUpdated ?? null,
+    inventory_amount: p.inventoryAmount ?? 1,
     owner_id: ownerId !== undefined ? ownerId : undefined,
   };
 }
@@ -71,6 +72,7 @@ function fromRow(row: any): PropertyListing {
     dateListed: row.date_listed,
     dateUpdated: row.date_updated ?? undefined,
     origin: row.state as any,
+    inventoryAmount: row.inventory_amount ?? 1,
   };
 }
 

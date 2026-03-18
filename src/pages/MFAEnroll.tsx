@@ -11,8 +11,7 @@ const MFAEnroll: React.FC = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
-
-  const logoUrl = "/Image/LimeLogo2.png";
+  const logoUrl = "/Image/YGB_Logo_Trimmed.png";
 
   useEffect(() => {
     startEnrollment();

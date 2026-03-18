@@ -40,54 +40,44 @@ export interface PropertyListing {
   dateUpdated?: string;
   agent?: 'Yhen' | 'Daphne' | 'Abby' | 'Juvy';
   origin?: 'Saudi Gold' | 'Japan Gold' | 'Chinese Gold' | 'Hongkong Gold';
+  inventoryAmount: number;
 }
 
-export interface Commission {
+
+export enum OrderStatus {
+  Pending = 'pending',
+  Confirmed = 'confirmed',
+  Shipped = 'shipped',
+  Cancelled = 'cancelled'
+}
+
+export interface Order {
   id: string;
-  property_id: string;
+  order_number: number;
   listing_id: string;
-  property_title: string;
-  sold_price: number;
-  customer_agreed_percentage: number;
-  yhen_percentage: number;
-  taylor_percentage: number;
-  daphne_percentage: number;
-  abby_percentage: number;
-  juvy_percentage: number;
-  yhen_amount: number;
-  taylor_amount: number;
-  daphne_amount: number;
-  abby_amount: number;
-  juvy_amount: number;
-  customer_paid: boolean;
-  customer_payment_date: string | null;
-  yhen_paid: boolean;
-  yhen_payment_date: string | null;
-  taylor_paid: boolean;
-  taylor_payment_date: string | null;
-  daphne_paid: boolean;
-  daphne_payment_date: string | null;
-  abby_paid: boolean;
-  abby_payment_date: string | null;
-  juvy_paid: boolean;
-  juvy_payment_date: string | null;
+  user_id?: string;
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string;
+  shipping_address: string;
+  amount: number;
+  currency: string;
+  status: OrderStatus;
+  tracking_number?: string;
+  admin_notes?: string;
   created_at: string;
   updated_at: string;
-  created_by: string | null;
+  
+  // Joined fields when querying orders with their properties
+  property_title?: string;
+  property_slug?: string;
+  property_city?: string;
+  property_image?: string;
 }
 
-export interface CommissionFormData {
-  sold_price: number;
-  customer_agreed_percentage: number;
-  yhen_percentage: number;
-  taylor_percentage: number;
-  daphne_percentage: number;
-  abby_percentage: number;
-  juvy_percentage: number;
-  customer_paid: boolean;
-  yhen_paid: boolean;
-  taylor_paid: boolean;
-  daphne_paid: boolean;
-  abby_paid: boolean;
-  juvy_paid: boolean;
+export interface OrderFormData {
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string;
+  shipping_address: string;
 }

@@ -4,7 +4,7 @@ import Navbar from './components/Navbar.tsx';
 import ScrollToTop from './components/ScrollToTop.tsx';
 import Home from './pages/Home.tsx';
 import AddListing from './pages/AddListing.tsx';
-import PropertyDetails from './pages/PropertyDetails.tsx';
+import ItemDetails from './pages/ItemDetails.tsx';
 import ManageListings from './pages/ManageListings.tsx';
 import CategoryListings from './pages/CategoryListings.tsx';
 import About from './pages/About.tsx';
@@ -143,7 +143,7 @@ const AppContent: React.FC = () => {
               <AdminDashboard />
             </ProtectedRoute>
           } />
-          <Route path="/item/:id" element={<PropertyDetails properties={properties} />} />
+          <Route path="/item/:id" element={<ItemDetails properties={properties} />} />
           <Route path="/category/:category" element={<CategoryListings properties={properties} />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
