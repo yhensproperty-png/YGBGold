@@ -60,11 +60,18 @@ export default async (request: Request, context: Context) => {
 
     // Only proceed if the event is a received email
     if (payload.type === "email.received") {
-      // Full email content is in the webhook payload — no separate fetch needed
       const emailData = payload.data;
       console.log(`[resend-inbound] Received email from ${emailData.from}, subject: "${emailData.subject}"`);
 
-      // Forward directly using payload.data content
+      // Resolve body content — check text, html, and content fields with fallbacks
+      const textBody: string = emailData.text || emailData.content || "";
+      const htmlBody: string = emailData.html || emailData.content || "";
+
+      // If all body fields are empty, log payload keys to help debug
+      if (!textBody && !htmlBody) {
+        console.warn(`[resend-inbound] All body fields empty. payload.data keys: ${Object.keys(emailData).join(", ")}`);
+      }
+
       const forwardRes = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
@@ -74,9 +81,10 @@ export default async (request: Request, context: Context) => {
         body: JSON.stringify({
           from: "inquiries@mail.ygbgold.com",
           to: ["ygbgoldbuysell@gmail.com"],
-          subject: `New website inquiry: ${emailData.subject || "No Subject"}`,
-          text: `Original sender: ${emailData.from}\n\n${emailData.text || "No text content found."}`,
-          html: emailData.html || undefined
+          reply_to: emailData.from,  // Reply goes back to the original sender
+          subject: `New inquiry: ${emailData.subject || "No Subject"}`,
+          text: `From: ${emailData.from}\n\n${textBody || "(no text content)"}`,
+          html: htmlBody || undefined
         })
       });
 
