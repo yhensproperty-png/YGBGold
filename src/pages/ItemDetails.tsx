@@ -114,7 +114,9 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
     customer_name: '',
     customer_email: '',
     customer_phone: '',
-    shipping_address: ''
+    shipping_address: '',
+    shipping_country_group: '',
+    shipping_fee: 0
   });
 
   useEffect(() => {
@@ -207,25 +209,44 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
     setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
 
-  const handleBuyInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleBuyInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setBuyFormData(prev => ({ ...prev, [name]: value }));
+    if (name === 'shipping_country_group') {
+      let fee = 0;
+      if (value === 'philippines') fee = 300;
+      else if (value === 'thkrjpau') fee = 3500;
+      else if (value === 'sghktw') fee = 3000;
+      else if (value === 'caus') fee = 4000;
+      
+      setBuyFormData(prev => ({ ...prev, [name]: value, shipping_fee: fee }));
+    } else {
+      setBuyFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleBuySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!property) return;
 
+    if (!buyFormData.shipping_country_group) {
+      alert('Please select a shipping destination.');
+      return;
+    }
+    if (buyFormData.shipping_country_group === 'other') {
+      alert('Please contact us via WhatsApp/email for custom shipping.');
+      return;
+    }
+
     setIsOrdering(true);
     try {
       await OrderService.addOrder(
         property.id,
-        property.price,
+        property.price + buyFormData.shipping_fee,
         buyFormData,
         user?.id
       );
       setShowBuyModal(false);
-      alert('Buy request submitted successfully! We will contact you shortly to confirm your order.');
+      alert("Your purchase request has been sent! We'll contact you shortly to confirm payment and shipping.");
     } catch (error) {
       console.error('Error submitting buy request:', error);
       alert('There was an error submitting your request. Please try again.');
@@ -568,9 +589,34 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
                   required disabled={isOrdering}
                 />
               </div>
+              <div>
+                <label className="block text-[9px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-2 px-1">Shipping Destination</label>
+                <select
+                  name="shipping_country_group"
+                  value={buyFormData.shipping_country_group}
+                  onChange={handleBuyInputChange}
+                  className="w-full bg-zinc-50 dark:bg-zinc-800 border-zinc-100 dark:border-zinc-700 rounded-xl p-3 text-sm font-bold focus:ring-primary focus:border-primary transition-all text-zinc-900 dark:text-white"
+                  required disabled={isOrdering}
+                >
+                  <option value="">Select shipping destination</option>
+                  <option value="philippines">Philippines (Lbc) – ₱300</option>
+                  <option value="thkrjpau">Thailand / Korea / Japan / Australia – ₱3,500</option>
+                  <option value="sghktw">Singapore / Hong Kong / Taiwan – ₱3,000</option>
+                  <option value="caus">Canada / United States – ₱4,000</option>
+                  <option value="other">Other – Contact us</option>
+                </select>
+              </div>
+              
+              <div className="pt-2 pb-4">
+                <p className="text-lg font-black text-zinc-900 dark:text-white flex justify-between items-center bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-xl border border-zinc-100 dark:border-zinc-800">
+                  <span>Total:</span>
+                  <span className="text-primary">₱{(property.price + buyFormData.shipping_fee).toLocaleString()}</span>
+                </p>
+              </div>
+
               <button
                 type="submit"
-                disabled={isOrdering}
+                disabled={isOrdering || buyFormData.shipping_country_group === 'other'}
                 className="w-full bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-black py-4 rounded-xl shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-2 disabled:opacity-50"
               >
                 {isOrdering ? (

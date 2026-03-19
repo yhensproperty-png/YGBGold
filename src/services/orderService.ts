@@ -82,6 +82,8 @@ export const OrderService = {
       customer_email: formData.customer_email,
       customer_phone: formData.customer_phone,
       shipping_address: formData.shipping_address,
+      shipping_country_group: formData.shipping_country_group,
+      shipping_fee: formData.shipping_fee,
       status: OrderStatus.Pending
     };
 

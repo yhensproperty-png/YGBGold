@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
+import GoldLongTermPerformance from '../components/GoldLongTermPerformance';
 import { Link } from 'react-router-dom';
 import { PropertyListing, PropertyType } from '../types.ts';
-import { supabase } from '../services/supabaseClient.ts';
 import { SEO } from '../components/SEO';
 
 const WHATSAPP_NUMBER = "639467543767";
@@ -11,12 +11,6 @@ interface HomeProps {
   isLoading?: boolean;
 }
 
-// Utility to format number with commas
-const formatWithCommas = (value: string) => {
-  if (!value) return '';
-  const num = value.replace(/\D/g, '');
-  return num.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-};
 
 export const PropertyCard: React.FC<{ property: PropertyListing }> = ({ property }) => {
   const dateListedFormatted = property.dateListed
@@ -211,44 +205,61 @@ export const PropertyCard: React.FC<{ property: PropertyListing }> = ({ property
   );
 };
 
-const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
-  const resultsRef = useRef<HTMLDivElement>(null);
-  const [isSearching, setIsSearching] = useState(false);
-  const [filteredResults, setFilteredResults] = useState<PropertyListing[] | null>(null);
-  const [availableAmenities, setAvailableAmenities] = useState<{ id: string; label: string; icon: string }[]>([]);
-  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
-  const [showSearchBox, setShowSearchBox] = useState(false);
-
-  const [searchFilters, setSearchFilters] = useState({
-    location: '',
-    type: '',
-    beds: '',
-    baths: '',
-    keywords: '',
-    minPrice: '',
-    maxPrice: '',
-    origin: '',
-    amenities: [] as string[],
-    minLotSize: '',
-    maxLotSize: '',
-    dateFilter: '',
-    sortBy: ''
-  });
+const GoldChart: React.FC = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const loadAmenities = async () => {
-      const { data, error } = await supabase
-        .from('custom_amenities')
-        .select('id, label, icon')
-        .order('created_at', { ascending: true });
+    if (!containerRef.current) return;
+    containerRef.current.innerHTML = '';
 
-      if (!error && data) {
-        setAvailableAmenities(data);
-      }
-    };
-    loadAmenities();
+    const script = document.createElement('script');
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+    script.type = 'text/javascript';
+    script.async = true;
+    script.innerHTML = JSON.stringify({
+      autosize: true,
+      symbol: 'OANDA:XAUUSD',
+      interval: 'W',
+      range: '60M',
+      timezone: 'Etc/UTC',
+      theme: 'light',
+      style: '1',
+      locale: 'en',
+      hide_top_toolbar: false,
+      hide_legend: false,
+      save_image: false,
+      calendar: false,
+      support_host: 'https://www.tradingview.com'
+    });
+
+    containerRef.current.appendChild(script);
   }, []);
+
+  return (
+    <section className="pt-8 pb-24 bg-black">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 px-16 items-stretch">
+          {/* Left: header + chart */}
+          <div className="flex flex-col">
+            <div className="mb-6">
+              <span className="text-primary font-bold tracking-[0.5em] text-[10px] uppercase">LIVE MARKET DATA</span>
+              <h2 className="text-4xl md:text-5xl font-black text-white tracking-tighter mt-3">Gold Performance</h2>
+              <p className="text-zinc-400 mt-3 text-sm font-medium">XAU/USD — Live data powered by TradingView. Updates in real time.</p>
+            </div>
+            <div className="rounded-3xl overflow-hidden border border-zinc-700 shadow-sm flex-1 min-h-[400px]">
+              <div className="tradingview-widget-container h-full" ref={containerRef} style={{ height: '100%', width: '100%' }} />
+            </div>
+          </div>
+          {/* Right: header + performance card */}
+          <GoldLongTermPerformance />
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
+  const inventoryRef = useRef<HTMLDivElement>(null);
 
   // Scroll-reveal observer
   useEffect(() => {
@@ -266,154 +277,24 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
     els.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, []);
+  const [listingTypeFilter, setListingTypeFilter] = useState('');
+  const [listingPurityFilter, setListingPurityFilter] = useState('');
+  const [listingOriginFilter, setListingOriginFilter] = useState('');
+  const [listingSortBy, setListingSortBy] = useState('');
+
   const activeProperties = properties.filter(p => p.status === 'active' || p.status === 'draft');
-  const featuredProperties = activeProperties.filter(p => p.featured);
 
-  const newProperties = activeProperties.filter(p => {
-    if (!p.dateListed) return false;
-    const listedDate = new Date(p.dateListed);
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    return listedDate >= thirtyDaysAgo;
-  });
-
-  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-
-    if (name === 'minPrice' || name === 'maxPrice' || name === 'minLotSize' || name === 'maxLotSize') {
-      const numericValue = value.replace(/\D/g, '');
-      setSearchFilters(prev => ({ ...prev, [name]: numericValue }));
-    } else {
-      setSearchFilters(prev => ({ ...prev, [name]: value }));
-    }
-  };
-
-  const toggleAmenityFilter = (amenityLabel: string) => {
-    setSearchFilters(prev => {
-      const current = prev.amenities || [];
-      const updated = current.includes(amenityLabel)
-        ? current.filter(a => a !== amenityLabel)
-        : [...current, amenityLabel];
-      return { ...prev, amenities: updated };
-    });
-  };
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSearching(true);
-
-    setTimeout(() => {
-      let results = activeProperties.filter(p => {
-
-        if (searchFilters.location.trim()) {
-          const loc = searchFilters.location.toLowerCase().trim();
-          const searchableText = `${p.city} ${p.state} ${p.address} ${p.zipCode} ${p.title}`.toLowerCase();
-          if (!searchableText.includes(loc)) return false;
-        }
-
-        if (searchFilters.keywords.trim()) {
-          const keywords = searchFilters.keywords.toLowerCase().trim();
-          const searchableText = `${p.title} ${p.description || ''}`.toLowerCase();
-          if (!searchableText.includes(keywords)) return false;
-        }
-
-        if (searchFilters.type && p.type !== searchFilters.type) return false;
-
-        if (searchFilters.beds) {
-          if (searchFilters.beds === '5+') {
-            if (p.beds < 5) return false;
-          } else {
-            const minBeds = parseInt(searchFilters.beds);
-            if (p.beds < minBeds) return false;
-          }
-        }
-
-        if (searchFilters.baths) {
-          if (searchFilters.baths === '5+') {
-            if (p.baths < 5) return false;
-          } else {
-            const minBaths = parseFloat(searchFilters.baths);
-            if (p.baths < minBaths) return false;
-          }
-        }
-
-        if (searchFilters.minPrice && p.price < parseInt(searchFilters.minPrice)) return false;
-        if (searchFilters.maxPrice && p.price > parseInt(searchFilters.maxPrice)) return false;
-
-        if (searchFilters.origin && p.origin !== searchFilters.origin) return false;
-
-        if (searchFilters.dateFilter) {
-          if (!p.dateListed) return false;
-          const listedDate = new Date(p.dateListed);
-          const today = new Date();
-          const daysDiff = Math.floor((today.getTime() - listedDate.getTime()) / (1000 * 60 * 60 * 24));
-
-          if (searchFilters.dateFilter === '7days' && daysDiff > 7) return false;
-          if (searchFilters.dateFilter === '30days' && daysDiff > 30) return false;
-          if (searchFilters.dateFilter === '90days' && daysDiff > 90) return false;
-        }
-
-        if (searchFilters.amenities && searchFilters.amenities.length > 0) {
-          const propertyAmenities = p.amenities || [];
-          const hasAllAmenities = searchFilters.amenities.every(filterAmenity =>
-            propertyAmenities.some(propAmenity =>
-              propAmenity.toLowerCase() === filterAmenity.toLowerCase()
-            )
-          );
-          if (!hasAllAmenities) return false;
-        }
-
-        return true;
-      });
-
-      // Apply sorting
-      if (searchFilters.sortBy) {
-        results = [...results].sort((a, b) => {
-          switch (searchFilters.sortBy) {
-            case 'price-low':
-              return a.price - b.price;
-            case 'price-high':
-              return b.price - a.price;
-            case 'newest':
-              return new Date(b.dateListed || 0).getTime() - new Date(a.dateListed || 0).getTime();
-            case 'beds':
-              return b.beds - a.beds;
-            case 'baths':
-              return b.baths - a.baths;
-            default:
-              return 0;
-          }
-        });
-      }
-
-      setFilteredResults(results);
-      setIsSearching(false);
-
-      setTimeout(() => {
-        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 150);
-    }, 800);
-  };
-
-  const clearSearch = () => {
-    setFilteredResults(null);
-    setSearchFilters({
-      location: '',
-      type: '',
-      beds: '',
-      baths: '',
-      minPrice: '',
-      maxPrice: '',
-      amenities: [],
-      keywords: '',
-      minSqft: '',
-      maxSqft: '',
-      minLotSize: '',
-      maxLotSize: '',
-      dateFilter: '',
-      sortBy: ''
-    });
-  };
+  const allListings = (() => {
+    let results = activeProperties;
+    if (listingTypeFilter) results = results.filter(p => p.type === listingTypeFilter);
+    if (listingPurityFilter) results = results.filter(p => p.beds >= parseInt(listingPurityFilter));
+    if (listingOriginFilter) results = results.filter(p => p.origin === listingOriginFilter);
+    if (listingSortBy === 'price-low') results = [...results].sort((a, b) => a.price - b.price);
+    else if (listingSortBy === 'price-high') results = [...results].sort((a, b) => b.price - a.price);
+    else if (listingSortBy === 'newest') results = [...results].sort((a, b) => new Date(b.dateListed || 0).getTime() - new Date(a.dateListed || 0).getTime());
+    else if (listingSortBy === 'purity') results = [...results].sort((a, b) => b.beds - a.beds);
+    return results;
+  })();
 
   const homeStructuredData = {
     "@context": "https://schema.org",
@@ -478,422 +359,143 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
             Secure Platform for Buying Gold investment Items, work directly with <span className="text-primary">YGB</span> from <span className="text-primary">Start</span> to <span className="text-primary">Finish</span> where every investment and client matters.
           </p>
 
-          {/* Advanced Search Hub or Button */}
-          {!showSearchBox ? (
-            <button
-              onClick={() => setShowSearchBox(true)}
-              className="bg-primary text-zinc-900 font-black py-4 px-12 rounded-full hover:brightness-110 active:scale-95 transition-all shadow-2xl shadow-primary/30 text-lg md:text-xl tracking-wider uppercase mb-8"
-            >
-              Invest in Gold
-            </button>
-          ) : (
-          <div className="bg-zinc-900/60 backdrop-blur-3xl p-4 md:p-6 rounded-2xl md:rounded-3xl border border-white/10 shadow-2xl max-w-5xl mx-auto relative">
-
-            {/* Advanced Filters Button */}
-            <div className="flex justify-end mb-5">
-              <button
-                type="button"
-                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-                className="px-3 md:px-4 py-2 md:py-2.5 bg-white/10 hover:bg-white/15 border border-white/20 rounded-xl text-white text-xs font-bold flex items-center gap-1.5 md:gap-2 transition-all"
-              >
-                <span className="material-icons text-sm">tune</span>
-                <span className="hidden sm:inline">ADVANCED</span>
-              </button>
-            </div>
-
-            <form onSubmit={handleSearch} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 lg:grid-cols-12 gap-2.5 md:gap-3 items-stretch">
-
-              {/* Location Input */}
-              <div className="sm:col-span-2 md:col-span-6 lg:col-span-4 relative group">
-                <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-white/40 group-focus-within:text-primary transition-colors text-base">location_on</span>
-                <input
-                  name="location"
-                  value={searchFilters.location}
-                  onChange={handleFilterChange}
-                  className="w-full h-full bg-white/5 border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/20 text-white pl-10 pr-3 rounded-xl py-3 placeholder:text-white/30 transition-all text-sm font-medium"
-                  placeholder="City, Address or ZIP"
-                  type="text"
-                />
-              </div>
-
-              {/* Property Type Dropdown */}
-              <div className="md:col-span-2 lg:col-span-2 relative">
-                <select
-                  name="type"
-                  value={searchFilters.type}
-                  onChange={handleFilterChange}
-                  style={{ backgroundImage: 'none' }}
-                  className="w-full h-full bg-white/5 border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/20 text-white/80 rounded-xl py-3 px-3 !appearance-none transition-all cursor-pointer text-sm font-medium pr-9"
-                >
-                  <option value="" className="bg-zinc-900">Any Type</option>
-                  {Object.values(PropertyType).map(t => (
-                    <option key={t} value={t} className="bg-zinc-900">{t}</option>
-                  ))}
-                </select>
-                <span className="material-icons absolute right-2.5 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none text-base">expand_more</span>
-              </div>
-
-              {/* Purity selection */}
-              <div className="md:col-span-2 lg:col-span-2 relative">
-                <select
-                  name="beds"
-                  value={searchFilters.beds}
-                  onChange={handleFilterChange}
-                  style={{ backgroundImage: 'none' }}
-                  className="w-full h-full bg-white/5 border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/20 text-white/80 rounded-xl py-3 px-3 !appearance-none transition-all cursor-pointer text-sm font-medium pr-9"
-                >
-                  <option value="" className="bg-zinc-900">Any Purity</option>
-                  {[18, 21, 22, 24].map(n => <option key={n} value={n} className="bg-zinc-900">{n}K+</option>)}
-                </select>
-                <span className="material-icons absolute right-2.5 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none text-base">diamond</span>
-              </div>
-
-              {/* Weight selection */}
-              <div className="md:col-span-2 lg:col-span-2 relative">
-                <select
-                  name="baths"
-                  value={searchFilters.baths}
-                  onChange={handleFilterChange}
-                  style={{ backgroundImage: 'none' }}
-                  className="w-full h-full bg-white/5 border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/20 text-white/80 rounded-xl py-3 px-3 !appearance-none transition-all cursor-pointer text-sm font-medium pr-9"
-                >
-                  <option value="" className="bg-zinc-900">Any Weight</option>
-                  {[1, 5, 10, 50, 100].map(n => <option key={n} value={n} className="bg-zinc-900">{n}g+</option>)}
-                </select>
-                <span className="material-icons-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none text-base">scale</span>
-              </div>
-
-              {/* Price Range Fields - Formatted with Symbol */}
-              <div className="sm:col-span-2 md:col-span-6 lg:col-span-2 flex flex-col sm:flex-row lg:flex-col gap-2">
-                <div className="relative group">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 text-xs font-bold pointer-events-none group-focus-within:text-primary transition-colors">₱</span>
-                  <input
-                    name="minPrice"
-                    value={formatWithCommas(searchFilters.minPrice)}
-                    onChange={handleFilterChange}
-                    className="w-full bg-white/5 border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/20 text-white pl-7 pr-3 rounded-xl py-2 placeholder:text-white/30 text-xs font-bold transition-all"
-                    placeholder="Min Price"
-                    type="text"
-                  />
-                </div>
-                <div className="relative group">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 text-xs font-bold pointer-events-none group-focus-within:text-primary transition-colors">₱</span>
-                  <input
-                    name="maxPrice"
-                    value={formatWithCommas(searchFilters.maxPrice)}
-                    onChange={handleFilterChange}
-                    className="w-full bg-white/5 border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/20 text-white pl-7 pr-3 rounded-xl py-2 placeholder:text-white/30 text-xs font-bold transition-all"
-                    placeholder="Max Price"
-                    type="text"
-                  />
-                </div>
-              </div>
-
-              {/* Advanced Filters Modal */}
-              {showAdvancedFilters && (
-                <div className="lg:col-span-12 bg-white/5 border border-white/10 rounded-2xl p-6 space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-white font-bold text-sm flex items-center gap-2">
-                      <span className="material-icons text-primary text-base">filter_alt</span>
-                      Advanced Filters
-                    </h3>
-                    <button
-                      type="button"
-                      onClick={() => setShowAdvancedFilters(false)}
-                      className="text-white/50 hover:text-white transition-colors"
-                    >
-                      <span className="material-icons text-sm">close</span>
-                    </button>
-                  </div>
-
-                  {/* Keywords Search */}
-                  <div>
-                    <label className="text-white/70 text-xs font-bold mb-2 block">KEYWORDS</label>
-                    <div className="relative group">
-                      <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-white/40 group-focus-within:text-primary transition-colors text-base">search</span>
-                      <input
-                        name="keywords"
-                        value={searchFilters.keywords}
-                        onChange={handleFilterChange}
-                        className="w-full bg-white/5 border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/20 text-white pl-10 pr-3 rounded-xl py-2.5 placeholder:text-white/30 transition-all text-sm font-medium"
-                        placeholder="Search in titles and descriptions"
-                        type="text"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Property Size Range */}
-                  <div>
-                    <label className="text-white/70 text-xs font-bold mb-2 block">ORIGIN</label>
-                    <select
-                      name="origin"
-                      className="w-full bg-white/5 border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/20 text-white px-3 rounded-xl py-2.5 transition-all text-sm font-medium"
-                      value={searchFilters.origin}
-                      onChange={handleFilterChange}
-                    >
-                      <option value="" className="bg-zinc-900">Any Origin</option>
-                      <option value="Saudi Gold" className="bg-zinc-900">Saudi Gold</option>
-                      <option value="Japan Gold" className="bg-zinc-900">Japan Gold</option>
-                      <option value="Chinese Gold" className="bg-zinc-900">Chinese Gold</option>
-                      <option value="Hongkong Gold" className="bg-zinc-900">Hongkong Gold</option>
-                    </select>
-                  </div>
-
-                  {/* Reference / Serial ID Range */}
-                  <div>
-                    <label className="text-white/70 text-xs font-bold mb-2 block">REFERENCE / SERIAL ID</label>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="relative group">
-                        <input
-                          name="minLotSize"
-                          value={formatWithCommas(searchFilters.minLotSize)}
-                          onChange={handleFilterChange}
-                          className="w-full bg-white/5 border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/20 text-white px-3 rounded-xl py-2.5 placeholder:text-white/30 transition-all text-sm font-medium"
-                          placeholder="Min ID"
-                          type="text"
-                        />
-                      </div>
-                      <div className="relative group">
-                        <input
-                          name="maxLotSize"
-                          value={formatWithCommas(searchFilters.maxLotSize)}
-                          onChange={handleFilterChange}
-                          className="w-full bg-white/5 border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/20 text-white px-3 rounded-xl py-2.5 placeholder:text-white/30 transition-all text-sm font-medium"
-                          placeholder="Max ID"
-                          type="text"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Date Filters */}
-                  <div className="relative">
-                    <label className="text-white/70 text-xs font-bold mb-2 block">DATE LISTED</label>
-                    <select
-                      name="dateFilter"
-                      value={searchFilters.dateFilter}
-                      onChange={handleFilterChange}
-                      style={{ backgroundImage: 'none' }}
-                      className="w-full bg-white/5 border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/20 text-white/80 rounded-xl py-2.5 px-3 !appearance-none transition-all cursor-pointer text-sm font-medium pr-9"
-                    >
-                      <option value="" className="bg-zinc-900">Any Time</option>
-                      <option value="7days" className="bg-zinc-900">Last 7 Days</option>
-                      <option value="30days" className="bg-zinc-900">Last 30 Days</option>
-                      <option value="90days" className="bg-zinc-900">Last 90 Days</option>
-                    </select>
-                    <span className="material-icons absolute right-2.5 bottom-2.5 text-white/30 pointer-events-none text-base">expand_more</span>
-                  </div>
-
-                  {/* Sort Options */}
-                  <div className="relative">
-                    <label className="text-white/70 text-xs font-bold mb-2 block">SORT BY</label>
-                    <select
-                      name="sortBy"
-                      value={searchFilters.sortBy}
-                      onChange={handleFilterChange}
-                      style={{ backgroundImage: 'none' }}
-                      className="w-full bg-white/5 border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/20 text-white/80 rounded-xl py-2.5 px-3 !appearance-none transition-all cursor-pointer text-sm font-medium pr-9"
-                    >
-                      <option value="" className="bg-zinc-900">Default</option>
-                      <option value="price-low" className="bg-zinc-900">Price: Low to High</option>
-                      <option value="price-high" className="bg-zinc-900">Price: High to Low</option>
-                      <option value="newest" className="bg-zinc-900">Newest First</option>
-                      <option value="beds" className="bg-zinc-900">Highest Karat</option>
-                      <option value="baths" className="bg-zinc-900">Highest Weight</option>
-                    </select>
-                    <span className="material-icons absolute right-2.5 bottom-2.5 text-white/30 pointer-events-none text-base">expand_more</span>
-                  </div>
-                </div>
-              )}
-
-              {/* Advanced Search Toggle */}
-              <div className="lg:col-span-12">
-                <button
-                  type="button"
-                  onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
-                  className="w-full py-2 text-white/60 hover:text-white font-bold text-xs flex items-center justify-center gap-1 transition-all"
-                >
-                  <span className="material-icons text-sm">{showAdvancedSearch ? 'expand_less' : 'tune'}</span>
-                  {showAdvancedSearch ? 'HIDE' : 'SHOW'} AMENITY FILTERS
-                </button>
-              </div>
-
-              {/* Advanced Amenities Section */}
-              {showAdvancedSearch && availableAmenities.length > 0 && (
-                <div className="lg:col-span-12 bg-white/5 border border-white/10 rounded-2xl p-6 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-white font-bold text-sm flex items-center gap-2">
-                      <span className="material-icons text-primary text-base">auto_awesome</span>
-                      Filter by Amenities
-                    </h3>
-                    {searchFilters.amenities.length > 0 && (
-                      <button
-                        type="button"
-                        onClick={() => setSearchFilters(prev => ({ ...prev, amenities: [] }))}
-                        className="text-xs text-white/50 hover:text-primary transition-colors"
-                      >
-                        Clear All
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-                    {availableAmenities.map((amenity) => {
-                      const isSelected = searchFilters.amenities.includes(amenity.label);
-                      return (
-                        <button
-                          key={amenity.id}
-                          type="button"
-                          onClick={() => toggleAmenityFilter(amenity.label)}
-                          className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-left text-xs font-bold transition-all ${
-                            isSelected
-                              ? 'bg-primary/20 border-primary text-white shadow-sm shadow-primary/10'
-                              : 'bg-white/5 border-white/10 text-white/60 hover:border-white/30'
-                          }`}
-                        >
-                          <span className={`material-icons text-sm ${isSelected ? 'text-primary' : 'text-white/40'}`}>
-                            {amenity.icon}
-                          </span>
-                          <span className="truncate flex-1">{amenity.label}</span>
-                          {isSelected && (
-                            <span className="material-icons text-primary text-xs">check_circle</span>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {searchFilters.amenities.length > 0 && (
-                    <div className="mt-4 pt-4 border-t border-white/10">
-                      <p className="text-xs text-white/50 mb-2">Selected amenities:</p>
-                      <div className="flex flex-wrap gap-2">
-                        {searchFilters.amenities.map((amenity) => (
-                          <span
-                            key={amenity}
-                            className="inline-flex items-center gap-1 bg-primary/10 border border-primary/30 text-white text-xs font-bold px-2 py-1 rounded-lg"
-                          >
-                            {amenity}
-                            <button
-                              type="button"
-                              onClick={() => toggleAmenityFilter(amenity)}
-                              className="ml-1 text-white/50 hover:text-red-400 transition-colors"
-                            >
-                              <span className="material-icons text-[12px]">close</span>
-                            </button>
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Large Action Button */}
-              <div className="lg:col-span-12 mt-2">
-                <button
-                  type="submit"
-                  disabled={isSearching || isLoading}
-                  className="w-full bg-primary text-zinc-900 font-black py-3 md:py-3.5 rounded-xl md:rounded-2xl hover:brightness-110 active:scale-95 transition-all shadow-2xl shadow-primary/30 flex items-center justify-center gap-2.5 text-sm md:text-base tracking-wider group disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <span className={`material-icons text-lg md:text-xl ${isSearching ? 'animate-spin' : ''}`}>
-                    {isSearching ? 'sync' : 'search'}
-                  </span>
-                  {isSearching ? 'SEARCHING...' : 'FIND PROPERTY'}
-                </button>
-              </div>
-            </form>
-          </div>
-          )}
+          <button
+            onClick={() => inventoryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+            className="bg-primary text-zinc-900 font-black py-4 px-12 rounded-full hover:brightness-110 active:scale-95 transition-all shadow-2xl shadow-primary/30 text-lg md:text-xl tracking-wider uppercase mb-8"
+          >
+            Invest in Gold
+          </button>
         </div>
       </header>
 
-      {/* Conditional Search Results Section */}
-      <div ref={resultsRef} className="scroll-mt-24">
-        {filteredResults !== null && (
-          <section className="max-w-7xl mx-auto px-6 py-12">
-            <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
-              <div>
-                <span className="text-primary font-bold tracking-[0.5em] text-[10px] mb-4 uppercase">CURATED SEARCH RESULTS</span>
-                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black dark:text-white tracking-tighter leading-none">
-                  {filteredResults.length === 0 ? 'No Matches' : `Found ${filteredResults.length} ${filteredResults.length === 1 ? 'Match' : 'Matches'}`}
-                </h2>
-                {filteredResults.length > 0 && (
-                  <p className="text-zinc-500 mt-4 font-medium italic">Showing premium listings for your specific criteria.</p>
-                )}
+      {/* How It Works */}
+      <section className="py-24 bg-white dark:bg-zinc-950">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <span className="text-primary font-bold tracking-[0.5em] text-[10px] uppercase">SIMPLE PROCESS</span>
+            <h2 className="text-4xl md:text-5xl font-black dark:text-white tracking-tighter mt-3">How It Works</h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+            {/* Connector line (desktop) */}
+            <div className="hidden md:block absolute top-12 left-1/3 right-1/3 h-0.5 bg-gradient-to-r from-primary/30 via-primary to-primary/30 -translate-y-1/2 z-0"></div>
+
+            {/* Step 1 */}
+            <div className="relative z-10 flex flex-col items-center text-center bg-zinc-50 dark:bg-zinc-900 rounded-3xl p-8 border border-zinc-100 dark:border-zinc-800 shadow-sm hover:shadow-xl transition-shadow">
+              <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 border border-primary/20">
+                <span className="material-icons text-primary text-4xl">diamond</span>
               </div>
-              <button 
-                onClick={clearSearch}
-                className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-primary transition-all font-bold text-sm"
+              <div className="w-8 h-8 rounded-full bg-primary text-zinc-900 font-black text-sm flex items-center justify-center mb-4">1</div>
+              <h3 className="text-xl font-black dark:text-white mb-3 tracking-tight">Choose Your Item</h3>
+              <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed">
+                Browse our inventory and find the gold item you love. When you're ready, click <span className="font-bold text-zinc-700 dark:text-zinc-200">"Buy Now"</span> on the listing.
+              </p>
+            </div>
+
+            {/* Step 2 */}
+            <div className="relative z-10 flex flex-col items-center text-center bg-zinc-50 dark:bg-zinc-900 rounded-3xl p-8 border border-zinc-100 dark:border-zinc-800 shadow-sm hover:shadow-xl transition-shadow">
+              <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 border border-primary/20">
+                <span className="material-icons text-primary text-4xl">local_shipping</span>
+              </div>
+              <div className="w-8 h-8 rounded-full bg-primary text-zinc-900 font-black text-sm flex items-center justify-center mb-4">2</div>
+              <h3 className="text-xl font-black dark:text-white mb-3 tracking-tight">Enter Info & Pay</h3>
+              <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed">
+                Fill in your details and select your shipping country. Click <span className="font-bold text-zinc-700 dark:text-zinc-200">"Pay Now"</span> and receive your payment confirmation instantly.
+              </p>
+            </div>
+
+            {/* Step 3 */}
+            <div className="relative z-10 flex flex-col items-center text-center bg-zinc-50 dark:bg-zinc-900 rounded-3xl p-8 border border-zinc-100 dark:border-zinc-800 shadow-sm hover:shadow-xl transition-shadow">
+              <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 border border-primary/20">
+                <span className="material-icons text-primary text-4xl">moving</span>
+              </div>
+              <div className="w-8 h-8 rounded-full bg-primary text-zinc-900 font-black text-sm flex items-center justify-center mb-4">3</div>
+              <h3 className="text-xl font-black dark:text-white mb-3 tracking-tight">Track & Receive</h3>
+              <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed">
+                In <span className="font-bold text-zinc-700 dark:text-zinc-200">3–5 days</span> you'll get an email with tracked shipping details. Sit back and watch your wealth grow!
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+
+      {/* Gold Performance Chart */}
+      <GoldChart />
+
+      {/* All Listings */}
+      <section ref={inventoryRef} className="bg-zinc-50 dark:bg-zinc-900/30 py-32 scroll-mt-20">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+            <div>
+              <span className="text-primary font-bold tracking-[0.4em] text-[11px] mb-4 block uppercase">ALL LISTINGS</span>
+              <h2 className="text-5xl font-black dark:text-white tracking-tighter">
+                Gold Jewelry Investment Inventory
+                {!isLoading && <span className="ml-4 text-2xl font-bold text-zinc-400">({allListings.length})</span>}
+              </h2>
+            </div>
+          </div>
+
+          {/* Filter Bar */}
+          <div className="flex flex-wrap gap-3 mb-10">
+            <select
+              value={listingTypeFilter}
+              onChange={e => setListingTypeFilter(e.target.value)}
+              style={{ backgroundImage: 'none' }}
+              className="appearance-none bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-xl px-4 py-2.5 text-sm font-bold cursor-pointer focus:outline-none focus:border-primary transition-colors"
+            >
+              <option value="">All Types</option>
+              {Object.values(PropertyType).map(t => (
+                <option key={t} value={t}>{t}</option>
+              ))}
+            </select>
+
+            <select
+              value={listingPurityFilter}
+              onChange={e => setListingPurityFilter(e.target.value)}
+              style={{ backgroundImage: 'none' }}
+              className="appearance-none bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-xl px-4 py-2.5 text-sm font-bold cursor-pointer focus:outline-none focus:border-primary transition-colors"
+            >
+              <option value="">Any Purity</option>
+              {[18, 21, 22, 24].map(n => <option key={n} value={n}>{n}K+</option>)}
+            </select>
+
+            <select
+              value={listingOriginFilter}
+              onChange={e => setListingOriginFilter(e.target.value)}
+              style={{ backgroundImage: 'none' }}
+              className="appearance-none bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-xl px-4 py-2.5 text-sm font-bold cursor-pointer focus:outline-none focus:border-primary transition-colors"
+            >
+              <option value="">Any Origin</option>
+              <option value="Saudi Gold">Saudi Gold</option>
+              <option value="Japan Gold">Japan Gold</option>
+              <option value="Chinese Gold">Chinese Gold</option>
+              <option value="Hongkong Gold">Hongkong Gold</option>
+            </select>
+
+            <select
+              value={listingSortBy}
+              onChange={e => setListingSortBy(e.target.value)}
+              style={{ backgroundImage: 'none' }}
+              className="appearance-none bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-xl px-4 py-2.5 text-sm font-bold cursor-pointer focus:outline-none focus:border-primary transition-colors"
+            >
+              <option value="">Sort: Default</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+              <option value="newest">Newest First</option>
+              <option value="purity">Highest Purity</option>
+            </select>
+
+            {(listingTypeFilter || listingPurityFilter || listingOriginFilter || listingSortBy) && (
+              <button
+                onClick={() => { setListingTypeFilter(''); setListingPurityFilter(''); setListingOriginFilter(''); setListingSortBy(''); }}
+                className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-zinc-200 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-primary text-sm font-bold transition-colors"
               >
                 <span className="material-icons text-sm">close</span>
-                RESET FILTERS
+                Clear
               </button>
-            </div>
-            
-            {filteredResults.length === 0 ? (
-              <div className="text-center py-32 bg-white dark:bg-zinc-900 rounded-[50px] border border-dashed border-zinc-200 dark:border-zinc-800 shadow-sm">
-                <div className="bg-zinc-50 dark:bg-zinc-800 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-8">
-                  <span className="material-icons text-6xl text-zinc-200">sentiment_dissatisfied</span>
-                </div>
-                <h3 className="text-2xl font-bold dark:text-white mb-2">No Properties Found</h3>
-                <p className="text-zinc-500 max-w-md mx-auto leading-relaxed">
-                  We couldn't find any listings matching those exact specifications. Try adjusting your filters or browsing our latest inventory below.
-                </p>
-                <button 
-                  onClick={clearSearch}
-                  className="mt-10 px-10 py-4 bg-zinc-900 dark:bg-zinc-800 text-white rounded-2xl font-bold hover:bg-zinc-800 dark:hover:bg-zinc-700 transition-all"
-                >
-                  View All Listings
-                </button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
-                {filteredResults.map((property) => (
-                  <PropertyCard key={property.id} property={property} />
-                ))}
-              </div>
             )}
-            
-            <div className="mt-24 h-px bg-zinc-200 dark:bg-zinc-800 w-full"></div>
-          </section>
-        )}
-      </div>
-
-      {/* Categories */}
-      <section className="max-w-7xl mx-auto px-6 mt-20">
-        <div className="text-center mb-16 flex flex-col items-center">
-          <span className="text-primary font-bold tracking-[0.5em] text-[10px] mb-4 uppercase">CURATED COLLECTIONS</span>
-          <h2 className="text-5xl md:text-6xl font-black dark:text-white mb-6 tracking-tighter">Choose Your Lifestyle</h2>
-          <div className="w-24 h-2 bg-primary rounded-full"></div>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {[
-            { slug: 'jewelry', icon: 'diamond', label: 'Gold Jewelry', img: 'https://images.unsplash.com/photo-1611085583191-a3b1a30a8a3a?auto=format&fit=crop&q=80&w=800' },
-            { slug: 'coins', icon: 'monetization_on', label: 'Gold Coins', img: 'https://images.unsplash.com/photo-1589753123714-c9711681a2da?auto=format&fit=crop&q=80&w=800' },
-            { slug: 'bars', icon: 'view_week', label: 'Gold Bars', img: 'https://images.unsplash.com/photo-1589753123714-c9711681a2da?auto=format&fit=crop&q=80&w=800' },
-            { slug: 'collectibles', icon: 'category', label: 'Collectibles', img: 'https://images.unsplash.com/photo-1611085583191-a3b1a30a8a3a?auto=format&fit=crop&q=80&w=800' }
-          ].map((cat, i) => (
-            <Link key={i} to={`/category/${cat.slug}`} className="group relative h-96 rounded-[40px] overflow-hidden cursor-pointer block border border-zinc-100 dark:border-zinc-800 shadow-2xl">
-              {cat.img && <img src={cat.img} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" alt={`${cat.label} category - Browse gold items`} loading="lazy" width="800" height="600" />}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-8">
-                <div className="flex items-center gap-4">
-                  <div className="bg-primary p-3 rounded-2xl text-zinc-900 shadow-xl shadow-primary/30 group-hover:rotate-12 transition-transform duration-500">
-                    <span className="material-icons text-2xl">{cat.icon}</span>
-                  </div>
-                  <h3 className="text-2xl font-black text-white tracking-tight leading-none">{cat.label}</h3>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* Featured Properties */}
-      <section className="bg-zinc-50 dark:bg-zinc-900/30 py-32">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="mb-16">
-            <span className="text-primary font-bold tracking-[0.4em] text-[11px] mb-4 block uppercase">PREMIUM LISTINGS</span>
-            <h2 className="text-5xl font-black dark:text-white tracking-tighter">Featured Assets</h2>
           </div>
 
           {isLoading ? (
@@ -908,14 +510,14 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
                 </div>
               ))}
             </div>
-          ) : featuredProperties.length === 0 ? (
+          ) : allListings.length === 0 ? (
             <div className="text-center py-32 bg-white dark:bg-zinc-900 rounded-[48px] border border-dashed border-zinc-200 dark:border-zinc-800">
-              <span className="material-icons text-7xl text-zinc-300 mb-6">star_outline</span>
-              <p className="text-zinc-500 text-xl font-medium">No properties currently featured in the vault.</p>
+              <span className="material-icons text-7xl text-zinc-300 mb-6">inventory_2</span>
+              <p className="text-zinc-500 text-xl font-medium">No listings match your filters.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
-              {featuredProperties.map((property) => (
+              {allListings.map((property) => (
                 <PropertyCard key={property.id} property={property} />
               ))}
             </div>
@@ -923,41 +525,6 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
         </div>
       </section>
 
-      {/* Latest Listings */}
-      <section className="py-32">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="mb-16">
-            <span className="text-primary font-bold tracking-[0.4em] text-[11px] mb-4 block uppercase">NEW TO THE MARKET IN THE LAST 30 DAYS</span>
-            <h2 className="text-5xl font-black dark:text-white tracking-tighter">Latest Inventory</h2>
-          </div>
-
-          {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
-              {[1, 2, 3].map(i => (
-                <div key={i} className="bg-white dark:bg-zinc-900 rounded-[32px] h-[450px] animate-pulse border border-zinc-100 dark:border-zinc-800">
-                  <div className="h-64 bg-zinc-200 dark:bg-zinc-800 rounded-t-[32px]"></div>
-                  <div className="p-8 space-y-4">
-                    <div className="h-4 bg-zinc-200 dark:bg-zinc-800 w-1/2 rounded-full"></div>
-                    <div className="h-8 bg-zinc-200 dark:bg-zinc-800 w-3/4 rounded-full"></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : newProperties.length === 0 ? (
-            <div className="text-center py-32 bg-white dark:bg-zinc-900 rounded-[48px] border border-dashed border-zinc-200 dark:border-zinc-800">
-              <span className="material-icons text-7xl text-zinc-300 mb-6">search_off</span>
-              <p className="text-zinc-500 text-xl font-medium">No new items in the last 30 days. Check back soon!</p>
-              <Link to="/add" className="mt-8 inline-block px-10 py-4 bg-primary text-zinc-900 font-bold rounded-2xl hover:scale-105 transition-transform shadow-xl shadow-primary/20">Start Listing</Link>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
-              {newProperties.map((property) => (
-                <PropertyCard key={property.id} property={property} />
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
     </div>
   );
 };

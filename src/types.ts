@@ -65,6 +65,8 @@ export interface Order {
   status: OrderStatus;
   tracking_number?: string;
   admin_notes?: string;
+  shipping_country_group?: string;
+  shipping_fee?: number;
   created_at: string;
   updated_at: string;
   
@@ -80,4 +82,6 @@ export interface OrderFormData {
   customer_email: string;
   customer_phone: string;
   shipping_address: string;
+  shipping_country_group: string;
+  shipping_fee: number;
 }

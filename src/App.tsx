@@ -154,6 +154,20 @@ const AppContent: React.FC = () => {
         </Routes>
       </main>
 
+      {/* Floating Messenger Button */}
+      <a
+        href="https://m.me/Goldelyn"
+        target="_blank"
+        rel="noopener noreferrer"
+        title="Chat with us on Messenger"
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-transform duration-200 hover:scale-110"
+        style={{ background: 'linear-gradient(135deg, #0084FF 0%, #A033FF 100%)' }}
+      >
+        <svg className="w-7 h-7 fill-white" viewBox="0 0 24 24">
+          <path d="M12 0C5.373 0 0 4.975 0 11.111c0 3.497 1.745 6.616 4.472 8.652V24l4.086-2.242c1.09.301 2.246.464 3.442.464 6.627 0 12-4.975 12-11.111S18.627 0 12 0zm1.191 14.963l-3.055-3.26-5.963 3.26L10.732 8.1l3.131 3.26L19.752 8.1l-6.561 6.863z"/>
+        </svg>
+      </a>
+
       <footer className="bg-zinc-50 dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 py-20 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col lg:flex-row justify-between items-start gap-12 mb-16">
