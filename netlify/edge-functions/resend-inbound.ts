@@ -64,11 +64,19 @@ export default async (request: Request, context: Context) => {
       const emailId = payload.data.email_id;
 
       // 1. Fetch the full email content from Resend using the email_id
-      const fetchRes = await fetch(`https://api.resend.com/emails/receiving/${emailId}`, {
-        headers: { "Authorization": `Bearer ${apiKey}` }
+      const fetchRes = await fetch(`https://api.resend.com/emails/${emailId}`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${Netlify.env.get("RESEND_API_KEY")}`,
+          "Content-Type": "application/json",
+        },
       });
 
-      if (!fetchRes.ok) throw new Error("Failed to fetch inbound email content");
+      if (!fetchRes.ok) {
+        const errorText = await fetchRes.text();
+        console.error(`[resend-inbound] API Error: ${fetchRes.status} - ${errorText}`);
+        throw new Error("Failed to fetch inbound email content from Resend");
+      }
       const emailData = await fetchRes.json();
 
       // 2. Forward the content to your specific YGB Gmail address
