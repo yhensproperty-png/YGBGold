@@ -63,21 +63,40 @@ export default async (request: Request, context: Context) => {
     if (payload.type === "email.received") {
       const emailId = payload.data.email_id;
 
-      // 1. Fetch the full email content from Resend using the email_id
-      const fetchRes = await fetch(`https://api.resend.com/emails/${emailId}`, {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${Netlify.env.get("RESEND_API_KEY")}`,
-          "Content-Type": "application/json",
-        },
-      });
+      // 1. Fetch the full email content from Resend — retry up to 3x on 404 (race condition)
+      const MAX_ATTEMPTS = 3;
+      const RETRY_DELAY_MS = 2000;
+      let emailData: Record<string, unknown> | null = null;
 
-      if (!fetchRes.ok) {
+      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+        console.log(`[resend-inbound] Attempt ${attempt}/${MAX_ATTEMPTS} fetching email ${emailId}`);
+
+        const fetchRes = await fetch(`https://api.resend.com/emails/${emailId}`, {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${Netlify.env.get("RESEND_API_KEY")}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (fetchRes.ok) {
+          emailData = await fetchRes.json();
+          console.log(`[resend-inbound] Successfully fetched email on attempt ${attempt}`);
+          break;
+        }
+
         const errorText = await fetchRes.text();
-        console.error(`[resend-inbound] API Error: ${fetchRes.status} - ${errorText}`);
-        throw new Error("Failed to fetch inbound email content from Resend");
+        console.error(`[resend-inbound] Attempt ${attempt} failed — ${fetchRes.status}: ${errorText}`);
+
+        if (fetchRes.status === 404 && attempt < MAX_ATTEMPTS) {
+          console.log(`[resend-inbound] 404 received, waiting ${RETRY_DELAY_MS}ms before retry...`);
+          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+        } else {
+          throw new Error(`Failed to fetch inbound email after ${attempt} attempt(s): ${fetchRes.status}`);
+        }
       }
-      const emailData = await fetchRes.json();
+
+      if (!emailData) throw new Error("Failed to fetch inbound email content from Resend");
 
       // 2. Forward the content to your specific YGB Gmail address
       const forwardRes = await fetch("https://api.resend.com/emails", {
