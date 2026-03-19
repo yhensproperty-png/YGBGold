@@ -60,16 +60,35 @@ export default async (request: Request, context: Context) => {
 
     // Only proceed if the event is a received email
     if (payload.type === "email.received") {
-      const emailData = payload.data;
-      console.log(`[resend-inbound] Received email from ${emailData.from}, subject: "${emailData.subject}"`);
+      const emailId = payload.data.email_id;
+      const from    = payload.data.from;
+      const subject = payload.data.subject;
+      console.log(`[resend-inbound] Received email from ${from}, subject: "${subject}", id: ${emailId}`);
 
-      // Resolve body content — check text, html, and content fields with fallbacks
-      const textBody: string = emailData.text || emailData.content || "";
-      const htmlBody: string = emailData.html || emailData.content || "";
+      // Attempt to fetch full body via Resend's inbound-specific endpoint
+      console.log(`[resend-inbound] Fetching body from /emails/receiving/${emailId}...`);
+      const inboundRes = await fetch(`https://api.resend.com/emails/receiving/${emailId}`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${Netlify.env.get("RESEND_API_KEY")}`,
+          "Content-Type": "application/json"
+        }
+      });
 
-      // If all body fields are empty, log payload keys to help debug
-      if (!textBody && !htmlBody) {
-        console.warn(`[resend-inbound] All body fields empty. payload.data keys: ${Object.keys(emailData).join(", ")}`);
+      console.log(`[resend-inbound] /emails/receiving response status: ${inboundRes.status}`);
+
+      let textBody = "";
+      let htmlBody = "";
+
+      if (inboundRes.ok) {
+        const inboundData = await inboundRes.json();
+        console.log(`[resend-inbound] Inbound fetch succeeded. Keys: ${Object.keys(inboundData).join(", ")}`);
+        textBody = inboundData.text || inboundData.content || "";
+        htmlBody = inboundData.html || inboundData.content || "";
+      } else {
+        const errText = await inboundRes.text();
+        console.error(`[resend-inbound] Inbound fetch failed — ${inboundRes.status}: ${errText}`);
+        console.warn(`[resend-inbound] Falling back to metadata-only forward`);
       }
 
       const forwardRes = await fetch("https://api.resend.com/emails", {
@@ -81,9 +100,9 @@ export default async (request: Request, context: Context) => {
         body: JSON.stringify({
           from: "inquiries@mail.ygbgold.com",
           to: ["ygbgoldbuysell@gmail.com"],
-          reply_to: emailData.from,  // Reply goes back to the original sender
-          subject: `New inquiry: ${emailData.subject || "No Subject"}`,
-          text: `From: ${emailData.from}\n\n${textBody || "(no text content)"}`,
+          reply_to: from,
+          subject: `New inquiry: ${subject || "No Subject"}`,
+          text: `From: ${from}\n\n${textBody || "(body unavailable — see Resend dashboard)"}`,
           html: htmlBody || undefined
         })
       });
