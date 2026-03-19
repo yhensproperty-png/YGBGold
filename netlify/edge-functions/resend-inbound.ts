@@ -1,13 +1,62 @@
-import type { Context } from "@netlify/edge-functions";
+import type { Context } from "https://edge.netlify.com";
+
+// Verify Resend webhook signature using Svix signing scheme (HMAC-SHA256)
+async function verifySignature(request: Request, rawBody: string): Promise<boolean> {
+  const secret = Netlify.env.get("RESEND_WEBHOOK_SECRET");
+  if (!secret) return false;
+
+  const svixId        = request.headers.get("svix-id");
+  const svixTimestamp = request.headers.get("svix-timestamp");
+  const svixSignature = request.headers.get("svix-signature");
+
+  if (!svixId || !svixTimestamp || !svixSignature) return false;
+
+  // Reject requests older than 5 minutes to prevent replay attacks
+  const ts = parseInt(svixTimestamp);
+  if (Math.abs(Date.now() / 1000 - ts) > 300) return false;
+
+  // Svix secret is prefixed with "whsec_" — strip it and base64-decode
+  const secretBytes = Uint8Array.from(
+    atob(secret.replace(/^whsec_/, "")),
+    c => c.charCodeAt(0)
+  );
+
+  // Import as HMAC-SHA256 key
+  const key = await crypto.subtle.importKey(
+    "raw",
+    secretBytes,
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+
+  // Signed content format: "{svix-id}.{svix-timestamp}.{raw-body}"
+  const signedContent = `${svixId}.${svixTimestamp}.${rawBody}`;
+  const encoder = new TextEncoder();
+  const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(signedContent));
+  const computedSig = btoa(String.fromCharCode(...new Uint8Array(signature)));
+
+  // svix-signature header can contain multiple sigs: "v1,<b64> v1,<b64>"
+  const providedSigs = svixSignature.split(" ").map(s => s.replace(/^v1,/, ""));
+  return providedSigs.some(sig => sig === computedSig);
+}
 
 export default async (request: Request, context: Context) => {
-  // Check if the request is a POST from Resend
   if (request.method !== "POST") {
     return new Response("Method Not Allowed", { status: 405 });
   }
 
   try {
-    const payload = await request.json();
+    const rawBody = await request.text();
+
+    // Verify the webhook signature before processing
+    const isValid = await verifySignature(request, rawBody);
+    if (!isValid) {
+      console.error("Webhook signature verification failed");
+      return new Response("Unauthorized", { status: 401 });
+    }
+
+    const payload = JSON.parse(rawBody);
     const apiKey = Netlify.env.get("RESEND_API_KEY");
 
     // Only proceed if the event is a received email
@@ -30,11 +79,11 @@ export default async (request: Request, context: Context) => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          from: "inquiries@mail.ygbgold.com", // Your branded sender
-          to: ["ygbgoldbuysell@gmail.com"],   // Your updated recipient
+          from: "inquiries@mail.ygbgold.com",
+          to: ["ygbgoldbuysell@gmail.com"],
           subject: `New website inquiry: ${emailData.subject || "No Subject"}`,
           text: `Original sender: ${emailData.from}\n\n${emailData.text || "No text content found."}`,
-          html: emailData.html || undefined // Forwards HTML formatting if available
+          html: emailData.html || undefined
         })
       });
 
