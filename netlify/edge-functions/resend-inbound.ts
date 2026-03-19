@@ -57,53 +57,18 @@ export default async (request: Request, context: Context) => {
     }
 
     const payload = JSON.parse(rawBody);
-    const apiKey = Netlify.env.get("RESEND_API_KEY");
 
     // Only proceed if the event is a received email
     if (payload.type === "email.received") {
-      const emailId = payload.data.email_id;
-      console.log(`[resend-inbound] Using email_id from payload.data.email_id: ${emailId}`);
+      // Full email content is in the webhook payload — no separate fetch needed
+      const emailData = payload.data;
+      console.log(`[resend-inbound] Received email from ${emailData.from}, subject: "${emailData.subject}"`);
 
-      // 1. Fetch the full email content from Resend — retry up to 3x on 404 (race condition)
-      const MAX_ATTEMPTS = 3;
-      const RETRY_DELAY_MS = 2000;
-      let emailData: Record<string, unknown> | null = null;
-
-      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-        console.log(`[resend-inbound] Attempt ${attempt}/${MAX_ATTEMPTS} fetching email ${emailId}`);
-
-        const fetchRes = await fetch(`https://api.resend.com/emails/${emailId}`, {
-          method: "GET",
-          headers: {
-            "Authorization": `Bearer ${Netlify.env.get("RESEND_API_KEY")}`,
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (fetchRes.ok) {
-          emailData = await fetchRes.json();
-          console.log(`[resend-inbound] Successfully fetched email on attempt ${attempt}`);
-          break;
-        }
-
-        const errorText = await fetchRes.text();
-        console.error(`[resend-inbound] Attempt ${attempt} failed — ${fetchRes.status}: ${errorText}`);
-
-        if (fetchRes.status === 404 && attempt < MAX_ATTEMPTS) {
-          console.log(`[resend-inbound] 404 received, waiting ${RETRY_DELAY_MS}ms before retry...`);
-          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
-        } else {
-          throw new Error(`Failed to fetch inbound email after ${attempt} attempt(s): ${fetchRes.status}`);
-        }
-      }
-
-      if (!emailData) throw new Error("Failed to fetch inbound email content from Resend");
-
-      // 2. Forward the content to your specific YGB Gmail address
+      // Forward directly using payload.data content
       const forwardRes = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${apiKey}`,
+          "Authorization": `Bearer ${Netlify.env.get("RESEND_API_KEY")}`,
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
@@ -115,7 +80,13 @@ export default async (request: Request, context: Context) => {
         })
       });
 
-      if (!forwardRes.ok) throw new Error("Failed to forward email");
+      if (!forwardRes.ok) {
+        const errText = await forwardRes.text();
+        console.error(`[resend-inbound] Forward failed — ${forwardRes.status}: ${errText}`);
+        throw new Error("Failed to forward email");
+      }
+
+      console.log(`[resend-inbound] Email forwarded successfully to ygbgoldbuysell@gmail.com`);
     }
 
     return new Response("OK", { status: 200 });
