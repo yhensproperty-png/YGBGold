@@ -62,6 +62,7 @@ export default async (request: Request, context: Context) => {
     // Only proceed if the event is a received email
     if (payload.type === "email.received") {
       const emailId = payload.data.email_id;
+      console.log(`[resend-inbound] Using email_id from payload.data.email_id: ${emailId}`);
 
       // 1. Fetch the full email content from Resend — retry up to 3x on 404 (race condition)
       const MAX_ATTEMPTS = 3;
