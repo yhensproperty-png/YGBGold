@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient.ts';
 import { Order, OrderFormData, OrderStatus } from '../types.ts';
+import { getOrderInvoiceHTML } from '../utils/emailTemplates.ts';
 
 export const OrderService = {
   /**
@@ -72,9 +73,10 @@ export const OrderService = {
   },
 
   /**
-   * Attempt to insert a new order into the database.
+   * Attempt to insert a new order into the database, then send an invoice email.
+   * Returns the human-readable order_number.
    */
-  async addOrder(listingId: string, amount: number, formData: OrderFormData, userId?: string): Promise<void> {
+  async addOrder(listingId: string, amount: number, formData: OrderFormData, userId?: string, propertyTitle?: string): Promise<number> {
     const insertData: any = {
       listing_id: listingId,
       amount: amount,
@@ -91,14 +93,55 @@ export const OrderService = {
       insertData.user_id = userId;
     }
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('orders')
-      .insert(insertData);
+      .insert(insertData)
+      .select('order_number')
+      .single();
 
     if (error) {
       console.error('Error adding order:', error);
       throw error;
     }
+
+    const orderNumber: number = data.order_number;
+
+    // Send invoice email to customer
+    const invoiceHtml = getOrderInvoiceHTML({
+      order_number: orderNumber,
+      customer_name: formData.customer_name,
+      customer_email: formData.customer_email,
+      customer_phone: formData.customer_phone,
+      shipping_address: formData.shipping_address,
+      amount: amount,
+      shipping_fee: formData.shipping_fee,
+      property_title: propertyTitle || 'Gold Item',
+    });
+
+    const resendKey = import.meta.env.VITE_RESEND_API_KEY;
+    if (resendKey) {
+      try {
+        await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${resendKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            from: 'YGB Gold <inquiries@mail.ygbgold.com>',
+            to: [formData.customer_email],
+            reply_to: 'inquiries@mail.ygbgold.com',
+            subject: `Order #${orderNumber} Reserved — YGB Gold Invoice`,
+            html: invoiceHtml,
+          }),
+        });
+      } catch (emailError) {
+        // Don't fail the order if email fails
+        console.error('Invoice email failed to send:', emailError);
+      }
+    }
+
+    return orderNumber;
   },
 
   /**

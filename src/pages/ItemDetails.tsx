@@ -110,6 +110,7 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
   
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [isOrdering, setIsOrdering] = useState(false);
+  const [orderSuccess, setOrderSuccess] = useState<{ orderNumber: number } | null>(null);
   const [buyFormData, setBuyFormData] = useState({
     customer_name: '',
     customer_email: '',
@@ -239,14 +240,14 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
 
     setIsOrdering(true);
     try {
-      await OrderService.addOrder(
+      const orderNumber = await OrderService.addOrder(
         property.id,
         property.price + buyFormData.shipping_fee,
         buyFormData,
-        user?.id
+        user?.id,
+        property.title
       );
-      setShowBuyModal(false);
-      alert("Your purchase request has been sent! We'll contact you shortly to confirm payment and shipping.");
+      setOrderSuccess({ orderNumber });
     } catch (error) {
       console.error('Error submitting buy request:', error);
       alert('There was an error submitting your request. Please try again.');
@@ -540,11 +541,28 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-zinc-950/90 backdrop-blur-xl animate-in fade-in duration-300 p-4">
           <div className="bg-white dark:bg-zinc-900 p-8 rounded-3xl shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-500 relative border border-zinc-200 dark:border-zinc-800">
             <button
-              onClick={() => setShowBuyModal(false)}
+              onClick={() => { setShowBuyModal(false); setOrderSuccess(null); }}
               className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors"
             >
               <span className="material-icons">close</span>
             </button>
+
+            {orderSuccess ? (
+              <div className="text-center py-4">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="material-icons text-green-600 text-3xl">check_circle</span>
+                </div>
+                <h2 className="text-2xl font-black dark:text-white tracking-tighter mb-2">Order #{orderSuccess.orderNumber} Reserved!</h2>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6">Check your email for your official invoice and payment details.</p>
+                <button
+                  onClick={() => { setShowBuyModal(false); setOrderSuccess(null); }}
+                  className="w-full bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-black py-4 rounded-xl shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all"
+                >
+                  Done
+                </button>
+              </div>
+            ) : (
+              <>
             <h2 className="text-2xl font-black dark:text-white tracking-tighter mb-1">Request to Buy</h2>
             <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-6">{property.title} - ₱{property.price.toLocaleString()}</p>
             
@@ -627,6 +645,8 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
                 <span className="text-lg">{isOrdering ? 'Submitting...' : 'Confirm Request'}</span>
               </button>
             </form>
+              </>
+            )}
           </div>
         </div>
       )}
