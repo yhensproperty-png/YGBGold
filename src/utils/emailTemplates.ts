@@ -42,7 +42,7 @@ const emailFooter = `
   <tr>
     <td style="background:#000;padding:20px 40px;text-align:center;">
       <p style="margin:0;font-size:12px;color:#888;">YGB Buy Gold &amp; Sell &nbsp;|&nbsp; ygbgold.com</p>
-      <p style="margin:4px 0 0;font-size:12px;color:#888;">Questions? Email us at <a href="mailto:inquiries@mail.ygbgold.com" style="color:#d4af37;text-decoration:none;">inquiries@mail.ygbgold.com</a></p>
+      <p style="margin:4px 0 0;font-size:12px;color:#888;">Questions? Email us at <a href="mailto:contact@mail.ygbgold.com" style="color:#d4af37;text-decoration:none;">contact@mail.ygbgold.com</a></p>
     </td>
   </tr>`;
 

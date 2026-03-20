@@ -31,9 +31,9 @@ export default async (request: Request, _context: Context) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "YGB Gold <inquiries@mail.ygbgold.com>",
+        from: "YGB Gold <contact@mail.ygbgold.com>",
         to: [to],
-        reply_to: "inquiries@mail.ygbgold.com",
+        reply_to: "contact@mail.ygbgold.com",
         subject,
         html,
       }),

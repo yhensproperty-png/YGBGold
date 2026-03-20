@@ -21,7 +21,7 @@ const Contact: React.FC = () => {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const captchaRef = useRef<HCaptcha>(null);
 
-  const email = "ygbgoldbuysell@gmail.com";
+  const email = "contact@mail.ygbgold.com";
   const phone = "+639467543767";
   const whatsappNumber = "639467543767";
 
