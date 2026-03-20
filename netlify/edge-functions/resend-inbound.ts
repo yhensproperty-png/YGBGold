@@ -98,12 +98,14 @@ export default async (request: Request, context: Context) => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          from: "inquiries@mail.ygbgold.com",
+          from: `${from} <inquiries@mail.ygbgold.com>`,
           to: ["ygbgoldbuysell@gmail.com"],
           reply_to: from,
           subject: `New inquiry: ${subject || "No Subject"}`,
-          text: `From: ${from}\n\n${textBody || "(body unavailable — see Resend dashboard)"}`,
-          html: htmlBody || undefined
+          text: `New Inquiry from: ${from}\n${"─".repeat(40)}\n\n${textBody || "(body unavailable — see Resend dashboard)"}`,
+          html: htmlBody
+            ? `<p><strong>New Inquiry from:</strong> ${from}</p><hr/>${htmlBody}`
+            : `<p><strong>New Inquiry from:</strong> ${from}</p><p>(body unavailable — see Resend dashboard)</p>`
         })
       });
 
