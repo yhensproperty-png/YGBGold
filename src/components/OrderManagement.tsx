@@ -10,6 +10,7 @@ const OrderManagement: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [trackingNumbers, setTrackingNumbers] = useState<Record<string, string>>({});
+  const [shippingCarriers, setShippingCarriers] = useState<Record<string, string>>({});
   const [adminNotes, setAdminNotes] = useState<Record<string, string>>({});
   
   // Filtering
@@ -31,12 +32,15 @@ const OrderManagement: React.FC = () => {
       // Initialize states from existing data
       const initialNotes: Record<string, string> = {};
       const initialTracking: Record<string, string> = {};
+      const initialCarriers: Record<string, string> = {};
       data.forEach(o => {
         if (o.admin_notes) initialNotes[o.id] = o.admin_notes;
         if (o.tracking_number) initialTracking[o.id] = o.tracking_number;
+        if (o.shipping_carrier) initialCarriers[o.id] = o.shipping_carrier;
       });
       setAdminNotes(initialNotes);
       setTrackingNumbers(initialTracking);
+      setShippingCarriers(initialCarriers);
     } catch (error) {
       console.error('Failed to load orders:', error);
       showToast('Failed to load orders', 'error');
@@ -55,21 +59,31 @@ const OrderManagement: React.FC = () => {
     try {
       setActionLoading(orderId);
       const trackingNumber = trackingNumbers[orderId];
-      if (status === OrderStatus.Shipped && !trackingNumber) {
-        showToast('Please enter a tracking number before marking as shipped.', 'error');
+      const shippingCarrier = shippingCarriers[orderId];
+      if (status === OrderStatus.Shipped && (!trackingNumber || !shippingCarrier)) {
+        showToast('Please enter both a tracking number and shipping company.', 'error');
         return;
       }
-      await OrderService.updateOrderStatus(orderId, status, trackingNumber, adminNotes[orderId]);
+      await OrderService.updateOrderStatus(orderId, status, trackingNumber, adminNotes[orderId], shippingCarrier);
 
-      // Send confirmation email when admin marks as confirmed
-      if (status === OrderStatus.Confirmed) {
-        const order = orders.find(o => o.id === orderId);
-        if (order) {
+      const order = orders.find(o => o.id === orderId);
+      if (order) {
+        if (status === OrderStatus.Confirmed) {
           await OrderService.sendConfirmedEmail({
             order_number: order.order_number,
             customer_name: order.customer_name,
             customer_email: order.customer_email,
             property_title: order.property_title || 'Gold Item',
+          });
+        }
+        if (status === OrderStatus.Shipped && trackingNumber && shippingCarrier) {
+          await OrderService.sendShippedEmail({
+            order_number: order.order_number,
+            customer_name: order.customer_name,
+            customer_email: order.customer_email,
+            property_title: order.property_title || 'Gold Item',
+            tracking_number: trackingNumber,
+            shipping_carrier: shippingCarrier,
           });
         }
       }
@@ -304,9 +318,16 @@ const OrderManagement: React.FC = () => {
                             onChange={(e) => handleTrackingChange(order.id, e.target.value)}
                             className="text-xs w-full px-2.5 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 focus:outline-none focus:border-emerald-500"
                           />
+                          <input
+                            type="text"
+                            placeholder="Shipping company (e.g. LBC, DHL)"
+                            value={shippingCarriers[order.id] || ''}
+                            onChange={(e) => setShippingCarriers(prev => ({ ...prev, [order.id]: e.target.value }))}
+                            className="text-xs w-full px-2.5 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 focus:outline-none focus:border-emerald-500"
+                          />
                           <button
                             onClick={() => handleUpdateStatus(order.id, OrderStatus.Shipped)}
-                            disabled={actionLoading === order.id || !trackingNumbers[order.id]}
+                            disabled={actionLoading === order.id || !trackingNumbers[order.id] || !shippingCarriers[order.id]}
                             className="text-xs font-bold px-3 py-1.5 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors disabled:opacity-50 inline-flex items-center justify-center w-full"
                           >
                             <span className="material-icons text-[14px] mr-1">local_shipping</span> Ship

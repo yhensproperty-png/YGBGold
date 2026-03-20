@@ -64,6 +64,7 @@ export interface Order {
   currency: string;
   status: OrderStatus;
   tracking_number?: string;
+  shipping_carrier?: string;
   admin_notes?: string;
   shipping_country_group?: string;
   shipping_fee?: number;

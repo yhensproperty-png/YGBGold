@@ -1,6 +1,6 @@
 import { supabase } from './supabaseClient.ts';
 import { Order, OrderFormData, OrderStatus } from '../types.ts';
-import { getOrderInvoiceHTML, getOrderConfirmedHTML, ConfirmedOrderData } from '../utils/emailTemplates.ts';
+import { getOrderInvoiceHTML, getOrderConfirmedHTML, getOrderShippedHTML, ConfirmedOrderData, ShippedOrderData } from '../utils/emailTemplates.ts';
 
 
 export const OrderService = {
@@ -158,16 +158,32 @@ export const OrderService = {
   },
 
   /**
+   * Send the shipped email to the customer.
+   */
+  async sendShippedEmail(order: ShippedOrderData): Promise<void> {
+    try {
+      await fetch('/send-invoice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: order.customer_email,
+          subject: `Order #${order.order_number} Shipped — YGB Gold`,
+          html: getOrderShippedHTML(order),
+        }),
+      });
+    } catch (err) {
+      console.error('Shipped email failed to send:', err);
+    }
+  },
+
+  /**
    * Update the status and optionally the tracking number of an order.
    */
-  async updateOrderStatus(orderId: string, status: OrderStatus, trackingNumber?: string, adminNotes?: string): Promise<void> {
+  async updateOrderStatus(orderId: string, status: OrderStatus, trackingNumber?: string, adminNotes?: string, shippingCarrier?: string): Promise<void> {
     const updateData: any = { status };
-    if (trackingNumber !== undefined) {
-      updateData.tracking_number = trackingNumber;
-    }
-    if (adminNotes !== undefined) {
-      updateData.admin_notes = adminNotes;
-    }
+    if (trackingNumber !== undefined) updateData.tracking_number = trackingNumber;
+    if (adminNotes !== undefined) updateData.admin_notes = adminNotes;
+    if (shippingCarrier !== undefined) updateData.shipping_carrier = shippingCarrier;
 
     const { error } = await supabase
       .from('orders')

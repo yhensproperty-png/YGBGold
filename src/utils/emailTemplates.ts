@@ -137,7 +137,7 @@ export function getOrderInvoiceHTML(order: InvoiceOrder): string {
               <p style="margin:2px 0 0;font-size:14px;color:#555;">${PAYMENT_METHODS.gcash.number}</p>
             </td>
             <td style="vertical-align:top;text-align:right;">
-              <img src="${PAYMENT_METHODS.gcash.qrUrl}" alt="GCash QR" width="100" style="border-radius:6px;" />
+              <img src="${PAYMENT_METHODS.gcash.qrUrl}" alt="GCash QR" width="160" style="border-radius:6px;" />
             </td>
           </tr>
         </table>
@@ -151,7 +151,7 @@ export function getOrderInvoiceHTML(order: InvoiceOrder): string {
               <p style="margin:2px 0 0;font-size:14px;color:#555;">Acct: ${PAYMENT_METHODS.bpi.accountNumber}</p>
             </td>
             <td style="vertical-align:top;text-align:right;">
-              <img src="${PAYMENT_METHODS.bpi.qrUrl}" alt="BPI QR" width="100" style="border-radius:6px;" />
+              <img src="${PAYMENT_METHODS.bpi.qrUrl}" alt="BPI QR" width="160" style="border-radius:6px;" />
             </td>
           </tr>
         </table>
@@ -174,6 +174,84 @@ export function getOrderInvoiceHTML(order: InvoiceOrder): string {
     </tr>`);
 }
 
+export interface ShippedOrderData {
+  order_number: number;
+  customer_name: string;
+  customer_email: string;
+  property_title: string;
+  tracking_number: string;
+  shipping_carrier: string;
+}
+
+export function getOrderShippedHTML(order: ShippedOrderData): string {
+  return emailWrapper(`
+    <!-- Title -->
+    <tr>
+      <td style="padding:36px 40px 0;text-align:center;">
+        <div style="width:64px;height:64px;background:#e3f2fd;border-radius:50%;display:inline-block;line-height:64px;text-align:center;margin-bottom:16px;">
+          <span style="font-size:32px;line-height:64px;">📦</span>
+        </div>
+        <h1 style="margin:0;font-size:24px;color:#111;">Your Order Has Shipped!</h1>
+        <p style="color:#666;margin:8px 0 0;font-size:14px;">Order #<strong>${order.order_number}</strong></p>
+      </td>
+    </tr>
+
+    <!-- Message -->
+    <tr>
+      <td style="padding:28px 40px 0;">
+        <p style="font-size:15px;color:#333;line-height:1.7;margin:0 0 16px;">
+          Dear <strong>${order.customer_name}</strong>,
+        </p>
+        <p style="font-size:15px;color:#333;line-height:1.7;margin:0 0 16px;">
+          We are pleased to inform you that your gold investment — <strong>${order.property_title}</strong> (Order #${order.order_number}) — has now been shipped and is on its way to you!
+        </p>
+      </td>
+    </tr>
+
+    <!-- Tracking box -->
+    <tr>
+      <td style="padding:16px 40px;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0f7ff;border-left:4px solid #1a73e8;border-radius:4px;padding:20px;">
+          <tr>
+            <td>
+              <p style="margin:0 0 4px;font-size:12px;color:#999;text-transform:uppercase;letter-spacing:1px;">Shipping Carrier</p>
+              <p style="margin:0 0 16px;font-size:17px;font-weight:bold;color:#111;">${order.shipping_carrier}</p>
+              <p style="margin:0 0 4px;font-size:12px;color:#999;text-transform:uppercase;letter-spacing:1px;">Tracking Number</p>
+              <p style="margin:0;font-size:20px;font-weight:bold;color:#1a73e8;font-family:monospace,Arial;">${order.tracking_number}</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <!-- Instructions -->
+    <tr>
+      <td style="padding:8px 40px 24px;">
+        <p style="font-size:14px;color:#555;line-height:1.7;margin:0;">
+          You can use the tracking number above on the <strong>${order.shipping_carrier}</strong> website or app to monitor your delivery status in real time.
+        </p>
+      </td>
+    </tr>
+
+    <!-- Divider -->
+    <tr><td style="padding:0 40px;"><hr style="border:none;border-top:1px solid #eee;margin:0;" /></td></tr>
+
+    <!-- Sign off -->
+    <tr>
+      <td style="padding:28px 40px 32px;">
+        <p style="font-size:15px;color:#333;line-height:1.7;margin:0 0 16px;">
+          Thank you once again for being a valued customer of <strong>YGB Gold Buy &amp; Sell</strong>. Your trust in us means everything, and we hope your gold investment brings you lasting value and peace of mind.
+        </p>
+        <p style="font-size:15px;color:#333;line-height:1.7;margin:0;">
+          If you have any questions about your delivery, please don't hesitate to reply to this email.<br/><br/>
+          Warm regards,<br/>
+          <strong style="color:#111;">The YGB Gold Team</strong><br/>
+          <a href="https://ygbgold.com" style="color:#d4af37;text-decoration:none;font-size:13px;">ygbgold.com</a>
+        </p>
+      </td>
+    </tr>`);
+}
+
 export interface ConfirmedOrderData {
   order_number: number;
   customer_name: string;
@@ -186,8 +264,8 @@ export function getOrderConfirmedHTML(order: ConfirmedOrderData): string {
     <!-- Title -->
     <tr>
       <td style="padding:36px 40px 0;text-align:center;">
-        <div style="width:64px;height:64px;background:#e8f5e9;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;">
-          <span style="font-size:32px;">✅</span>
+        <div style="width:64px;height:64px;background:#e8f5e9;border-radius:50%;display:inline-block;line-height:64px;text-align:center;margin-bottom:16px;">
+          <span style="font-size:32px;line-height:64px;">✅</span>
         </div>
         <h1 style="margin:0;font-size:24px;color:#111;">Payment Confirmed!</h1>
         <p style="color:#666;margin:8px 0 0;font-size:14px;">Order #<strong>${order.order_number}</strong></p>
