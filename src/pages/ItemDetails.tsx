@@ -538,8 +538,8 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
 
       {/* Buy Request Modal */}
       {showBuyModal && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-zinc-950/90 backdrop-blur-xl animate-in fade-in duration-300 p-4">
-          <div className="bg-white dark:bg-zinc-900 p-8 rounded-3xl shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-500 relative border border-zinc-200 dark:border-zinc-800">
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-zinc-950/90 backdrop-blur-xl animate-in fade-in duration-300 p-3 sm:p-4">
+          <div className="bg-white dark:bg-zinc-900 p-5 sm:p-7 rounded-2xl shadow-2xl w-full max-w-sm animate-in zoom-in-95 duration-500 relative border border-zinc-200 dark:border-zinc-800 max-h-[92vh] overflow-y-auto">
             <button
               onClick={() => { setShowBuyModal(false); setOrderSuccess(null); }}
               className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors"

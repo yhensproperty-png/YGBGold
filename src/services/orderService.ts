@@ -1,6 +1,6 @@
 import { supabase } from './supabaseClient.ts';
 import { Order, OrderFormData, OrderStatus } from '../types.ts';
-import { getOrderInvoiceHTML } from '../utils/emailTemplates.ts';
+import { getOrderInvoiceHTML, getOrderConfirmedHTML, ConfirmedOrderData } from '../utils/emailTemplates.ts';
 
 
 export const OrderService = {
@@ -114,6 +114,7 @@ export const OrderService = {
       customer_email: formData.customer_email,
       customer_phone: formData.customer_phone,
       shipping_address: formData.shipping_address,
+      shipping_country_group: formData.shipping_country_group,
       amount: amount,
       shipping_fee: formData.shipping_fee,
       property_title: propertyTitle || 'Gold Item',
@@ -135,6 +136,25 @@ export const OrderService = {
     }
 
     return orderNumber;
+  },
+
+  /**
+   * Send the payment confirmed email to the customer.
+   */
+  async sendConfirmedEmail(order: ConfirmedOrderData): Promise<void> {
+    try {
+      await fetch('/send-invoice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: order.customer_email,
+          subject: `Order #${order.order_number} Confirmed — YGB Gold`,
+          html: getOrderConfirmedHTML(order),
+        }),
+      });
+    } catch (err) {
+      console.error('Confirmed email failed to send:', err);
+    }
   },
 
   /**

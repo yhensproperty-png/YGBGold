@@ -60,6 +60,20 @@ const OrderManagement: React.FC = () => {
         return;
       }
       await OrderService.updateOrderStatus(orderId, status, trackingNumber, adminNotes[orderId]);
+
+      // Send confirmation email when admin marks as confirmed
+      if (status === OrderStatus.Confirmed) {
+        const order = orders.find(o => o.id === orderId);
+        if (order) {
+          await OrderService.sendConfirmedEmail({
+            order_number: order.order_number,
+            customer_name: order.customer_name,
+            customer_email: order.customer_email,
+            property_title: order.property_title || 'Gold Item',
+          });
+        }
+      }
+
       showToast(`Order marked as ${status}`);
       await loadOrders();
     } catch (error) {
