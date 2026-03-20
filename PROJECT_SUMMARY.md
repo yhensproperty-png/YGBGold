@@ -10,7 +10,8 @@ This document provides a detailed overview of the technical setup, architecture,
   - **Framework**: Vite
 - **Edge Functions**:
   - `og-injector`: Injects OpenGraph metadata at the `/property/*` path for better social sharing previews.
-  - `resend-inbound`: Handles inbound email webhooks from Resend. Verifies Svix webhook signature, fetches full email body via `GET /emails/receiving/{id}` (requires Full Access API key), and forwards to `ygbgoldbuysell@gmail.com` with `reply_to` set to the original sender.
+  - `resend-inbound`: Receives inbound email webhooks from Resend (`email.received`). Fetches full body via `GET /emails/receiving/{email_id}` (Full Access key required). Forwards to `ygbgoldbuysell@gmail.com` with dynamic sender name and `reply_to` set to original sender. Webhook URL: `https://ygbgold.com/resend-inbound`.
+  - `send-invoice`: Server-side email sender used by the frontend to avoid browser CORS restrictions. Accepts `{ to, subject, html }` and sends via Resend API using `RESEND_API_KEY`. Path: `/send-invoice`.
 - **Environment Variables** (Netlify dashboard):
   - `VITE_SUPABASE_URL`: Supabase project endpoint.
   - `VITE_SUPABASE_ANON_KEY`: Public anonymous key for client-side operations.
@@ -42,9 +43,11 @@ This document provides a detailed overview of the technical setup, architecture,
   - `update()`: Updates existing records.
   - `delete()`: Removes records from the database.
 - **Order Service Layer**: `src/services/orderService.ts` handles purchase intent requests.
-  - `getAllOrders()`: Admin-only fetch for all customer buy requests.
-  - `addOrder()`: Submits a new purchase request (supports guest/anonymous users).
-  - `updateOrderStatus()`: Updates status and tracking numbers.
+  - `getAllOrders()`: Admin-only fetch for all customer buy requests (joins `properties`).
+  - `addOrder()`: Inserts order, returns `order_number`, sends branded invoice email via `/send-invoice` edge function.
+  - `updateOrderStatus()`: Updates status, tracking number, admin notes, and shipping carrier.
+  - `sendConfirmedEmail()`: Sends payment confirmed email when admin clicks Confirm.
+  - `sendShippedEmail()`: Sends shipment dispatched email (with tracking number + carrier) when admin clicks Ship.
 
 ## 4. Database Schema
 The database runs on PostgreSQL (Supabase). Key tables include:
@@ -88,6 +91,7 @@ The database runs on PostgreSQL (Supabase). Key tables include:
 | `currency` | `text` | Default `PHP`. |
 | `status` | `text` | `pending` → `confirmed` → `shipped` / `cancelled`. |
 | `tracking_number` | `text` | Courier tracking ID (set by admin). |
+| `shipping_carrier` | `text` | Shipping company name (e.g. LBC, DHL) — set by admin at Ship stage. |
 | `admin_notes` | `text` | Internal notes visible only to admin. |
 | `created_at` | `timestamptz` | Order creation timestamp. |
 | `updated_at` | `timestamptz` | Auto-updated via `moddatetime` trigger. |
@@ -108,18 +112,26 @@ The database runs on PostgreSQL (Supabase). Key tables include:
 - **Inventory Tracking**: Mandatory `inventory_amount` field added for future automated purchase integration.
 - **Removed Logic**: Commission tracking, "Rent" functionality, search bar, Featured Assets section, Latest Inventory section, and "Choose Your Lifestyle" categories have all been fully stripped from the codebase.
 - **Buy Request Flow**:
-  1. User clicks **"Reserve"** on `ItemDetails.tsx`, which opens an order form.
-  2. On submit, `OrderService.addOrder()` is called — inserts a row into `public.orders` with `status = 'pending'`.
-  3. Supports both authenticated users (`user_id` set) and anonymous guests (`user_id` null).
-  4. Admin manages orders in `OrderManagement.tsx` (within `AdminDashboard`), which calls `OrderService.getAllOrders()` joining with `properties` for listing details.
-  5. Admin view has a **status filter toggle** — tabs for `all`, `pending`, `confirmed`, `shipped`, `cancelled`.
-  6. Admin can update status, add tracking number, and write internal notes via `OrderService.updateOrderStatus()`.
-  7. No payment gateway — fulfillment is manual.
-- **Storage**: Supabase Storage Bucket **is set up** (migration `20260220112059_setup_storage_bucket.sql`). Images are stored/referenced there; the bucket was configured with a size limit increase in a follow-up migration.
+  1. User clicks **"Reserve"** on `ItemDetails.tsx`, opens a compact order form (mobile-friendly, `max-h-[92vh]` scrollable).
+  2. On submit, `OrderService.addOrder()` inserts a row into `public.orders` with `status = 'pending'` and returns `order_number`.
+  3. Branded invoice email is sent automatically to the customer via `/send-invoice` edge function. Includes: item price, shipping destination + fee, grand total, GCash + BPI QR codes (160px), order number as payment reference, and "reply with payment screenshot" CTA.
+  4. Modal shows success screen: *"Order #X Reserved! Check your email for your invoice and payment details."*
+  5. Supports both authenticated users and anonymous guests.
+  6. Admin manages orders in `OrderManagement.tsx` — status filter tabs: `all`, `pending`, `confirmed`, `shipped`, `cancelled`.
+  7. **Pending → Confirmed**: Admin clicks blue Confirm button → status updates → **payment confirmed email** sent automatically.
+  8. **Confirmed → Shipped**: Admin enters Tracking # + Shipping Company (both required, Ship button disabled until filled) → status updates → **shipment dispatched email** sent automatically with tracking details.
+  9. No payment gateway — fulfillment is manual.
+- **Email Templates** (`src/utils/emailTemplates.ts`):
+  - `getOrderInvoiceHTML()` — Invoice sent on order reservation. Shows itemized breakdown, payment methods (GCash + BPI with QR codes), and order reference instruction.
+  - `getOrderConfirmedHTML()` — Sent when admin confirms payment received. Professional message with 3-step "what happens next" breakdown.
+  - `getOrderShippedHTML()` — Sent when admin marks as shipped. Shows carrier name, tracking number prominently, and warm sign-off.
+  - `PAYMENT_METHODS` constant — centralised GCash (09467543767 / DAYLYN ORIA) and BPI (0319326193 / DAYLYN ORIA) details + QR image URLs.
+- **Payment QR Codes**: Stored at `public/payments/gcash-qr.png` and `public/payments/bpi-qr.png`. Served at `https://ygbgold.com/payments/`.
+- **Storage**: Supabase Storage Bucket **is set up** (migration `20260220112059_setup_storage_bucket.sql`).
 - **Email Architecture**:
-  - **Outbound** (automated/transactional): Resend API via `RESEND_API_KEY`.
-  - **Inbound** (domain email forwarding): Resend `email.received` webhook → `resend-inbound` Netlify edge function → fetches body via `GET /emails/receiving/{email_id}` (Full Access key required — standard `/emails/{id}` is for sent mail only and returns 404) → forwards to `ygbgoldbuysell@gmail.com` with `reply_to` = original sender and sender name = original sender email. Webhook URL: `https://ygbgold.com/resend-inbound`.
-  - **Contact forms**: Web3Forms (already working, separate from Resend).
+  - **Outbound transactional**: Frontend calls `POST /send-invoice` (Netlify edge function) → edge function calls Resend API server-side (avoids browser CORS). Three automated emails: invoice, confirmed, shipped.
+  - **Inbound forwarding**: Resend `email.received` webhook → `resend-inbound` edge function → fetches body via `GET /emails/receiving/{email_id}` → forwards to `ygbgoldbuysell@gmail.com`.
+  - **Contact forms**: Web3Forms (separate, already working).
 - **Floating Facebook Messenger Button**: Fixed bottom-right button in `App.tsx` linking to `https://m.me/Goldelyn` with Messenger gradient styling.
 - **Gold Performance Section**: TradingView chart (OANDA:XAUUSD, weekly, 60M range) displayed side-by-side with `GoldLongTermPerformance` component showing 5Y–30Y historical returns. Background is black with white text.
 - **GoldLongTermPerformance Component**:
