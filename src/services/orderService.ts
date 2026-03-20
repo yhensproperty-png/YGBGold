@@ -2,6 +2,7 @@ import { supabase } from './supabaseClient.ts';
 import { Order, OrderFormData, OrderStatus } from '../types.ts';
 import { getOrderInvoiceHTML } from '../utils/emailTemplates.ts';
 
+
 export const OrderService = {
   /**
    * Fetch all orders, joining with the properties table to get listing details.
@@ -118,27 +119,19 @@ export const OrderService = {
       property_title: propertyTitle || 'Gold Item',
     });
 
-    const resendKey = import.meta.env.VITE_RESEND_API_KEY;
-    if (resendKey) {
-      try {
-        await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${resendKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            from: 'YGB Gold <inquiries@mail.ygbgold.com>',
-            to: [formData.customer_email],
-            reply_to: 'inquiries@mail.ygbgold.com',
-            subject: `Order #${orderNumber} Reserved — YGB Gold Invoice`,
-            html: invoiceHtml,
-          }),
-        });
-      } catch (emailError) {
-        // Don't fail the order if email fails
-        console.error('Invoice email failed to send:', emailError);
-      }
+    try {
+      await fetch('/send-invoice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: formData.customer_email,
+          subject: `Order #${orderNumber} Reserved — YGB Gold Invoice`,
+          html: invoiceHtml,
+        }),
+      });
+    } catch (emailError) {
+      // Don't fail the order if email fails
+      console.error('Invoice email failed to send:', emailError);
     }
 
     return orderNumber;
