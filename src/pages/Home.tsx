@@ -398,9 +398,9 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
                 <span className="material-icons text-primary text-4xl">local_shipping</span>
               </div>
               <div className="w-8 h-8 rounded-full bg-primary text-zinc-900 font-black text-sm flex items-center justify-center mb-4">2</div>
-              <h3 className="text-xl font-black dark:text-white mb-3 tracking-tight">Enter Info & Pay</h3>
+              <h3 className="text-xl font-black dark:text-white mb-3 tracking-tight">Reserve & Pay</h3>
               <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed">
-                Fill in your details and select your shipping country. Click <span className="font-bold text-zinc-700 dark:text-zinc-200">"Pay Now"</span> and receive your payment confirmation instantly.
+                Fill in your details and select your shipping country. Click <span className="font-bold text-zinc-700 dark:text-zinc-200">"Buy Now"</span> and instantly receive an email with your invoice, payment options (GCash &amp; BPI), and step-by-step payment instructions.
               </p>
             </div>
 

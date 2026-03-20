@@ -103,10 +103,12 @@ const GoldLongTermPerformance: React.FC = () => {
       {/* Card */}
       <div className="flex flex-col flex-1 bg-zinc-900 border border-zinc-700 rounded-3xl p-6 min-h-[400px]">
         {/* Table header */}
-        <div className="grid grid-cols-3 gap-2 mb-3 px-2">
+        <div className="flex justify-between mb-3 px-2">
           <span className="text-zinc-500 text-[10px] font-black uppercase tracking-widest">Period</span>
-          <span className="text-zinc-500 text-[10px] font-black uppercase tracking-widest text-center">Total Return</span>
-          <span className="text-zinc-500 text-[10px] font-black uppercase tracking-widest text-right">CAGR</span>
+          <div className="flex gap-6">
+            <span className="text-zinc-500 text-[10px] font-black uppercase tracking-widest w-16 text-right">Return</span>
+            <span className="text-zinc-500 text-[10px] font-black uppercase tracking-widest w-16 text-right">CAGR</span>
+          </div>
         </div>
 
         {/* Rows */}
@@ -121,17 +123,15 @@ const GoldLongTermPerformance: React.FC = () => {
               return (
                 <div
                   key={label}
-                  className="grid grid-cols-3 gap-2 items-center bg-zinc-800/60 hover:bg-zinc-800 transition-colors rounded-2xl px-4 py-3"
+                  className="flex items-center justify-between bg-zinc-800/60 hover:bg-zinc-800 transition-colors rounded-2xl px-4 py-3"
                 >
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-white font-black text-sm">{label}</p>
                     <p className="text-zinc-500 text-[10px] font-medium">{startDate}</p>
                   </div>
-                  <div className="text-center">
-                    <span className="text-emerald-400 font-black text-base">+{totalReturn.toFixed(0)}%</span>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-emerald-300 font-bold text-sm">+{cagr.toFixed(1)}% p.a.</span>
+                  <div className="flex gap-6 shrink-0">
+                    <span className="text-emerald-400 font-black text-sm w-16 text-right">+{totalReturn.toFixed(0)}%</span>
+                    <span className="text-emerald-300 font-bold text-sm w-16 text-right">+{cagr.toFixed(1)}%</span>
                   </div>
                 </div>
               );

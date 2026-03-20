@@ -563,7 +563,7 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
               </div>
             ) : (
               <>
-            <h2 className="text-2xl font-black dark:text-white tracking-tighter mb-1">Request to Buy</h2>
+            <h2 className="text-2xl font-black dark:text-white tracking-tighter mb-1">Buy Now</h2>
             <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-6">{property.title} - ₱{property.price.toLocaleString()}</p>
             
             <form className="space-y-4" onSubmit={handleBuySubmit}>
@@ -995,7 +995,7 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
                 className="w-full bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-black py-4 rounded-xl shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 mb-6 border border-zinc-800 dark:border-zinc-200"
               >
                 <span className="material-icons text-xl">shopping_cart</span>
-                <span className="text-lg">Request to Buy</span>
+                <span className="text-lg">Buy Now</span>
               </button>
 
               <div className="flex items-center gap-3 mb-6">
