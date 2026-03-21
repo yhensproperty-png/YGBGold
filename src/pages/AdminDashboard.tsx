@@ -49,8 +49,41 @@ const AdminDashboard: React.FC = () => {
     setIsLoading(false);
   };
 
+  const [stats, setStats] = useState({
+    totalGMV: 0,
+    pendingFulfillment: 0,
+    activeListings: 0,
+    totalOrders: 0
+  });
+
+  const loadStats = async () => {
+    // Orders
+    const { data: dbOrders } = await supabase.from('orders').select('amount, status');
+    if (dbOrders) {
+      const gmv = dbOrders.filter(o => o.status === 'shipped' || o.status === 'confirmed').reduce((sum, o) => sum + Number(o.amount || 0), 0);
+      const pending = dbOrders.filter(o => o.status === 'pending').reduce((sum, o) => sum + Number(o.amount || 0), 0);
+      const totalOrders = dbOrders.length;
+      
+      // Properties
+      const { count } = await supabase.from('properties').select('*', { count: 'exact', head: true }).in('status', ['active']);
+      
+      setStats({
+        totalGMV: gmv,
+        pendingFulfillment: pending,
+        activeListings: count || 0,
+        totalOrders
+      });
+    }
+  };
+
+  const loadData = async () => {
+    setIsLoading(true);
+    await Promise.all([loadUsers(), loadStats()]);
+    setIsLoading(false);
+  };
+
   useEffect(() => {
-    loadUsers();
+    loadData();
   }, []);
 
   const openCreate = () => {
@@ -97,7 +130,7 @@ const AdminDashboard: React.FC = () => {
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || result.message || `Failed to create user (${response.status})`);
-      await loadUsers();
+      await loadData();
       closeModal();
       showToast(`Account created for ${newEmail}`, 'success');
     } catch (err: any) {
@@ -152,7 +185,7 @@ const AdminDashboard: React.FC = () => {
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'Failed to delete user');
-      await loadUsers();
+      await loadData();
       closeModal();
       showToast('User deleted. Their listings are preserved.', 'success');
     } catch (err: any) {
@@ -181,7 +214,7 @@ const AdminDashboard: React.FC = () => {
     const newRole = user.role === 'admin' ? 'user' : 'admin';
     try {
       await callAdminFunction({ action: 'update_role', user_id: user.id, role: newRole });
-      await loadUsers();
+      await loadData();
       showToast(`${user.display_name || user.email} is now ${newRole === 'admin' ? 'an Admin' : 'a Team user'}`, 'success');
     } catch (err: any) {
       showToast(err.message || 'Failed to update role', 'error');
@@ -191,7 +224,7 @@ const AdminDashboard: React.FC = () => {
   const handleToggleLogin = async (user: Profile) => {
     try {
       await callAdminFunction({ action: 'toggle_login', user_id: user.id, login_enabled: !user.login_enabled });
-      await loadUsers();
+      await loadData();
       showToast(`Login ${!user.login_enabled ? 'enabled' : 'disabled'} for ${user.display_name || user.email}`, 'success');
     } catch (err: any) {
       showToast('Failed to update login status', 'error');
@@ -254,20 +287,20 @@ const AdminDashboard: React.FC = () => {
       </header>
 
       <div className="max-w-6xl mx-auto px-6 py-10 space-y-8">
-        {/* Stats Row */}
+        {/* Dropship Business Metrics */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { label: 'Total Users', value: users.length, icon: 'group', color: 'text-blue-500' },
-            { label: 'Admins', value: users.filter(u => u.role === 'admin').length, icon: 'admin_panel_settings', color: 'text-primary' },
-            { label: 'Team', value: users.filter(u => u.role === 'user').length, icon: 'badge', color: 'text-sky-500' },
-            { label: 'Disabled', value: users.filter(u => !u.login_enabled).length, icon: 'block', color: 'text-red-500' },
+            { label: 'Total GMV', value: `₱${stats.totalGMV.toLocaleString()}`, icon: 'payments', color: 'text-emerald-500' },
+            { label: 'Pending Waitlist', value: `₱${stats.pendingFulfillment.toLocaleString()}`, icon: 'hourglass_empty', color: 'text-amber-500' },
+            { label: 'Total Orders', value: stats.totalOrders, icon: 'local_shipping', color: 'text-blue-500' },
+            { label: 'Active Listings', value: stats.activeListings, icon: 'storefront', color: 'text-primary' },
           ].map(stat => (
             <div key={stat.label} className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-5 shadow-sm">
               <div className="flex items-center justify-between mb-3">
                 <span className={`material-icons text-2xl ${stat.color}`}>{stat.icon}</span>
-                <span className="text-3xl font-black text-zinc-900 dark:text-white">{stat.value}</span>
+                <span className={`text-xl md:text-2xl lg:text-3xl font-black text-zinc-900 dark:text-white truncate`} title={stat.value.toString()}>{stat.value}</span>
               </div>
-              <p className="text-xs font-bold uppercase tracking-wider text-zinc-400">{stat.label}</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-zinc-400 truncate">{stat.label}</p>
             </div>
           ))}
         </div>

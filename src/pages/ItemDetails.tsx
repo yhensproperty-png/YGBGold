@@ -123,7 +123,9 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
     customer_phone: '',
     shipping_address: '',
     shipping_country_group: '',
-    shipping_fee: 0
+    shipping_fee: 0,
+    combine_shipping: false,
+    previous_order_ref: ''
   });
 
   useEffect(() => {
@@ -217,17 +219,34 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
   };
 
   const handleBuyInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+    const target = e.target as HTMLInputElement;
+    const { name, value, type, checked } = target;
+
+    if (name === 'combine_shipping') {
+      setBuyFormData(prev => ({ 
+        ...prev, 
+        combine_shipping: checked,
+        shipping_fee: checked ? 0 : (
+          prev.shipping_country_group === 'philippines' ? 300 :
+          prev.shipping_country_group === 'thkrjpau' ? 3500 :
+          prev.shipping_country_group === 'sghktw' ? 3000 :
+          prev.shipping_country_group === 'caus' ? 4000 : 0
+        )
+      }));
+      return;
+    }
+
     if (name === 'shipping_country_group') {
       let fee = 0;
-      if (value === 'philippines') fee = 300;
-      else if (value === 'thkrjpau') fee = 3500;
-      else if (value === 'sghktw') fee = 3000;
-      else if (value === 'caus') fee = 4000;
-      
+      if (!buyFormData.combine_shipping) {
+        if (value === 'philippines') fee = 300;
+        else if (value === 'thkrjpau') fee = 3500;
+        else if (value === 'sghktw') fee = 3000;
+        else if (value === 'caus') fee = 4000;
+      }
       setBuyFormData(prev => ({ ...prev, [name]: value, shipping_fee: fee }));
     } else {
-      setBuyFormData(prev => ({ ...prev, [name]: value }));
+      setBuyFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
     }
   };
 
@@ -244,19 +263,58 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
       return;
     }
 
+    const sanitizedPhone = buyFormData.customer_phone.replace(/[\s-]/g, '');
+    const phoneRegex = /^\+?[0-9]{10,15}$/;
+    if (!phoneRegex.test(sanitizedPhone)) {
+      alert('Please enter a valid international phone number (10 to 15 digits).');
+      return;
+    }
+
     setIsOrdering(true);
     try {
+      if (buyFormData.combine_shipping) {
+        const emailToCheck = buyFormData.previous_order_ref.trim().toLowerCase();
+        
+        if (!emailToCheck) {
+          alert('Please enter the email address used for your open order.');
+          setIsOrdering(false);
+          return;
+        }
+
+        const { data: hasPending, error: rpcError } = await supabase.rpc('has_pending_order', { target_email: emailToCheck });
+          
+        if (rpcError) {
+           console.error('Error checking open orders:', rpcError);
+           throw new Error('Database verification failed.');
+        }
+        
+        if (!hasPending) {
+          alert('We could not find an open "Pending" order under that email address. The order may have already been shipped, or the email is incorrect.');
+          setIsOrdering(false);
+          return;
+        }
+      }
+
+      const sanitizedData = {
+        ...buyFormData,
+        customer_name: buyFormData.customer_name.trim(),
+        customer_email: buyFormData.customer_email.trim().toLowerCase(),
+        customer_phone: sanitizedPhone
+      };
+
       const orderNumber = await OrderService.addOrder(
         property.id,
         property.price + buyFormData.shipping_fee,
-        buyFormData,
+        sanitizedData,
         user?.id,
         property.title
       );
       setOrderSuccess({ orderNumber });
     } catch (error) {
       console.error('Error submitting buy request:', error);
-      alert('There was an error submitting your request. Please try again.');
+      alert(error instanceof Error && error.message.includes('verification') 
+        ? 'Could not connect to the server to verify your order.' 
+        : 'There was an error submitting your request. Please try again.');
     } finally {
       setIsOrdering(false);
     }
@@ -573,6 +631,12 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
             <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-6">{property.title} - ₱{property.price.toLocaleString()}</p>
             
             <form className="space-y-4" onSubmit={handleBuySubmit}>
+              <div className="bg-primary/10 border border-primary/20 rounded-xl p-3 mb-2">
+                <p className="text-xs text-primary font-bold">
+                  <span className="material-icons text-[14px] align-text-bottom mr-1">info</span>
+                  Buying multiple items? Check the 'Combine Shipping' box below to waive the shipping fee!
+                </p>
+              </div>
               <div>
                 <label className="block text-[9px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-2 px-1">Full Name</label>
                 <input
@@ -632,6 +696,34 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
               </div>
               
               <div className="pt-2 pb-4">
+                <label className="flex items-center gap-3 mb-4 cursor-pointer bg-zinc-50 dark:bg-zinc-800 p-3 rounded-xl border border-zinc-100 dark:border-zinc-700 hover:border-primary transition-colors">
+                  <input 
+                    type="checkbox"
+                    name="combine_shipping"
+                    checked={buyFormData.combine_shipping}
+                    onChange={handleBuyInputChange}
+                    className="w-4 h-4 text-primary rounded focus:ring-primary bg-white dark:bg-zinc-900 border-zinc-300 dark:border-zinc-700"
+                    disabled={isOrdering}
+                  />
+                  <span className="text-sm font-bold text-zinc-700 dark:text-zinc-200">
+                    Combine this with an open order (Free Shipping)
+                  </span>
+                </label>
+
+                {buyFormData.combine_shipping && (
+                  <div className="mb-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <label className="block text-[9px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-2 px-1">Email Address from previous order</label>
+                    <input
+                      name="previous_order_ref"
+                      value={buyFormData.previous_order_ref}
+                      onChange={handleBuyInputChange}
+                      placeholder="e.g. you@email.com"
+                      className="w-full bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800/50 text-amber-900 dark:text-amber-100 rounded-xl p-3 text-sm font-bold focus:ring-primary focus:border-primary transition-all"
+                      type="email" required={buyFormData.combine_shipping} disabled={isOrdering}
+                    />
+                  </div>
+                )}
+
                 <p className="text-lg font-black text-zinc-900 dark:text-white flex justify-between items-center bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-xl border border-zinc-100 dark:border-zinc-800">
                   <span>Total:</span>
                   <span className="text-primary">₱{(property.price + buyFormData.shipping_fee).toLocaleString()}</span>

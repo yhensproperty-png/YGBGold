@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { OrderService } from '../services/orderService.ts';
 import { Order, OrderStatus } from '../types.ts';
 import { useAuth } from '../context/AuthContext.tsx';
+import { supabase } from '../services/supabaseClient.ts';
 
 const OrderManagement: React.FC = () => {
   const { profile } = useAuth();
@@ -52,6 +53,18 @@ const OrderManagement: React.FC = () => {
   useEffect(() => {
     if (profile?.role === 'admin') {
       loadOrders();
+
+      // Realtime listener for instant notification without refreshing
+      const channel = supabase.channel('realtime_admin_orders')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, () => {
+          showToast('🔔 🚨 NEW ORDER RECEIVED! Refreshing dashboard...', 'success');
+          loadOrders();
+        })
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
     }
   }, [profile]);
 
@@ -212,9 +225,15 @@ const OrderManagement: React.FC = () => {
               {filteredOrders.map((order) => (
                 <tr key={order.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 transition-colors">
                   <td className="px-6 py-4 align-top w-28">
-                    <span className="text-[13px] font-black font-mono text-zinc-900 dark:text-white bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded-md shadow-sm border border-zinc-200 dark:border-zinc-700 select-all">
+                    <span className="text-[13px] font-black font-mono text-zinc-900 dark:text-white bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded-md shadow-sm border border-zinc-200 dark:border-zinc-700 select-all block w-max">
                       #{String(order.order_number).padStart(4, '0')}
                     </span>
+                    {order.admin_notes?.includes('[COMBINED SHIPPING]') && (
+                      <div className="mt-3 bg-red-500 text-white text-[9px] font-black uppercase tracking-widest px-2 py-1.5 rounded-lg shadow-[0_0_15px_rgba(239,68,68,0.5)] animate-pulse flex items-center gap-1 w-max">
+                        <span className="material-icons text-[12px]">warning</span>
+                        Combined
+                      </div>
+                    )}
                   </td>
                   <td className="px-6 py-4 align-top min-w-[200px]">
                     {order.property_slug ? (
@@ -251,12 +270,20 @@ const OrderManagement: React.FC = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 align-top">
-                    <div className="w-48 text-right flex flex-col items-end">
+                    <div className="w-56 text-right flex flex-col items-end">
+                      {order.admin_notes?.includes('[COMBINED SHIPPING]') && (
+                        <div className="bg-red-50 dark:bg-red-900/20 border-2 border-red-500 rounded-xl p-2 mb-2 w-full text-left">
+                          <p className="text-[10px] font-black text-red-600 dark:text-red-400 uppercase tracking-wider flex items-center gap-1 mb-1">
+                            <span className="material-icons text-[14px]">local_shipping</span>
+                            Ship Together!
+                          </p>
+                        </div>
+                      )}
                       <textarea
                         value={adminNotes[order.id] || ''}
                         onChange={(e) => handleNoteChange(order.id, e.target.value)}
                         placeholder="Add private note (e.g. WA chat, payment proof)..."
-                        className="w-full text-xs p-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 focus:outline-none focus:border-primary resize-none h-16"
+                        className={`w-full text-xs p-2 rounded-lg border ${order.admin_notes?.includes('[COMBINED SHIPPING]') ? 'border-red-500 bg-red-50/50 dark:bg-red-900/10' : 'border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800'} focus:outline-none focus:border-primary resize-none h-24`}
                       />
                       {adminNotes[order.id] !== (order.admin_notes || '') && (
                         <button

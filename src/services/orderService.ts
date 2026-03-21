@@ -90,6 +90,10 @@ export const OrderService = {
       status: OrderStatus.Pending
     };
 
+    if (formData.combine_shipping) {
+      insertData.admin_notes = `[COMBINED SHIPPING] Customer requested to combine this item with previous order under email: ${formData.previous_order_ref || 'N/A'}`;
+    }
+
     if (userId) {
       insertData.user_id = userId;
     }
@@ -121,6 +125,7 @@ export const OrderService = {
     });
 
     try {
+      // 1. Send Invoice to Customer
       await fetch('/send-invoice', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -130,9 +135,35 @@ export const OrderService = {
           html: invoiceHtml,
         }),
       });
+
+      // 2. Build Admin Alert HTML
+      const adminAlertHtml = `
+        <div style="font-family: sans-serif; padding: 20px; background: #fafafa;">
+          <h2 style="color: #2F2F2F;">New Order Received! (#${orderNumber})</h2>
+          <p><strong>Customer:</strong> ${formData.customer_name} (${formData.customer_email})</p>
+          <p><strong>Item:</strong> ${propertyTitle || 'Gold Item'}</p>
+          <p><strong>Amount:</strong> ₱${(amount).toLocaleString()}</p>
+          <p><strong>Shipping:</strong> ₱${formData.shipping_fee.toLocaleString()}</p>
+          <p><strong>Combine Shipping:</strong> ${formData.combine_shipping ? `YES (Check Dashboard)` : 'No'}</p>
+          <br/>
+          <a href="https://ygbgold.com/admin" style="display:inline-block; padding: 12px 24px; background:#eab308; color:#000; font-weight:bold; text-decoration:none; border-radius:8px;">View in Dashboard</a>
+        </div>
+      `;
+
+      // 3. Send Alert to Admin via Resend
+      await fetch('/send-invoice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: 'Contact@mail.ygbgold.com',
+          subject: `🚨 NEW YGB ORDER: #${orderNumber} (${propertyTitle || 'Gold Item'})`,
+          html: adminAlertHtml,
+        }),
+      });
+
     } catch (emailError) {
       // Don't fail the order if email fails
-      console.error('Invoice email failed to send:', emailError);
+      console.error('Email failed to send:', emailError);
     }
 
     return orderNumber;
