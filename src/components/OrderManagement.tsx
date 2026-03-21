@@ -15,7 +15,7 @@ const OrderManagement: React.FC = () => {
   const [adminNotes, setAdminNotes] = useState<Record<string, string>>({});
   
   // Filtering
-  const [filter, setFilter] = useState<OrderStatus | 'all'>('all');
+  const [filter, setFilter] = useState<OrderStatus | 'all' | 'combined'>('all');
   
   // Toast
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -135,7 +135,27 @@ const OrderManagement: React.FC = () => {
 
   const filteredOrders = useMemo(() => {
     if (filter === 'all') return orders;
+    if (filter === 'combined') {
+      return orders.filter(o => o.admin_notes?.includes('[COMBINED SHIPPING]'));
+    }
     return orders.filter(o => o.status === filter);
+  }, [orders, filter]);
+
+  // Group combined orders by email so they appear in the same "box"
+  const groupedCombinedOrders = useMemo(() => {
+    if (filter !== 'combined') return {};
+    
+    // Find all orders that have the combined flag
+    const combinedOrders = orders.filter(o => o.admin_notes?.includes('[COMBINED SHIPPING]'));
+    const emailsWithCombined = Array.from(new Set(combinedOrders.map(o => o.customer_email))) as string[];
+    
+    // Group ALL orders for these emails (both the parent and the combined)
+    const grouped: Record<string, Order[]> = {};
+    emailsWithCombined.forEach(email => {
+      grouped[email] = orders.filter(o => o.customer_email === email);
+    });
+    
+    return grouped;
   }, [orders, filter]);
 
   if (profile?.role !== 'admin') {
@@ -180,16 +200,17 @@ const OrderManagement: React.FC = () => {
         
         {/* Filters */}
         <div className="flex items-center gap-2 mt-4 overflow-x-auto pb-2">
-          {['all', 'pending', 'confirmed', 'shipped', 'cancelled'].map(f => (
+          {['all', 'pending', 'confirmed', 'shipped', 'cancelled', 'combined'].map(f => (
             <button
               key={f}
               onClick={() => setFilter(f as any)}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-colors whitespace-nowrap ${
                 filter === f 
-                  ? 'bg-zinc-800 text-white dark:bg-white dark:text-zinc-900' 
+                  ? f === 'combined' ? 'bg-red-500 text-white shadow-md' : 'bg-zinc-800 text-white dark:bg-white dark:text-zinc-900' 
                   : 'bg-zinc-100 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800/50 dark:hover:bg-zinc-800'
               }`}
             >
+              {f === 'combined' && <span className="material-icons text-[12px] mr-1 align-middle">call_merge</span>}
               {f}
             </button>
           ))}
@@ -206,6 +227,79 @@ const OrderManagement: React.FC = () => {
             <span className="material-icons text-zinc-300 dark:text-zinc-600 text-3xl">shopping_bag</span>
           </div>
           <p className="text-zinc-500 font-medium">No order requests found</p>
+        </div>
+      ) : filter === 'combined' ? (
+        <div className="p-6 space-y-6 bg-zinc-50/50 dark:bg-zinc-900/50">
+          {Object.entries(groupedCombinedOrders as Record<string, Order[]>).map(([email, groupOrders]) => (
+            <div key={email} className="bg-white dark:bg-zinc-900 border-2 border-red-500 rounded-2xl overflow-hidden shadow-lg shadow-red-500/10">
+              <div className="bg-red-50 dark:bg-red-900/20 px-6 py-4 border-b border-red-100 dark:border-red-900/50 flex items-center justify-between">
+                <h3 className="text-sm font-black text-red-600 dark:text-red-400 flex items-center gap-2">
+                  <span className="material-icons">local_shipping</span>
+                  Ship these {groupOrders.length} items together!
+                </h3>
+                <span className="text-xs font-bold text-red-500">{email}</span>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                    {/* Render groupOrders rows here */}
+                    {groupOrders.map((order) => (
+                      <tr key={order.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 transition-colors">
+                        <td className="px-6 py-4 align-top w-28">
+                          <span className="text-[13px] font-black font-mono text-zinc-900 dark:text-white bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded-md shadow-sm border border-zinc-200 dark:border-zinc-700 select-all block w-max">
+                            #{String(order.order_number).padStart(4, '0')}
+                          </span>
+                          {order.admin_notes?.includes('[COMBINED SHIPPING]') && (
+                            <div className="mt-3 bg-red-500 text-white text-[9px] font-black uppercase tracking-widest px-2 py-1.5 rounded-lg shadow-[0_0_15px_rgba(239,68,68,0.5)] animate-pulse flex items-center gap-1 w-max">
+                              <span className="material-icons text-[12px]">warning</span>
+                              Combined
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 align-top min-w-[200px]">
+                          {order.property_slug ? (
+                            <Link to={`/item/${order.property_slug}`} className="flex items-center gap-3 hover:opacity-80 group inline-flex max-w-full">
+                              {order.property_image && (
+                                <img src={order.property_image} alt={order.property_title} className="w-10 h-10 rounded-lg object-cover bg-zinc-100 group-hover:ring-2 ring-primary transition-all flex-shrink-0" />
+                              )}
+                              <div className="min-w-0">
+                                <p className="text-sm font-bold text-zinc-900 dark:text-white truncate group-hover:text-primary transition-colors">{order.property_title || 'Unknown Item'}</p>
+                                <p className="text-xs text-zinc-500 truncate">{order.property_city || '—'}</p>
+                              </div>
+                            </Link>
+                          ) : (
+                            <div className="flex items-center gap-3 w-full">
+                              {order.property_image && (
+                                <img src={order.property_image} alt={order.property_title} className="w-10 h-10 rounded-lg object-cover bg-zinc-100 flex-shrink-0" />
+                              )}
+                              <div className="min-w-0">
+                                <p className="text-sm font-bold text-zinc-900 dark:text-white truncate">{order.property_title || 'Unknown Item'}</p>
+                                <p className="text-xs text-zinc-500 truncate">{order.property_city || '—'}</p>
+                              </div>
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 align-top">
+                          <p className="text-sm font-bold text-zinc-900 dark:text-white">{order.customer_name}</p>
+                          <p className="text-xs text-zinc-500">{order.customer_phone}</p>
+                        </td>
+                        <td className="px-6 py-4 align-top min-w-[120px]">
+                          <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                            ₱{order.amount.toLocaleString()}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 align-top">
+                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border ${getStatusColor(order.status)}`}>
+                            {order.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ))}
         </div>
       ) : (
         <div className="overflow-x-auto">
