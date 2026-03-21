@@ -22,7 +22,7 @@ const GuideShipping: React.FC = () => (
             Shipping & <span className="text-primary italic">Security</span>
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 text-lg font-medium">
-            How we get your gold to you — safely, anywhere in the world.
+            YGB sources directly from Japan, Saudi Arabia, Hong Kong, and China — and ships to customers across the Philippines and worldwide. Here's exactly how we get your gold to you safely.
           </p>
         </div>
 

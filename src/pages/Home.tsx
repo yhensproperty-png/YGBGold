@@ -423,8 +423,70 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
 
 
 
+      {/* Verified Sourcing Banner */}
+      <section className="bg-zinc-900 dark:bg-zinc-950 border-y border-zinc-800 py-5 px-6 overflow-hidden">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-center sm:text-left">
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="material-icons text-primary text-lg">verified</span>
+            <span className="text-xs font-black text-white uppercase tracking-[0.2em]">100% Authentic Sourcing</span>
+          </div>
+          <div className="hidden sm:block w-px h-4 bg-zinc-700"></div>
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs font-bold">
+            <span className="flex items-center gap-1.5 text-zinc-300"><span className="w-2 h-2 rounded-full bg-primary inline-block"></span>Japan — 18K</span>
+            <span className="flex items-center gap-1.5 text-zinc-300"><span className="w-2 h-2 rounded-full bg-primary inline-block"></span>Saudi Arabia — 21K</span>
+            <span className="flex items-center gap-1.5 text-zinc-300"><span className="w-2 h-2 rounded-full bg-primary inline-block"></span>Hong Kong & China — 24K</span>
+          </div>
+        </div>
+      </section>
+
       {/* Gold Performance Chart */}
       <GoldChart />
+
+      {/* Customer Stories */}
+      <section className="bg-white dark:bg-zinc-950 py-24 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <span className="text-primary font-black tracking-[0.6em] text-[10px] uppercase block mb-4">Customer Stories</span>
+            <h2 className="text-4xl font-black dark:text-white tracking-tighter">Trusted by buyers <span className="text-primary italic">worldwide</span></h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                quote: "Ordered a Saudi 21K necklace for my wife's birthday. Payment was smooth via GCash and it arrived via LBC right on time. The quality was exactly as described — rich colour and heavy feel. Very satisfied!",
+                name: "Rodel M.",
+                location: "Pampanga, Philippines",
+                item: "21K Saudi Gold Necklace",
+              },
+              {
+                quote: "I'm based in Australia and was looking for a genuine Hong Kong 24K piece as a long-term investment. Yhen was very helpful and the shipping was secure and tracked the whole way. Highly recommend.",
+                name: "Marie T.",
+                location: "Melbourne, Australia",
+                item: "24K HK Chuk Kam Piece",
+              },
+              {
+                quote: "As an OFW in Japan I wanted authentic 18K Japanese gold to send home to my family. YGB was the only seller I trusted. Fast LBC delivery to my province and the hallmark was exactly right.",
+                name: "Jessa L.",
+                location: "Tokyo, Japan → Cebu",
+                item: "18K Japan Gold Bracelet",
+              },
+            ].map(({ quote, name, location, item }) => (
+              <div key={name} className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-3xl p-7 flex flex-col gap-4">
+                <div className="flex gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <span key={i} className="material-icons text-primary text-base">star</span>
+                  ))}
+                </div>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed italic flex-1">"{quote}"</p>
+                <div className="border-t border-zinc-200 dark:border-zinc-800 pt-4">
+                  <p className="font-black dark:text-white text-sm">{name}</p>
+                  <p className="text-xs text-zinc-400">{location}</p>
+                  <span className="inline-block mt-2 px-2.5 py-1 bg-primary/10 text-primary text-[10px] font-black rounded-lg uppercase tracking-wider">{item}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* All Listings */}
       <section ref={inventoryRef} className="bg-zinc-50 dark:bg-zinc-900/30 py-32 scroll-mt-20">

@@ -1,0 +1,121 @@
+﻿0a70914 feat: Messenger button on guide CTAs, footer 4-col grid, heading update
+ src/App.tsx                 |  2 +-
+ src/pages/GuideOFW.tsx      |  6 ++++++
+ src/pages/GuidePurity.tsx   | 14 +++++++++++---
+ src/pages/GuideShipping.tsx | 14 +++++++++++---
+ src/pages/Home.tsx          |  2 +-
+ 5 files changed, 30 insertions(+), 8 deletions(-)
+0178936 feat: live USD price, guide pages, Resources nav, SEO keywords
+ src/App.tsx                    |  15 ++++++
+ src/components/Navbar.tsx      |  48 ++++++++++++++++++-
+ src/components/SEO.tsx         |   5 ++
+ src/pages/CategoryListings.tsx |   2 +-
+ src/pages/GuideOFW.tsx         | 104 +++++++++++++++++++++++++++++++++++++++++
+ src/pages/GuidePurity.tsx      |  79 +++++++++++++++++++++++++++++++
+ src/pages/GuideShipping.tsx    |  97 ++++++++++++++++++++++++++++++++++++++
+ src/pages/ItemDetails.tsx      |  15 ++++++
+ src/utils/exchangeRate.ts      |  27 +++++++++++
+ 9 files changed, 389 insertions(+), 3 deletions(-)
+869276e fix: update About page content and hero video poster
+ public/Image/hero_poster.jpg.png | Bin 0 -> 1960625 bytes
+ src/pages/About.tsx              |  17 +++++++++--------
+ src/pages/Home.tsx               |   2 +-
+ 3 files changed, 10 insertions(+), 9 deletions(-)
+2d2d157 feat: performance, content updates, and forced MFA enrollment
+ index.html                                 |  10 ++-
+ netlify.toml                               |  25 +++++++
+ src/App.tsx                                | 106 ++++++++++++++++-------------
+ src/components/GoldLongTermPerformance.tsx |  22 +++---
+ src/pages/About.tsx                        |   4 +-
+ src/pages/Contact.tsx                      |  29 +++++++-
+ src/pages/Home.tsx                         |   6 +-
+ src/pages/MFAEnroll.tsx                    |  11 ---
+ vite.config.ts                             |  14 +++-
+ 9 files changed, 148 insertions(+), 79 deletions(-)
+f7b5988 feat: fix mobile gold table layout, update How It Works step 2, rename Buy Now button
+ src/components/GoldLongTermPerformance.tsx | 20 ++++++++++----------
+ src/pages/Home.tsx                         |  4 ++--
+ src/pages/ItemDetails.tsx                  |  4 ++--
+ 3 files changed, 14 insertions(+), 14 deletions(-)
+108a0e8 fix: replace inquiries@ with contact@mail.ygbgold.com across all emails and contact page
+ netlify/edge-functions/resend-inbound.ts | 2 +-
+ netlify/edge-functions/send-invoice.ts   | 4 ++--
+ src/pages/Contact.tsx                    | 2 +-
+ src/utils/emailTemplates.ts              | 2 +-
+ 4 files changed, 5 insertions(+), 5 deletions(-)
+74b253d docs: update PROJECT_SUMMARY with full order/email system details
+ PROJECT_SUMMARY.md | 42 +++++++++++++++++++++++++++---------------
+ 1 file changed, 27 insertions(+), 15 deletions(-)
+b5b9697 feat: bigger QR codes, shipping carrier field, and shipped confirmation email
+ src/components/OrderManagement.tsx                 | 37 ++++++++--
+ src/services/orderService.ts                       | 32 ++++++--
+ src/types.ts                                       |  1 +
+ src/utils/emailTemplates.ts                        | 86 +++++++++++++++++++++-
+ ...260320000000_add_shipping_carrier_to_orders.sql |  2 +
+ 5 files changed, 138 insertions(+), 20 deletions(-)
+d114431 feat: shipping label in invoice, order ref note, smaller modal, confirmed email
+ src/components/OrderManagement.tsx |  14 ++
+ src/pages/ItemDetails.tsx          |   4 +-
+ src/services/orderService.ts       |  22 ++-
+ src/utils/emailTemplates.ts        | 335 +++++++++++++++++++++++--------------
+ 4 files changed, 245 insertions(+), 130 deletions(-)
+7735453 fix: move invoice email to edge function to bypass browser CORS restriction
+ netlify/edge-functions/send-invoice.ts | 64 ++++++++++++++++++++++++++++++++++
+ src/services/orderService.ts           | 35 ++++++++-----------
+ 2 files changed, 78 insertions(+), 21 deletions(-)
+8276d32 feat: add BPI and GCash QR code images for invoice emails
+ public/payments/bpi-qr.png   | Bin 0 -> 70409 bytes
+ public/payments/gcash-qr.png | Bin 0 -> 73130 bytes
+ 2 files changed, 0 insertions(+), 0 deletions(-)
+d1bdbc0 feat: order invoice email with payment details and success state on reserve
+ src/pages/ItemDetails.tsx    |  30 ++++++--
+ src/services/orderService.ts |  51 ++++++++++++--
+ src/utils/emailTemplates.ts  | 162 +++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 234 insertions(+), 9 deletions(-)
+afa843a docs: update PROJECT_SUMMARY with orders schema, buy flow, admin view, and email architecture
+ PROJECT_SUMMARY.md | 69 ++++++++++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 56 insertions(+), 13 deletions(-)
+817a542 feat: dynamic sender name, bold body header, and keep reply_to for inbound emails
+ netlify/edge-functions/resend-inbound.ts | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+253e55b test: try /emails/receiving endpoint with full access key for inbound body
+ netlify/edge-functions/resend-inbound.ts | 41 +++++++++++++++++++++++---------
+ 1 file changed, 30 insertions(+), 11 deletions(-)
+956b69f fix: improve email body fallbacks, add reply_to, and log empty payload keys
+ netlify/edge-functions/resend-inbound.ts | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
+2321b8f fix: use webhook payload.data directly instead of fetching email from API
+ netlify/edge-functions/resend-inbound.ts | 53 ++++++++------------------------
+ 1 file changed, 12 insertions(+), 41 deletions(-)
+a46a959 fix: confirm payload.data.email_id usage and add ID logging for debugging
+ netlify/edge-functions/resend-inbound.ts | 1 +
+ 1 file changed, 1 insertion(+)
+85b5376 fix: add retry loop for 404 race condition on Resend email fetch
+ netlify/edge-functions/resend-inbound.ts | 43 +++++++++++++++++++++++---------
+ 1 file changed, 31 insertions(+), 12 deletions(-)
+0d6d05c fix: correct Resend API URL for fetching inbound email content
+ netlify/edge-functions/resend-inbound.ts | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+3d8cca1 feat: add Svix webhook signature verification to resend-inbound edge function
+ netlify/edge-functions/resend-inbound.ts | 61 ++++++++++++++++++++++++++++----
+ 1 file changed, 55 insertions(+), 6 deletions(-)
+58c676a feat: add Resend inbound email webhook edge function
+ netlify/edge-functions/resend-inbound.ts | 53 ++++++++++++++++++++++++++++++++
+ 1 file changed, 53 insertions(+)
+89668ee feat: update gold performance component, order management, and shipping details
+ src/App.tsx                                        |  14 +
+ src/components/GoldLongTermPerformance.tsx         | 147 ++++
+ src/pages/Home.tsx                                 | 817 +++++----------------
+ src/pages/ItemDetails.tsx                          |  58 +-
+ src/services/orderService.ts                       |   2 +
+ src/types.ts                                       |   4 +
+ ...260319122500_add_shipping_details_to_orders.sql |   4 +
+ 7 files changed, 415 insertions(+), 631 deletions(-)
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	claude_recent_changes.txt
+
+nothing added to commit but untracked files present (use "git add" to track)

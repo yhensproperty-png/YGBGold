@@ -22,7 +22,7 @@ const GuideOFW: React.FC = () => (
             OFW Gold <span className="text-primary italic">Guide</span>
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 text-lg font-medium">
-            Trusted by Overseas Filipinos since 2015 — growing wealth through gold, wherever you are.
+            Trusted by Overseas Filipinos since 2015 — growing wealth through gold, wherever you are. YGB sources directly from Japan, Saudi Arabia, Hong Kong, and China so you can access the exact regional gold you want, shipped securely to you or your family.
           </p>
         </div>
 
@@ -39,7 +39,8 @@ const GuideOFW: React.FC = () => (
           </section>
 
           <section>
-            <h2 className="text-2xl font-black dark:text-white tracking-tight mb-3">Which Gold is Best for OFWs?</h2>
+            <h2 className="text-2xl font-black dark:text-white tracking-tight mb-3">Our 4-Region Sourcing — Your Advantage</h2>
+            <p className="text-sm mb-4">Whether you're in the Middle East, Asia, or the West — YGB sources the specific regional gold you're looking for. A buyer in the US can easily purchase authentic Saudi 21K or Hong Kong 24K through YGB and have it shipped securely to their door.</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-2xl p-5">
                 <p className="font-black text-primary text-xl mb-1">21K Saudi Gold</p>
@@ -50,6 +51,11 @@ const GuideOFW: React.FC = () => (
                 <p className="font-black text-primary text-xl mb-1">18K Japan Gold</p>
                 <p className="text-sm font-bold dark:text-white mb-2">Popular with Japan & Korea OFWs</p>
                 <p className="text-sm">Elegant, durable, and wearable every day. A great investment that can be worn as jewelry too.</p>
+              </div>
+              <div className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-2xl p-5 sm:col-span-2">
+                <p className="font-black text-primary text-xl mb-1">24K Hong Kong & China Gold <span className="text-sm text-zinc-400">(足金 Chuk Kam)</span></p>
+                <p className="text-sm font-bold dark:text-white mb-2">For serious investors & wealth preservation</p>
+                <p className="text-sm">99.9–99.99% pure gold. The highest tier — ideal for OFWs who want to store generational wealth in the most recognized pure gold form from Hong Kong and China.</p>
               </div>
             </div>
           </section>
