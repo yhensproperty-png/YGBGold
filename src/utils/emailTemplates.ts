@@ -259,6 +259,183 @@ export interface ConfirmedOrderData {
   property_title: string;
 }
 
+export interface CancelledOrderData {
+  order_number: number;
+  customer_name: string;
+  customer_email: string;
+  property_title: string;
+}
+
+export function getOrderCancelledHTML(order: CancelledOrderData): string {
+  return emailWrapper(`
+    <!-- Title -->
+    <tr>
+      <td style="padding:36px 40px 0;text-align:center;">
+        <div style="width:64px;height:64px;background:#fdecea;border-radius:50%;display:inline-block;line-height:64px;text-align:center;margin-bottom:16px;">
+          <span style="font-size:32px;line-height:64px;">❌</span>
+        </div>
+        <h1 style="margin:0;font-size:24px;color:#111;">Order Cancelled</h1>
+        <p style="color:#666;margin:8px 0 0;font-size:14px;">Order #<strong>${order.order_number}</strong></p>
+      </td>
+    </tr>
+
+    <!-- Message -->
+    <tr>
+      <td style="padding:28px 40px 0;">
+        <p style="font-size:15px;color:#333;line-height:1.7;margin:0 0 16px;">
+          Dear <strong>${order.customer_name}</strong>,
+        </p>
+        <p style="font-size:15px;color:#333;line-height:1.7;margin:0 0 16px;">
+          We're writing to let you know that your order for <strong>${order.property_title}</strong> (Order #${order.order_number}) has been cancelled.
+        </p>
+        <p style="font-size:15px;color:#333;line-height:1.7;margin:0 0 16px;">
+          If you believe this was a mistake, or if you have already sent your payment, please do not worry — simply reply to this email with your proof of payment and we will restore your order immediately.
+        </p>
+      </td>
+    </tr>
+
+    <!-- Info box -->
+    <tr>
+      <td style="padding:16px 40px 28px;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background:#fff5f5;border-left:4px solid #e53e3e;border-radius:4px;padding:16px;">
+          <tr>
+            <td>
+              <p style="margin:0;font-size:14px;color:#333;line-height:1.7;">
+                <strong>Still interested in this item?</strong><br/>
+                You're welcome to browse our latest listings and place a new order at any time.<br/>
+                <a href="https://ygbgold.com" style="color:#d4af37;text-decoration:none;font-weight:bold;">Browse YGB Gold →</a>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <!-- Divider -->
+    <tr><td style="padding:0 40px;"><hr style="border:none;border-top:1px solid #eee;margin:0;" /></td></tr>
+
+    <!-- Sign off -->
+    <tr>
+      <td style="padding:28px 40px 32px;">
+        <p style="font-size:15px;color:#333;line-height:1.7;margin:0;">
+          We appreciate your interest in YGB Gold and hope to serve you again soon.<br/><br/>
+          Warm regards,<br/>
+          <strong style="color:#111;">The YGB Gold Team</strong><br/>
+          <a href="https://ygbgold.com" style="color:#d4af37;text-decoration:none;font-size:13px;">ygbgold.com</a>
+        </p>
+      </td>
+    </tr>`);
+}
+
+export interface ReminderOrderData {
+  order_number: number;
+  customer_name: string;
+  customer_email: string;
+  property_title: string;
+  amount: number;
+  days_since_order: number;
+}
+
+export function getOrderReminderHTML(order: ReminderOrderData): string {
+  const formatPHP = (val: number) =>
+    `₱${val.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+  return emailWrapper(`
+    <!-- Title -->
+    <tr>
+      <td style="padding:36px 40px 0;text-align:center;">
+        <div style="width:64px;height:64px;background:#fffbea;border-radius:50%;display:inline-block;line-height:64px;text-align:center;margin-bottom:16px;">
+          <span style="font-size:32px;line-height:64px;">⏰</span>
+        </div>
+        <h1 style="margin:0;font-size:24px;color:#111;">Friendly Payment Reminder</h1>
+        <p style="color:#666;margin:8px 0 0;font-size:14px;">Order #<strong>${order.order_number}</strong></p>
+      </td>
+    </tr>
+
+    <!-- Message -->
+    <tr>
+      <td style="padding:28px 40px 0;">
+        <p style="font-size:15px;color:#333;line-height:1.7;margin:0 0 16px;">
+          Dear <strong>${order.customer_name}</strong>,
+        </p>
+        <p style="font-size:15px;color:#333;line-height:1.7;margin:0 0 16px;">
+          Just a friendly reminder that it has been <strong>${order.days_since_order} day${order.days_since_order !== 1 ? 's' : ''}</strong> since you reserved <strong>${order.property_title}</strong> (Order #${order.order_number}) for a total of <strong>${formatPHP(order.amount)}</strong>.
+        </p>
+        <p style="font-size:15px;color:#333;line-height:1.7;margin:0 0 16px;">
+          We are still holding this item for you! To confirm your order, please complete your payment using the details below.
+        </p>
+      </td>
+    </tr>
+
+    <!-- Already paid? -->
+    <tr>
+      <td style="padding:0 40px 20px;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background:#fffbea;border-left:4px solid #d4af37;border-radius:4px;padding:16px;">
+          <tr>
+            <td>
+              <p style="margin:0;font-size:14px;color:#333;line-height:1.7;">
+                <strong>Already paid?</strong> No worries at all! Simply reply to this email with a screenshot of your payment receipt and we will confirm your order right away.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <!-- Divider -->
+    <tr><td style="padding:0 40px 20px;"><hr style="border:none;border-top:1px solid #eee;margin:0;" /></td></tr>
+
+    <!-- Payment Section -->
+    <tr>
+      <td style="padding:0 40px;">
+        <h2 style="font-size:16px;color:#111;margin:0 0 6px;">Payment Details</h2>
+        <p style="margin:0 0 16px;font-size:14px;color:#d4af37;font-weight:bold;">Please use Order #${order.order_number} as your payment reference.</p>
+
+        <!-- GCash -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;background:#f9f9f9;border-radius:8px;padding:16px;">
+          <tr>
+            <td style="vertical-align:top;padding-right:16px;">
+              <p style="margin:0;font-size:13px;color:#999;text-transform:uppercase;letter-spacing:1px;">GCash</p>
+              <p style="margin:4px 0 0;font-size:15px;font-weight:bold;color:#111;">${PAYMENT_METHODS.gcash.name}</p>
+              <p style="margin:2px 0 0;font-size:14px;color:#555;">${PAYMENT_METHODS.gcash.number}</p>
+            </td>
+            <td style="vertical-align:top;text-align:right;">
+              <img src="${PAYMENT_METHODS.gcash.qrUrl}" alt="GCash QR" width="140" style="border-radius:6px;" />
+            </td>
+          </tr>
+        </table>
+
+        <!-- BPI -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="background:#f9f9f9;border-radius:8px;padding:16px;">
+          <tr>
+            <td style="vertical-align:top;padding-right:16px;">
+              <p style="margin:0;font-size:13px;color:#999;text-transform:uppercase;letter-spacing:1px;">BPI Bank</p>
+              <p style="margin:4px 0 0;font-size:15px;font-weight:bold;color:#111;">${PAYMENT_METHODS.bpi.name}</p>
+              <p style="margin:2px 0 0;font-size:14px;color:#555;">Acct: ${PAYMENT_METHODS.bpi.accountNumber}</p>
+            </td>
+            <td style="vertical-align:top;text-align:right;">
+              <img src="${PAYMENT_METHODS.bpi.qrUrl}" alt="BPI QR" width="140" style="border-radius:6px;" />
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <!-- Sign off -->
+    <tr>
+      <td style="padding:28px 40px 32px;">
+        <p style="font-size:14px;color:#555;line-height:1.7;margin:0 0 16px;">
+          If you have any questions or need assistance, please don't hesitate to reply to this email or contact us at <a href="mailto:contact@mail.ygbgold.com" style="color:#d4af37;">contact@mail.ygbgold.com</a>.
+        </p>
+        <p style="font-size:15px;color:#333;line-height:1.7;margin:0;">
+          Warm regards,<br/>
+          <strong style="color:#111;">The YGB Gold Team</strong><br/>
+          <a href="https://ygbgold.com" style="color:#d4af37;text-decoration:none;font-size:13px;">ygbgold.com</a>
+        </p>
+      </td>
+    </tr>`);
+}
+
 export function getOrderConfirmedHTML(order: ConfirmedOrderData): string {
   return emailWrapper(`
     <!-- Title -->

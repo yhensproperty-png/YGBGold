@@ -115,6 +115,14 @@ const OrderManagement: React.FC = () => {
             shipping_carrier: shippingCarrier,
           });
         }
+        if (status === OrderStatus.Cancelled) {
+          await OrderService.sendCancelledEmail({
+            order_number: order.order_number,
+            customer_name: order.customer_name,
+            customer_email: order.customer_email,
+            property_title: order.property_title || 'Gold Item',
+          });
+        }
       }
 
       if (status !== OrderStatus.Confirmed || !orders.find(o => o.id === orderId && (getPairedOrderNumber(o.admin_notes) || orders.find(x => getPairedOrderNumber(x.admin_notes) === o.order_number)))) {
@@ -138,6 +146,27 @@ const OrderManagement: React.FC = () => {
     } catch (error) {
       console.error('Error saving note:', error);
       showToast('Failed to save admin note.', 'error');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleRemindPayment = async (order: Order) => {
+    try {
+      setActionLoading(order.id + '_remind');
+      const daysSince = Math.floor((Date.now() - new Date(order.created_at).getTime()) / (1000 * 60 * 60 * 24));
+      await OrderService.sendReminderEmail({
+        order_number: order.order_number,
+        customer_name: order.customer_name,
+        customer_email: order.customer_email,
+        property_title: order.property_title || 'Gold Item',
+        amount: order.amount,
+        days_since_order: daysSince,
+      });
+      showToast(`Payment reminder sent to ${order.customer_email} (${daysSince} days since order)`);
+    } catch (error) {
+      console.error('Error sending reminder:', error);
+      showToast('Failed to send payment reminder.', 'error');
     } finally {
       setActionLoading(null);
     }
@@ -315,20 +344,32 @@ const OrderManagement: React.FC = () => {
       <td className="px-6 py-4 align-top w-48">
         <div className="flex flex-col items-end gap-2">
           {order.status === OrderStatus.Pending && (
-            <div className="flex items-center gap-1.5 w-full justify-end">
+            <div className="flex flex-col gap-1.5 w-full items-end">
+              <div className="flex items-center gap-1.5 w-full justify-end">
+                <button
+                  onClick={() => handleUpdateStatus(order.id, OrderStatus.Confirmed)}
+                  disabled={actionLoading === order.id}
+                  className="text-xs font-bold px-3 py-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 inline-flex items-center whitespace-nowrap"
+                >
+                  <span className="material-icons text-[14px] mr-1">check</span> Confirm
+                </button>
+                <button
+                  onClick={() => handleUpdateStatus(order.id, OrderStatus.Cancelled)}
+                  disabled={actionLoading === order.id}
+                  className="text-xs font-bold px-2.5 py-1.5 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+              </div>
               <button
-                onClick={() => handleUpdateStatus(order.id, OrderStatus.Confirmed)}
-                disabled={actionLoading === order.id}
-                className="text-xs font-bold px-3 py-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 inline-flex items-center whitespace-nowrap"
+                onClick={() => handleRemindPayment(order)}
+                disabled={actionLoading === order.id + '_remind'}
+                className="text-xs font-bold px-3 py-1.5 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors disabled:opacity-50 inline-flex items-center gap-1 w-full justify-center"
               >
-                <span className="material-icons text-[14px] mr-1">check</span> Confirm
-              </button>
-              <button
-                onClick={() => handleUpdateStatus(order.id, OrderStatus.Cancelled)}
-                disabled={actionLoading === order.id}
-                className="text-xs font-bold px-2.5 py-1.5 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors disabled:opacity-50"
-              >
-                Cancel
+                {actionLoading === order.id + '_remind'
+                  ? <><span className="material-icons text-[14px] animate-spin">sync</span> Sending...</>
+                  : <><span className="material-icons text-[14px]">notifications</span> Remind to Pay ({Math.floor((Date.now() - new Date(order.created_at).getTime()) / (1000 * 60 * 60 * 24))}d)</>
+                }
               </button>
             </div>
           )}

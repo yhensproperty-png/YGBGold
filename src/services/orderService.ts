@@ -1,6 +1,6 @@
 import { supabase } from './supabaseClient.ts';
 import { Order, OrderFormData, OrderStatus } from '../types.ts';
-import { getOrderInvoiceHTML, getOrderConfirmedHTML, getOrderShippedHTML, ConfirmedOrderData, ShippedOrderData } from '../utils/emailTemplates.ts';
+import { getOrderInvoiceHTML, getOrderConfirmedHTML, getOrderShippedHTML, getOrderCancelledHTML, getOrderReminderHTML, ConfirmedOrderData, ShippedOrderData, CancelledOrderData, ReminderOrderData } from '../utils/emailTemplates.ts';
 
 
 export const OrderService = {
@@ -205,6 +205,59 @@ export const OrderService = {
       });
     } catch (err) {
       console.error('Shipped email failed to send:', err);
+    }
+  },
+
+  /**
+   * Send the cancellation email to the customer and a notification to admin.
+   */
+  async sendCancelledEmail(order: CancelledOrderData): Promise<void> {
+    try {
+      await fetch('/send-invoice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: order.customer_email,
+          subject: `Order #${order.order_number} Cancelled — YGB Gold`,
+          html: getOrderCancelledHTML(order),
+        }),
+      });
+      await fetch('/send-invoice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: 'Contact@mail.ygbgold.com',
+          subject: `🚫 Order #${order.order_number} Cancelled — ${order.customer_name}`,
+          html: `<div style="font-family:sans-serif;padding:20px;">
+            <h2>Order Cancelled</h2>
+            <p><strong>Order:</strong> #${order.order_number}</p>
+            <p><strong>Customer:</strong> ${order.customer_name} (${order.customer_email})</p>
+            <p><strong>Item:</strong> ${order.property_title}</p>
+            <p>The cancellation email has been sent to the customer.</p>
+          </div>`,
+        }),
+      });
+    } catch (err) {
+      console.error('Cancelled email failed to send:', err);
+    }
+  },
+
+  /**
+   * Send a payment reminder email to the customer.
+   */
+  async sendReminderEmail(order: ReminderOrderData): Promise<void> {
+    try {
+      await fetch('/send-invoice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: order.customer_email,
+          subject: `Reminder: Your YGB Gold Order #${order.order_number} is waiting for payment`,
+          html: getOrderReminderHTML(order),
+        }),
+      });
+    } catch (err) {
+      console.error('Reminder email failed to send:', err);
     }
   },
 
