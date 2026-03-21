@@ -109,8 +109,8 @@ export function getOrderInvoiceHTML(order: InvoiceOrder): string {
             <td style="font-size:15px;color:#111;padding:8px 0;text-align:right;">${formatPHP(itemPrice)}</td>
           </tr>
           <tr>
-            <td style="font-size:15px;color:#111;padding:8px 0;">Shipping — ${shippingLabel}</td>
-            <td style="font-size:15px;color:#111;padding:8px 0;text-align:right;">${formatPHP(order.shipping_fee)}</td>
+            <td style="font-size:15px;color:#111;padding:8px 0;">${isCombined ? `📦 Combined Shipment — w/ Order #${String(order.paired_order_number || 0).padStart(4, '0')}` : `Shipping — ${shippingLabel}`}</td>
+            <td style="font-size:15px;color:#111;padding:8px 0;text-align:right;">${isCombined ? '<span style="color:#38a169;font-weight:bold;">Free</span>' : formatPHP(order.shipping_fee)}</td>
           </tr>
           <tr>
             <td colspan="2"><hr style="border:none;border-top:1px solid #eee;margin:12px 0;" /></td>
@@ -136,8 +136,8 @@ export function getOrderInvoiceHTML(order: InvoiceOrder): string {
           <tr>
             <td style="text-align:center;">
               <p style="margin:0 0 6px;font-size:12px;color:#999;text-transform:uppercase;letter-spacing:2px;">Your Payment Reference</p>
-              <p style="margin:0 0 8px;font-size:36px;font-weight:900;color:#d4af37;letter-spacing:3px;line-height:1;">ORDER #${String(order.order_number).padStart(4, '0')}</p>
-              <p style="margin:0;font-size:13px;color:#aaa;">Please include this number when sending payment</p>
+              <p style="margin:0 0 8px;font-size:28px;font-weight:900;color:#d4af37;letter-spacing:3px;line-height:1;">ORDER #${String(order.order_number).padStart(4, '0')}</p>
+              <p style="margin:0;font-size:15px;font-weight:700;color:#d4af37;">Please include this number when sending payment</p>
             </td>
           </tr>
         </table>
@@ -423,8 +423,8 @@ export function getOrderReminderHTML(order: ReminderOrderData): string {
           <tr>
             <td style="text-align:center;">
               <p style="margin:0 0 6px;font-size:12px;color:#999;text-transform:uppercase;letter-spacing:2px;">Your Payment Reference</p>
-              <p style="margin:0 0 8px;font-size:36px;font-weight:900;color:#d4af37;letter-spacing:3px;line-height:1;">ORDER #${String(order.order_number).padStart(4, '0')}</p>
-              <p style="margin:0;font-size:13px;color:#aaa;">Please include this number when sending payment</p>
+              <p style="margin:0 0 8px;font-size:28px;font-weight:900;color:#d4af37;letter-spacing:3px;line-height:1;">ORDER #${String(order.order_number).padStart(4, '0')}</p>
+              <p style="margin:0;font-size:15px;font-weight:700;color:#d4af37;">Please include this number when sending payment</p>
             </td>
           </tr>
         </table>

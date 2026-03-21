@@ -224,7 +224,7 @@ const OrderManagement: React.FC = () => {
           });
         }
       }
-      showToast(`Both orders marked as ${getStatusLabel(status as OrderStatus)}`);
+      showToast(`All ${pairOrders.length} orders marked as ${getStatusLabel(status as OrderStatus)}`);
       await loadOrders();
     } catch (error) {
       console.error('Error updating pair:', error);
@@ -272,59 +272,90 @@ const OrderManagement: React.FC = () => {
     return orders.filter(o => o.status === filter);
   }, [orders, filter]);
 
-  // For non-combined tabs: group paired orders together if both are in the same filtered view
+  // Build all combined order clusters (supports N orders, not just pairs)
+  // Uses BFS to follow "Paired with" references in both directions
+  const combinedClusters = useMemo((): Order[][] => {
+    const seen = new Set<number>();
+    const clusters: Order[][] = [];
+
+    const getClusterNums = (startNum: number): Set<number> => {
+      const cluster = new Set<number>();
+      const queue = [startNum];
+      cluster.add(startNum);
+      while (queue.length > 0) {
+        const num = queue.shift()!;
+        for (const o of orders) {
+          const paired = getPairedOrderNumber(o.admin_notes);
+          if (paired === num && !cluster.has(o.order_number)) {
+            cluster.add(o.order_number);
+            queue.push(o.order_number);
+          }
+        }
+        const thisOrder = orders.find(o => o.order_number === num);
+        if (thisOrder) {
+          const paired = getPairedOrderNumber(thisOrder.admin_notes);
+          if (paired && !cluster.has(paired)) {
+            cluster.add(paired);
+            queue.push(paired);
+          }
+        }
+      }
+      return cluster;
+    };
+
+    for (const o of orders.filter(x => x.admin_notes?.includes('[COMBINED SHIPPING]'))) {
+      if (seen.has(o.order_number)) continue;
+      const clusterNums = getClusterNums(o.order_number);
+      const groupOrders = orders.filter(x => clusterNums.has(x.order_number));
+      clusters.push(groupOrders);
+      clusterNums.forEach(n => seen.add(n));
+    }
+
+    return clusters;
+  }, [orders]);
+
+  // For non-combined tabs: group orders that belong to the same cluster and are both visible
   const renderGroups = useMemo(() => {
     if (filter === 'combined') return [];
     const seen = new Set<string>();
     const groups: Array<{ type: 'standalone'; order: Order } | { type: 'combined'; orders: Order[] }> = [];
 
+    const orderNumToCluster = new Map<number, Order[]>();
+    for (const cluster of combinedClusters) {
+      for (const o of cluster) orderNumToCluster.set(o.order_number, cluster);
+    }
+
     for (const order of filteredOrders) {
       if (seen.has(order.id)) continue;
-
-      const pairedNum = getPairedOrderNumber(order.admin_notes);
-      if (pairedNum) {
-        const originalOrder = filteredOrders.find(o => o.order_number === pairedNum);
-        if (originalOrder && !seen.has(originalOrder.id)) {
-          groups.push({ type: 'combined', orders: [order, originalOrder] });
-          seen.add(order.id);
-          seen.add(originalOrder.id);
-          continue;
-        }
-      } else {
-        const combiner = filteredOrders.find(o => !seen.has(o.id) && getPairedOrderNumber(o.admin_notes) === order.order_number);
-        if (combiner) {
-          groups.push({ type: 'combined', orders: [combiner, order] });
-          seen.add(combiner.id);
-          seen.add(order.id);
+      const cluster = orderNumToCluster.get(order.order_number);
+      if (cluster) {
+        const visibleGroup = filteredOrders.filter(o => cluster.some(c => c.order_number === o.order_number));
+        if (visibleGroup.length > 1) {
+          groups.push({ type: 'combined', orders: visibleGroup });
+          visibleGroup.forEach(o => seen.add(o.id));
           continue;
         }
       }
-
       groups.push({ type: 'standalone', order });
       seen.add(order.id);
     }
 
     return groups;
-  }, [filteredOrders, filter]);
+  }, [filteredOrders, filter, combinedClusters]);
 
-  // For Combined tab: show ONLY the actual pair (combined order + its specific original)
-  const combinedPairs = useMemo(() => {
+  // For Combined tab: show all clusters (each cluster = N orders)
+  const combinedPairs = useMemo((): Order[][] => {
     if (filter !== 'combined') return [];
-    const combinedOrders = orders.filter(o => o.admin_notes?.includes('[COMBINED SHIPPING]'));
-    return combinedOrders.map(combinedOrder => {
-      const pairedNum = getPairedOrderNumber(combinedOrder.admin_notes);
-      const originalOrder = pairedNum ? (orders.find(o => o.order_number === pairedNum) || null) : null;
-      return { combinedOrder, originalOrder };
-    });
-  }, [orders, filter]);
+    return combinedClusters;
+  }, [combinedClusters, filter]);
 
-  // For a standalone order, get a pairing label if its pair is in a different status tab
+  // For a standalone order shown outside its group, show how many others it's linked with
   const getStandalonePairingLabel = (order: Order): string | null => {
-    const pairedNum = getPairedOrderNumber(order.admin_notes);
-    if (pairedNum) return `Paired w/ #${String(pairedNum).padStart(4, '0')}`;
-    const combiner = orders.find(o => getPairedOrderNumber(o.admin_notes) === order.order_number);
-    if (combiner) return `Paired w/ #${String(combiner.order_number).padStart(4, '0')}`;
-    return null;
+    const cluster = combinedClusters.find(c => c.some(o => o.order_number === order.order_number));
+    if (!cluster || cluster.length < 2) return null;
+    const others = cluster.filter(o => o.order_number !== order.order_number);
+    if (others.length === 1) return `Paired w/ #${String(others[0].order_number).padStart(4, '0')}`;
+    return `Combined group (${cluster.length} orders)`;
   };
 
   if (profile?.role !== 'admin') return null;
@@ -635,30 +666,25 @@ const OrderManagement: React.FC = () => {
       ) : filter === 'combined' ? (
         /* ── COMBINED TAB: show exact pairs only ── */
         <div className="p-6 space-y-6 bg-zinc-50/50 dark:bg-zinc-900/50">
-          {combinedPairs.map(({ combinedOrder, originalOrder }) => {
-            const groupOrders = originalOrder
-              ? [combinedOrder, originalOrder]
-              : [combinedOrder];
+          {combinedPairs.map((groupOrders, groupIdx) => {
+            const representativeOrder = groupOrders[0];
             return (
-              <div key={combinedOrder.id} className="bg-white dark:bg-zinc-900 border-2 border-red-500 rounded-2xl overflow-hidden shadow-lg shadow-red-500/10">
+              <div key={groupIdx} className="bg-white dark:bg-zinc-900 border-2 border-red-500 rounded-2xl overflow-hidden shadow-lg shadow-red-500/10">
                 <div className="bg-red-50 dark:bg-red-900/20 px-6 py-4 border-b border-red-100 dark:border-red-900/50 flex items-center justify-between flex-wrap gap-2">
                   <h3 className="text-sm font-black text-red-600 dark:text-red-400 flex items-center gap-2">
                     <span className="material-icons">local_shipping</span>
                     Ship these {groupOrders.length} items together!
                   </h3>
-                  <span className="text-xs font-bold text-red-500">{combinedOrder.customer_email}</span>
+                  <span className="text-xs font-bold text-red-500">{representativeOrder.customer_email}</span>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
                       {groupOrders.map((order) => {
-                        const isCombined = order.admin_notes?.includes('[COMBINED SHIPPING]');
-                        const pairedOrderNum = isCombined
-                          ? getPairedOrderNumber(order.admin_notes)
-                          : combinedOrder.order_number;
-                        const pairingLabel = isCombined
-                          ? `Paired w/ #${String(pairedOrderNum).padStart(4, '0')}`
-                          : `Paired w/ #${String(combinedOrder.order_number).padStart(4, '0')}`;
+                        const otherNums = groupOrders
+                          .filter(o => o.order_number !== order.order_number)
+                          .map(o => `#${String(o.order_number).padStart(4, '0')}`).join(', ');
+                        const pairingLabel = otherNums ? `Paired w/ ${otherNums}` : '';
                         return (
                           <tr key={order.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 transition-colors">
                             <td className="px-6 py-4 align-top w-28">

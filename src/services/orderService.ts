@@ -167,7 +167,7 @@ export const OrderService = {
       });
 
       // 4. If combined, send a dedicated combined shipment summary to admin
-      if (formData.combine_shipping && formData.paired_order_number) {
+      if (formData.combine_shipping || formData.shipping_country_group === 'combined') {
         const pairedNum = String(formData.paired_order_number).padStart(4, '0');
         const newNum = String(orderNumber).padStart(4, '0');
         const combinedSummaryHtml = `
