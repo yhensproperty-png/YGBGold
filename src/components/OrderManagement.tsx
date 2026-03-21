@@ -57,13 +57,38 @@ const OrderManagement: React.FC = () => {
     }
   };
 
+  // Request browser notification permission on mount
+  useEffect(() => {
+    if (profile?.role === 'admin' && 'Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, [profile]);
+
   useEffect(() => {
     if (profile?.role === 'admin') {
       loadOrders();
 
       const channel = supabase.channel('realtime_admin_orders')
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, () => {
-          showToast('🔔 🚨 NEW ORDER RECEIVED! Refreshing dashboard...', 'success');
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, (payload: any) => {
+          const orderNum = payload.new?.order_number
+            ? `#${String(payload.new.order_number).padStart(4, '0')}`
+            : '';
+          const customerName = payload.new?.customer_name || '';
+          const msg = `🚨 New Order ${orderNum}${customerName ? ` — ${customerName}` : ''}`;
+
+          showToast(msg, 'success', 8000);
+
+          // Browser / OS notification (works even if tab is in background)
+          if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification('YGB Gold — New Order!', {
+              body: `${orderNum}${customerName ? ` from ${customerName}` : ''} just came in.`,
+              icon: '/ygb-logo.png',
+            });
+          }
+
+          loadOrders();
+        })
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, () => {
           loadOrders();
         })
         .subscribe();
