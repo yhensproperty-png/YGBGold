@@ -250,7 +250,10 @@ const CategoryListings: React.FC<CategoryListingsProps> = ({ properties }) => {
         ogTitle={pageInfo.title}
         ogDescription={pageInfo.description}
         ogUrl={window.location.href}
-        ogImage={`${window.location.origin}/Image/YGB_favicon.png`}
+        ogImage={`${window.location.origin}/Image/YGB Logo.png`}
+        ogImageWidth="1360"
+        ogImageHeight="768"
+        ogImageAlt="YGB Gold Buy & Sell"
         ogSiteName="YGB Gold"
         ogLocale="en_PH"
         twitterCard="summary_large_image"

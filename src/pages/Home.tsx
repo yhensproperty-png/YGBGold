@@ -320,13 +320,16 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
         ogTitle="YGB Buy Gold & Sell - Premium Gold Items"
         ogDescription="Premium platform offering luxury gold items for sale."
         ogUrl={window.location.origin}
-        ogImage={`${window.location.origin}/Image/YGB_favicon.png`}
+        ogImage={`${window.location.origin}/Image/YGB Logo.png`}
+        ogImageWidth="1360"
+        ogImageHeight="768"
+        ogImageAlt="YGB Gold Buy & Sell"
         ogSiteName="YGB Buy Gold & Sell"
         ogLocale="en_US"
         twitterCard="summary_large_image"
         twitterTitle="YGB Buy Gold & Sell"
         twitterDescription="Discover premium gold items"
-        twitterImage={`${window.location.origin}/Image/YGB_favicon.png`}
+        twitterImage={`${window.location.origin}/Image/YGB Logo.png`}
         structuredData={homeStructuredData}
       />
       {/* Hero Section */}
