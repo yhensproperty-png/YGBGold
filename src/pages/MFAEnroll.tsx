@@ -80,10 +80,6 @@ const MFAEnroll: React.FC = () => {
     navigate('/admin', { replace: true });
   };
 
-  const handleSkip = () => {
-    navigate('/manage', { replace: true });
-  };
-
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
@@ -189,13 +185,6 @@ const MFAEnroll: React.FC = () => {
                 </div>
               </div>
 
-              <button
-                type="button"
-                onClick={handleSkip}
-                className="w-full py-2.5 text-sm text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors text-center"
-              >
-                Set up later
-              </button>
             </>
           )}
         </div>

@@ -44,7 +44,7 @@ const About: React.FC = () => {
                 </div>
               </div>
               <p className="text-white/70 text-sm leading-relaxed font-medium italic">
-                "A proud driven Morena with 6 years experience in the Philippine market. providing profesional services where my local roots meet global standards"
+                "A proud driven Morena with 10 years selling authentic gold jewelry — shipping across the Philippines and worldwide, where my local roots meet global standards."
               </p>
             </div>
           </div>
@@ -70,7 +70,7 @@ const About: React.FC = () => {
 
             <div className="grid grid-cols-2 gap-6 sm:gap-10 border-t border-primary/20 pt-8">
               <div>
-                <h4 className="text-2xl sm:text-3xl md:text-4xl font-black dark:text-white tracking-tighter">6 Years</h4>
+                <h4 className="text-2xl sm:text-3xl md:text-4xl font-black dark:text-white tracking-tighter">10 Years</h4>
                 <p className="text-[9px] sm:text-[10px] text-zinc-500 uppercase tracking-[0.2em] sm:tracking-[0.3em] font-black mt-1 sm:mt-2">Experience</p>
               </div>
               <div>

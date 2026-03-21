@@ -1,25 +1,33 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar.tsx';
 import ScrollToTop from './components/ScrollToTop.tsx';
 import Home from './pages/Home.tsx';
-import AddListing from './pages/AddListing.tsx';
 import ItemDetails from './pages/ItemDetails.tsx';
-import ManageListings from './pages/ManageListings.tsx';
 import CategoryListings from './pages/CategoryListings.tsx';
-import About from './pages/About.tsx';
-import Contact from './pages/Contact.tsx';
-import Sell from './pages/Sell.tsx';
-import Login from './pages/Login.tsx';
-import Sitemap from './pages/Sitemap.tsx';
-import AdminDashboard from './pages/AdminDashboard.tsx';
-import MFAEnroll from './pages/MFAEnroll.tsx';
-import MFAVerify from './pages/MFAVerify.tsx';
-import PrivacyPolicy from './pages/PrivacyPolicy.tsx';
-import TermsOfService from './pages/TermsOfService.tsx';
 import { AuthProvider, useAuth } from './context/AuthContext.tsx';
 import { PropertyListing } from './types.ts';
 import { PropertyService } from './services/propertyService.ts';
+
+// Lazy-load non-critical pages to reduce initial bundle size
+const AddListing = lazy(() => import('./pages/AddListing.tsx'));
+const ManageListings = lazy(() => import('./pages/ManageListings.tsx'));
+const About = lazy(() => import('./pages/About.tsx'));
+const Contact = lazy(() => import('./pages/Contact.tsx'));
+const Sell = lazy(() => import('./pages/Sell.tsx'));
+const Login = lazy(() => import('./pages/Login.tsx'));
+const Sitemap = lazy(() => import('./pages/Sitemap.tsx'));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard.tsx'));
+const MFAEnroll = lazy(() => import('./pages/MFAEnroll.tsx'));
+const MFAVerify = lazy(() => import('./pages/MFAVerify.tsx'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy.tsx'));
+const TermsOfService = lazy(() => import('./pages/TermsOfService.tsx'));
+
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center">
+    <span className="material-icons animate-spin text-primary text-3xl">sync</span>
+  </div>
+);
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode; adminOnly?: boolean }> = ({ children, adminOnly }) => {
   const { user, isAdmin, isLoading } = useAuth();
@@ -118,40 +126,42 @@ const AppContent: React.FC = () => {
     <div className="min-h-screen bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col">
       <Navbar />
       <main className="flex-grow">
-        <Routes>
-          <Route path="/" element={<Home properties={properties} isLoading={loading} />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/mfa-enroll" element={<MFAEnroll />} />
-          <Route path="/mfa-verify" element={<MFAVerify />} />
-          <Route path="/add" element={
-            <ProtectedRoute>
-              <AddListing onAdd={handleAddOrUpdateProperty} />
-            </ProtectedRoute>
-          } />
-          <Route path="/edit/:id" element={
-            <ProtectedRoute>
-              <AddListing onAdd={handleAddOrUpdateProperty} isEdit />
-            </ProtectedRoute>
-          } />
-          <Route path="/manage" element={
-            <ProtectedRoute>
-              <ManageListings properties={properties} onUpdate={handleAddOrUpdateProperty} onDelete={handleDeleteProperty} />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin" element={
-            <ProtectedRoute adminOnly>
-              <AdminDashboard />
-            </ProtectedRoute>
-          } />
-          <Route path="/item/:id" element={<ItemDetails properties={properties} />} />
-          <Route path="/category/:category" element={<CategoryListings properties={properties} />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/sell" element={<Sell />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="/terms-of-service" element={<TermsOfService />} />
-          <Route path="/sitemap.xml" element={<Sitemap properties={properties} />} />
-        </Routes>
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route path="/" element={<Home properties={properties} isLoading={loading} />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/mfa-enroll" element={<MFAEnroll />} />
+            <Route path="/mfa-verify" element={<MFAVerify />} />
+            <Route path="/add" element={
+              <ProtectedRoute>
+                <AddListing onAdd={handleAddOrUpdateProperty} />
+              </ProtectedRoute>
+            } />
+            <Route path="/edit/:id" element={
+              <ProtectedRoute>
+                <AddListing onAdd={handleAddOrUpdateProperty} isEdit />
+              </ProtectedRoute>
+            } />
+            <Route path="/manage" element={
+              <ProtectedRoute>
+                <ManageListings properties={properties} onUpdate={handleAddOrUpdateProperty} onDelete={handleDeleteProperty} />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin" element={
+              <ProtectedRoute adminOnly>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/item/:id" element={<ItemDetails properties={properties} />} />
+            <Route path="/category/:category" element={<CategoryListings properties={properties} />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/sell" element={<Sell />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
+            <Route path="/sitemap.xml" element={<Sitemap properties={properties} />} />
+          </Routes>
+        </Suspense>
       </main>
 
       {/* Floating Messenger Button */}
@@ -176,7 +186,7 @@ const AppContent: React.FC = () => {
                 <img src={logoUrl} alt="YGB Buy Gold & Sell" className="h-12 w-auto object-contain dark:brightness-100 rounded-lg" />
               </div>
               <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed font-medium">
-                Premium Platform for Buying and Selling Gold Items, work directly with <span className="text-primary font-semibold">YGB</span> from <span className="text-primary font-semibold">Start</span> to <span className="text-primary font-semibold">Finish</span> where every investment and client matters.
+                Secure Platform for Buying Gold Jewlery Investments, work directly with <span className="text-primary font-semibold">YGB</span> from <span className="text-primary font-semibold">Start</span> to <span className="text-primary font-semibold">Finish</span> where every investment and client matters.
               </p>
             </div>
 

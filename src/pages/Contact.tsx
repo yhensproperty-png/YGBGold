@@ -101,7 +101,7 @@ const Contact: React.FC = () => {
     <>
       <SEO
         title="Contact Us - YGB Gold"
-        description="Get in touch with YGB Gold. We're here to help you secure and liquidate gold investments in the Philippines. Contact us via phone, email, or WhatsApp."
+        description="Get in touch with YGB Gold — trusted in selling authentic gold jewelry online since 2015. Shipping across the Philippines and worldwide. Contact us via email, phone, or WhatsApp."
         ogUrl="https://ygbgold.com/contact"
       />
       <div className="w-full bg-white dark:bg-zinc-950 min-h-screen">
@@ -112,7 +112,30 @@ const Contact: React.FC = () => {
             Let's Start a <span className="text-primary italic">Conversation</span>
           </h1>
           <p className="text-lg text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto font-medium">
-            Whether you're looking to buy, sell, or trade, we're here to help you every step of the way.
+            Interested in our gold jewelry or have a question about your order? We'd love to hear from you.
+          </p>
+        </div>
+
+        {/* About YGB section */}
+        <div className="bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800 rounded-3xl p-8 mb-12">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-primary font-black tracking-[0.4em] text-[10px] uppercase">About YGB Gold</span>
+          </div>
+          <p className="text-zinc-500 dark:text-zinc-500 text-sm font-black italic mb-6">
+            "Specialising in helping clients discover and invest in authentic gold jewelry since 2015."
+          </p>
+          <p className="text-zinc-600 dark:text-zinc-400 font-medium leading-relaxed mb-4">
+            As the founder of YGB Gold, <span className="text-zinc-900 dark:text-white font-bold">Yhen</span> is a dedicated force in the precious metals industry, committed to bridging the gap between high-quality gold jewelry and the people seeking to grow their wealth through it.
+          </p>
+          <p className="text-zinc-600 dark:text-zinc-400 font-medium leading-relaxed mb-4">
+            With a sharp eye for authenticity and a reputation for trust, she sources directly from wholesalers to deliver quality gold — shipping across the Philippines 🇵🇭 and to customers worldwide 🌍.
+          </p>
+          <p className="text-zinc-600 dark:text-zinc-400 font-medium leading-relaxed">
+            Beyond the gold business, Yhen's expertise is bolstered by her role as a serial entrepreneur — she is also the founder of{' '}
+            <a href="https://www.yhensproperty.com" target="_blank" rel="noopener noreferrer" className="text-primary font-bold hover:underline">YhensProperty.com</a>
+            , specialising in helping expats and foreigners buy property legally in the Philippines since 2019, and runs{' '}
+            <a href="https://www.facebook.com/yhensairbnbmanila" target="_blank" rel="noopener noreferrer" className="text-primary font-bold hover:underline">Yhen's Airbnb Manila</a>
+            , a portfolio of premium staycation experiences in Metro Manila.
           </p>
         </div>
 
@@ -251,7 +274,7 @@ const Contact: React.FC = () => {
                   required
                   rows={5}
                   className="w-full px-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none"
-                  placeholder="Tell us about your gold investment needs..."
+                  placeholder="What can we help you with today?"
                 />
               </div>
 

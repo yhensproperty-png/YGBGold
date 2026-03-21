@@ -339,6 +339,8 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
           loop
           muted
           playsInline
+          preload="auto"
+          poster="/Image/hero_gold.png"
           className="absolute inset-0 w-full h-full object-cover object-center"
           style={{ zIndex: 0 }}
         >
@@ -356,7 +358,7 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
           </h1>
 
           <p className="text-sm sm:text-base md:text-lg text-white/80 mb-8 drop-shadow-md font-medium leading-relaxed">
-            Secure Platform for Buying Gold investment Items, work directly with <span className="text-primary">YGB</span> from <span className="text-primary">Start</span> to <span className="text-primary">Finish</span> where every investment and client matters.
+            Secure Platform for Buying Gold Jewlery Investments, work directly with <span className="text-primary">YGB</span> from <span className="text-primary">Start</span> to <span className="text-primary">Finish</span> where every investment and client matters.
           </p>
 
           <button
@@ -400,7 +402,7 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
               <div className="w-8 h-8 rounded-full bg-primary text-zinc-900 font-black text-sm flex items-center justify-center mb-4">2</div>
               <h3 className="text-xl font-black dark:text-white mb-3 tracking-tight">Reserve & Pay</h3>
               <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed">
-                Fill in your details and select your shipping country. Click <span className="font-bold text-zinc-700 dark:text-zinc-200">"Buy Now"</span> and instantly receive an email with your invoice, payment options (GCash &amp; BPI), and step-by-step payment instructions.
+                Fill in your details and select your shipping country. Click <span className="font-bold text-zinc-700 dark:text-zinc-200">"Confirm Request"</span> and instantly receive an email with your invoice, payment options (GCash &amp; BPI Bank), and step-by-step payment instructions.
               </p>
             </div>
 
