@@ -9,7 +9,7 @@ const About: React.FC = () => {
     <>
       <SEO
         title="About Yhen - Expert Gold Merchant in the Philippines | YGB Gold"
-        description="Meet Yhen Oria, founder of YGB Gold. Offering boutique personal service for buying and selling premium gold, coins, and precious metals in the Philippines."
+        description="Meet Yhen, founder of YGB Gold. Trusted in selling authentic gold jewelry since 2015 — shipping across the Philippines and worldwide."
         url="https://ygbgold.com/about"
       />
       <div className="w-full bg-white dark:bg-zinc-950 min-h-screen">
@@ -87,22 +87,23 @@ const About: React.FC = () => {
         <div className="max-w-4xl mx-auto px-6 md:px-12 lg:px-20">
           <div className="space-y-6">
             <p className="text-xl md:text-2xl text-primary dark:text-primary font-bold leading-relaxed tracking-tight mb-8 italic">
-              "Specialising in helping clients secure, verify, and liquidate gold investments since 2019."
+              "Specialising in helping clients discover and invest in authentic gold jewelry since 2015."
             </p>
 
             <p className="text-base md:text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium tracking-tight">
-              As the founder of YGB Gold, Yhen Oria is a dedicated force in the precious metals industry, committed to bridging the gap between high-value bullion and the people seeking to secure their wealth.
-            </p>
-            <p className="text-base md:text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium tracking-tight">
-              With a sharp eye for market potential and a reputation for integrity, she provides clients with a seamless, end-to-end experience—whether they are searching for investment-grade coins or liquidating a strategic gold portfolio.
+              As the founder of YGB Gold, Yhen is a dedicated force in the precious metals industry, committed to bridging the gap between high-quality gold jewelry and the people seeking to grow their wealth through it.
             </p>
 
             <p className="text-base md:text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium tracking-tight">
-              Beyond the trade, Yhen's expertise is bolstered by her role as a serial entrepreneur, where she manages multiple premium service portfolios.
+              With a sharp eye for authenticity and a reputation for trust, she sources directly from wholesalers to deliver quality gold — shipping across the Philippines 🇵🇭 and to customers worldwide 🌍, including Thailand, Taiwan, Singapore, Hong Kong, Japan, Korea, Spain, Australia, Canada, and the United States.
             </p>
 
             <p className="text-base md:text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium tracking-tight">
-              Supported by her diverse background as a serial entrepreneur—including her leadership at YGB Gold Buy & Sell—Yhen brings a high-level, "hands-on" approach to every transaction.
+              Beyond the gold business, Yhen's expertise is bolstered by her role as a serial entrepreneur — she is also the founder of{' '}
+              <a href="https://www.yhensproperty.com" target="_blank" rel="noopener noreferrer" className="text-primary font-bold hover:underline">YhensProperty.com</a>
+              , specialising in helping expats and foreigners buy property legally in the Philippines since 2019, and runs{' '}
+              <a href="https://www.facebook.com/yhensairbnbmanila" target="_blank" rel="noopener noreferrer" className="text-primary font-bold hover:underline">Yhen's Airbnb Manila</a>
+              , a portfolio of premium staycation experiences in Metro Manila.
             </p>
           </div>
         </div>

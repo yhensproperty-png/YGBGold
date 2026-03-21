@@ -340,7 +340,7 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
           muted
           playsInline
           preload="auto"
-          poster="/Image/hero_gold.png"
+          poster="/Image/hero_poster.jpg.png"
           className="absolute inset-0 w-full h-full object-cover object-center"
           style={{ zIndex: 0 }}
         >
