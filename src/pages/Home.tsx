@@ -433,7 +433,7 @@ const Home: React.FC<HomeProps> = ({ properties, isLoading }) => {
             <div>
               <span className="text-primary font-bold tracking-[0.4em] text-[11px] mb-4 block uppercase">ALL LISTINGS</span>
               <h2 className="text-5xl font-black dark:text-white tracking-tighter">
-                Gold Jewelry Investment Inventory
+                Gold Jewelry Pieces
                 {!isLoading && <span className="ml-4 text-2xl font-bold text-zinc-400">({allListings.length})</span>}
               </h2>
             </div>

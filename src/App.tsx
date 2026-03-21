@@ -196,7 +196,7 @@ const AppContent: React.FC = () => {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-8 lg:gap-x-12 gap-y-12">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-8 lg:gap-x-12 gap-y-12">
               <div className="min-w-[120px]">
                 <h3 className="font-bold text-[10px] uppercase tracking-[0.3em] text-zinc-400 mb-8">Socials</h3>
                 <div className="flex gap-4">

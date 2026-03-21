@@ -92,6 +92,12 @@ const GuideOFW: React.FC = () => (
               <Link to="/contact" className="inline-flex items-center gap-2 px-5 py-2.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold rounded-xl hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all text-sm">
                 <span className="material-icons text-sm">chat</span> Ask Yhen
               </Link>
+              <a href="https://m.me/Goldelyn" target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-2.5 font-bold rounded-xl transition-all text-sm text-white"
+                style={{ background: 'linear-gradient(135deg, #0084FF 0%, #A033FF 100%)' }}>
+                <svg className="w-4 h-4 fill-white" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 4.975 0 11.111c0 3.497 1.745 6.616 4.472 8.652V24l4.086-2.242c1.09.301 2.246.464 3.442.464 6.627 0 12-4.975 12-11.111S18.627 0 12 0zm1.191 14.963l-3.055-3.26-5.963 3.26L10.732 8.1l3.131 3.26L19.752 8.1l-6.561 6.863z"/></svg>
+                Message on Messenger
+              </a>
             </div>
           </section>
 

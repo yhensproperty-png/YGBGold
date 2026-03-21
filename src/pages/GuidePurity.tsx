@@ -65,9 +65,17 @@ const GuidePurity: React.FC = () => (
           <section className="bg-primary/10 border border-primary/20 rounded-2xl p-6">
             <h2 className="text-lg font-black dark:text-white tracking-tight mb-2">Have a question about a specific piece?</h2>
             <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">Yhen personally verifies the purity of every item before listing. Message us anytime.</p>
-            <Link to="/contact" className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-zinc-900 font-bold rounded-xl hover:brightness-110 transition-all text-sm">
-              <span className="material-icons text-sm">chat</span> Contact Yhen
-            </Link>
+            <div className="flex flex-wrap gap-3">
+              <Link to="/contact" className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-zinc-900 font-bold rounded-xl hover:brightness-110 transition-all text-sm">
+                <span className="material-icons text-sm">chat</span> Contact Yhen
+              </Link>
+              <a href="https://m.me/Goldelyn" target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-2.5 font-bold rounded-xl transition-all text-sm text-white"
+                style={{ background: 'linear-gradient(135deg, #0084FF 0%, #A033FF 100%)' }}>
+                <svg className="w-4 h-4 fill-white" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 4.975 0 11.111c0 3.497 1.745 6.616 4.472 8.652V24l4.086-2.242c1.09.301 2.246.464 3.442.464 6.627 0 12-4.975 12-11.111S18.627 0 12 0zm1.191 14.963l-3.055-3.26-5.963 3.26L10.732 8.1l3.131 3.26L19.752 8.1l-6.561 6.863z"/></svg>
+                Message on Messenger
+              </a>
+            </div>
           </section>
 
         </div>
