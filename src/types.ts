@@ -47,6 +47,7 @@ export interface PropertyListing {
 export enum OrderStatus {
   Pending = 'pending',
   Confirmed = 'confirmed',
+  Ordered = 'ordered',
   Shipped = 'shipped',
   Cancelled = 'cancelled'
 }

@@ -28,6 +28,7 @@ interface InvoiceOrder {
   amount: number;
   shipping_fee: number;
   property_title: string;
+  paired_order_number?: number;
 }
 
 const emailHeader = `
@@ -65,7 +66,10 @@ const emailWrapper = (content: string) => `<!DOCTYPE html>
 export function getOrderInvoiceHTML(order: InvoiceOrder): string {
   const itemPrice = order.amount - order.shipping_fee;
   const grandTotal = order.amount;
-  const shippingLabel = SHIPPING_LABELS[order.shipping_country_group] || order.shipping_country_group;
+  const isCombined = order.shipping_country_group === 'combined' || !!order.paired_order_number;
+  const shippingLabel = isCombined
+    ? `Free — Combined with Order #${String(order.paired_order_number || 0).padStart(4, '0')}`
+    : (SHIPPING_LABELS[order.shipping_country_group] || order.shipping_country_group);
 
   const formatPHP = (val: number) =>
     `₱${val.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -125,8 +129,29 @@ export function getOrderInvoiceHTML(order: InvoiceOrder): string {
     <!-- Payment Section -->
     <tr>
       <td style="padding:0 40px;">
-        <h2 style="font-size:16px;color:#111;margin:0 0 6px;">Payment Details</h2>
-        <p style="margin:0 0 16px;font-size:14px;color:#d4af37;font-weight:bold;">Please use Order #${order.order_number} as your payment reference.</p>
+        <h2 style="font-size:16px;color:#111;margin:0 0 16px;">Payment Details</h2>
+
+        <!-- Order Number Reference Box -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;background:#1a1a1a;border-radius:10px;padding:20px;">
+          <tr>
+            <td style="text-align:center;">
+              <p style="margin:0 0 6px;font-size:12px;color:#999;text-transform:uppercase;letter-spacing:2px;">Your Payment Reference</p>
+              <p style="margin:0 0 8px;font-size:36px;font-weight:900;color:#d4af37;letter-spacing:3px;line-height:1;">ORDER #${String(order.order_number).padStart(4, '0')}</p>
+              <p style="margin:0;font-size:13px;color:#aaa;">Please include this number when sending payment</p>
+            </td>
+          </tr>
+        </table>
+
+        <!-- Next Step CTA -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;background:#fffbea;border-left:4px solid #d4af37;border-radius:4px;padding:16px;">
+          <tr>
+            <td>
+              <p style="margin:0;font-size:15px;color:#111;line-height:1.6;">
+                <strong>Next step:</strong> Please reply to this email with a <strong>screenshot of your payment receipt</strong> to begin processing your order.
+              </p>
+            </td>
+          </tr>
+        </table>
 
         <!-- GCash -->
         <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;background:#f9f9f9;border-radius:8px;padding:16px;">
@@ -158,20 +183,23 @@ export function getOrderInvoiceHTML(order: InvoiceOrder): string {
       </td>
     </tr>
 
-    <!-- CTA -->
+    <!-- Combined Shipping Notice (shown only for combined orders) -->
+    ${isCombined ? `
     <tr>
-      <td style="padding:28px 40px;">
-        <table width="100%" cellpadding="0" cellspacing="0" style="background:#fffbea;border-left:4px solid #d4af37;border-radius:4px;padding:16px;">
+      <td style="padding:20px 40px 0;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0fff4;border-left:4px solid #38a169;border-radius:4px;padding:16px;">
           <tr>
             <td>
-              <p style="margin:0;font-size:15px;color:#111;line-height:1.6;">
-                <strong>Next step:</strong> Please reply to this email with a <strong>screenshot of your payment receipt</strong> to begin processing your order.
+              <p style="margin:0 0 4px;font-size:13px;font-weight:bold;color:#276749;text-transform:uppercase;letter-spacing:1px;">📦 Combined Shipment</p>
+              <p style="margin:0;font-size:14px;color:#333;line-height:1.6;">
+                This item will be <strong>shipped together</strong> with your existing Order #${String(order.paired_order_number || 0).padStart(4, '0')} in one package — no extra shipping fee.
               </p>
             </td>
           </tr>
         </table>
       </td>
-    </tr>`);
+    </tr>` : ''}
+  `);
 }
 
 export interface ShippedOrderData {
@@ -388,8 +416,18 @@ export function getOrderReminderHTML(order: ReminderOrderData): string {
     <!-- Payment Section -->
     <tr>
       <td style="padding:0 40px;">
-        <h2 style="font-size:16px;color:#111;margin:0 0 6px;">Payment Details</h2>
-        <p style="margin:0 0 16px;font-size:14px;color:#d4af37;font-weight:bold;">Please use Order #${order.order_number} as your payment reference.</p>
+        <h2 style="font-size:16px;color:#111;margin:0 0 16px;">Payment Details</h2>
+
+        <!-- Order Number Reference Box -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;background:#1a1a1a;border-radius:10px;padding:20px;">
+          <tr>
+            <td style="text-align:center;">
+              <p style="margin:0 0 6px;font-size:12px;color:#999;text-transform:uppercase;letter-spacing:2px;">Your Payment Reference</p>
+              <p style="margin:0 0 8px;font-size:36px;font-weight:900;color:#d4af37;letter-spacing:3px;line-height:1;">ORDER #${String(order.order_number).padStart(4, '0')}</p>
+              <p style="margin:0;font-size:13px;color:#aaa;">Please include this number when sending payment</p>
+            </td>
+          </tr>
+        </table>
 
         <!-- GCash -->
         <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;background:#f9f9f9;border-radius:8px;padding:16px;">

@@ -123,6 +123,7 @@ export const OrderService = {
       amount: amount,
       shipping_fee: formData.shipping_fee,
       property_title: propertyTitle || 'Gold Item',
+      paired_order_number: formData.paired_order_number,
     });
 
     try {
@@ -141,13 +142,16 @@ export const OrderService = {
       const adminAlertHtml = `
         <div style="font-family: sans-serif; padding: 20px; background: #fafafa;">
           <h2 style="color: #2F2F2F;">New Order Received! (#${orderNumber})</h2>
-          <p><strong>Customer:</strong> ${formData.customer_name} (${formData.customer_email})</p>
+          <p><strong>Customer:</strong> ${formData.customer_name}</p>
+          <p><strong>Email:</strong> ${formData.customer_email}</p>
+          <p><strong>Phone:</strong> ${formData.customer_phone}</p>
+          <p><strong>Ship To:</strong> ${formData.shipping_address}</p>
           <p><strong>Item:</strong> ${propertyTitle || 'Gold Item'}</p>
           <p><strong>Amount:</strong> ₱${(amount).toLocaleString()}</p>
           <p><strong>Shipping:</strong> ₱${formData.shipping_fee.toLocaleString()}</p>
           <p><strong>Combine Shipping:</strong> ${formData.combine_shipping ? `YES — Paired with Order #${String(formData.paired_order_number || 0).padStart(4, '0')} (Check Dashboard)` : 'No'}</p>
           <br/>
-          <a href="https://ygbgold.com/admin" style="display:inline-block; padding: 12px 24px; background:#eab308; color:#000; font-weight:bold; text-decoration:none; border-radius:8px;">View in Dashboard</a>
+          <a href="https://ygbgold.com/manage?filter=pending" style="display:inline-block; padding: 12px 24px; background:#eab308; color:#000; font-weight:bold; text-decoration:none; border-radius:8px;">View Pending Orders</a>
         </div>
       `;
 
@@ -161,6 +165,44 @@ export const OrderService = {
           html: adminAlertHtml,
         }),
       });
+
+      // 4. If combined, send a dedicated combined shipment summary to admin
+      if (formData.combine_shipping && formData.paired_order_number) {
+        const pairedNum = String(formData.paired_order_number).padStart(4, '0');
+        const newNum = String(orderNumber).padStart(4, '0');
+        const combinedSummaryHtml = `
+          <div style="font-family:sans-serif;padding:24px;background:#fff5f5;border-radius:8px;">
+            <h2 style="color:#c53030;margin:0 0 16px;">📦 Combined Shipment Alert</h2>
+            <p style="margin:0 0 8px;">The following 2 orders must be <strong>shipped together in one package</strong>:</p>
+            <table style="width:100%;border-collapse:collapse;margin:16px 0;">
+              <tr style="background:#fed7d7;">
+                <th style="padding:8px 12px;text-align:left;font-size:13px;">Order</th>
+                <th style="padding:8px 12px;text-align:left;font-size:13px;">Details</th>
+              </tr>
+              <tr style="background:#fff;">
+                <td style="padding:8px 12px;font-weight:bold;">#${pairedNum} (existing)</td>
+                <td style="padding:8px 12px;">Original order — already pending</td>
+              </tr>
+              <tr style="background:#fafafa;">
+                <td style="padding:8px 12px;font-weight:bold;">#${newNum} (new)</td>
+                <td style="padding:8px 12px;">${propertyTitle || 'Gold Item'} — ₱${amount.toLocaleString()} (free shipping)</td>
+              </tr>
+            </table>
+            <p style="margin:0 0 8px;"><strong>Customer:</strong> ${formData.customer_name} (${formData.customer_email})</p>
+            <p style="margin:0 0 16px;"><strong>Ship To:</strong> ${formData.shipping_address}</p>
+            <a href="https://ygbgold.com/manage?filter=combined" style="display:inline-block;padding:12px 24px;background:#c53030;color:#fff;font-weight:bold;text-decoration:none;border-radius:8px;">View Combined Orders</a>
+          </div>
+        `;
+        await fetch('/send-invoice', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: 'Contact@mail.ygbgold.com',
+            subject: `📦 COMBINED SHIPMENT: Orders #${pairedNum} + #${newNum} — ${formData.customer_name}`,
+            html: combinedSummaryHtml,
+          }),
+        });
+      }
 
     } catch (emailError) {
       // Don't fail the order if email fails

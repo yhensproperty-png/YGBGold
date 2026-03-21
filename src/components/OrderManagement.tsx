@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { OrderService } from '../services/orderService.ts';
 import { Order, OrderStatus } from '../types.ts';
 import { useAuth } from '../context/AuthContext.tsx';
@@ -14,6 +14,7 @@ const getPairedOrderNumber = (adminNotes?: string): number | null => {
 
 const OrderManagement: React.FC = () => {
   const { profile } = useAuth();
+  const [searchParams] = useSearchParams();
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -21,7 +22,8 @@ const OrderManagement: React.FC = () => {
   const [shippingCarriers, setShippingCarriers] = useState<Record<string, string>>({});
   const [adminNotes, setAdminNotes] = useState<Record<string, string>>({});
 
-  const [filter, setFilter] = useState<OrderStatus | 'all' | 'combined'>('all');
+  const initialFilter = (searchParams.get('filter') as OrderStatus | 'all' | 'combined') || 'all';
+  const [filter, setFilter] = useState<OrderStatus | 'all' | 'combined'>(initialFilter);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const showToast = (message: string, type: 'success' | 'error' = 'success', duration = 3000) => {
@@ -237,7 +239,7 @@ const OrderManagement: React.FC = () => {
     const pairedNum = getPairedOrderNumber(order.admin_notes);
     if (pairedNum) return `Paired w/ #${String(pairedNum).padStart(4, '0')}`;
     const combiner = orders.find(o => getPairedOrderNumber(o.admin_notes) === order.order_number);
-    if (combiner) return `Combined w/ #${String(combiner.order_number).padStart(4, '0')}`;
+    if (combiner) return `Paired w/ #${String(combiner.order_number).padStart(4, '0')}`;
     return null;
   };
 
@@ -247,9 +249,18 @@ const OrderManagement: React.FC = () => {
     switch (status) {
       case OrderStatus.Pending: return 'bg-amber-100 text-amber-800 border-amber-200';
       case OrderStatus.Confirmed: return 'bg-blue-100 text-blue-800 border-blue-200';
-      case OrderStatus.Shipped: return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+      case OrderStatus.Ordered: return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+      case OrderStatus.Shipped: return 'bg-violet-100 text-violet-800 border-violet-200';
       case OrderStatus.Cancelled: return 'bg-red-100 text-red-800 border-red-200';
       default: return 'bg-zinc-100 text-zinc-800 border-zinc-200';
+    }
+  };
+
+  const getStatusLabel = (status: OrderStatus) => {
+    switch (status) {
+      case OrderStatus.Confirmed: return 'Payment Confirmed';
+      case OrderStatus.Ordered: return 'Ordered ✓';
+      default: return status.charAt(0).toUpperCase() + status.slice(1);
     }
   };
 
@@ -332,7 +343,7 @@ const OrderManagement: React.FC = () => {
       </td>
       <td className="px-6 py-4 align-top">
         <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border ${getStatusColor(order.status)}`}>
-          {order.status}
+          {getStatusLabel(order.status)}
         </span>
         {order.tracking_number && (
           <div className="mt-2 bg-zinc-50 dark:bg-zinc-800/50 rounded border border-zinc-100 dark:border-zinc-700 p-1.5 inline-block">
@@ -374,6 +385,15 @@ const OrderManagement: React.FC = () => {
             </div>
           )}
           {order.status === OrderStatus.Confirmed && (
+            <button
+              onClick={() => handleUpdateStatus(order.id, OrderStatus.Ordered)}
+              disabled={actionLoading === order.id}
+              className="text-xs font-bold px-3 py-1.5 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors disabled:opacity-50 inline-flex items-center justify-center w-full"
+            >
+              <span className="material-icons text-[14px] mr-1">inventory_2</span> Mark as Ordered
+            </button>
+          )}
+          {order.status === OrderStatus.Ordered && (
             <div className="flex flex-col items-end gap-1.5 w-full">
               <input
                 type="text"
@@ -392,7 +412,7 @@ const OrderManagement: React.FC = () => {
               <button
                 onClick={() => handleUpdateStatus(order.id, OrderStatus.Shipped)}
                 disabled={actionLoading === order.id || !trackingNumbers[order.id] || !shippingCarriers[order.id]}
-                className="text-xs font-bold px-3 py-1.5 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors disabled:opacity-50 inline-flex items-center justify-center w-full"
+                className="text-xs font-bold px-3 py-1.5 bg-violet-500 text-white rounded-lg hover:bg-violet-600 transition-colors disabled:opacity-50 inline-flex items-center justify-center w-full"
               >
                 <span className="material-icons text-[14px] mr-1">local_shipping</span> Ship
               </button>
@@ -434,18 +454,26 @@ const OrderManagement: React.FC = () => {
 
         {/* Filters */}
         <div className="flex items-center gap-2 mt-4 overflow-x-auto pb-2">
-          {['all', 'pending', 'confirmed', 'shipped', 'cancelled', 'combined'].map(f => (
+          {[
+            { value: 'all', label: 'All' },
+            { value: 'pending', label: 'Pending' },
+            { value: 'confirmed', label: 'Payment Confirmed' },
+            { value: 'ordered', label: 'Ordered' },
+            { value: 'shipped', label: 'Shipped' },
+            { value: 'cancelled', label: 'Cancelled' },
+            { value: 'combined', label: 'Combined' },
+          ].map(({ value: f, label }) => (
             <button
               key={f}
               onClick={() => setFilter(f as any)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-colors whitespace-nowrap ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors whitespace-nowrap ${
                 filter === f
                   ? f === 'combined' ? 'bg-red-500 text-white shadow-md' : 'bg-zinc-800 text-white dark:bg-white dark:text-zinc-900'
                   : 'bg-zinc-100 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800/50 dark:hover:bg-zinc-800'
               }`}
             >
               {f === 'combined' && <span className="material-icons text-[12px] mr-1 align-middle">call_merge</span>}
-              {f}
+              {label}
             </button>
           ))}
         </div>
@@ -489,7 +517,7 @@ const OrderManagement: React.FC = () => {
                           : combinedOrder.order_number;
                         const pairingLabel = isCombined
                           ? `Paired w/ #${String(pairedOrderNum).padStart(4, '0')}`
-                          : `Combined w/ #${String(combinedOrder.order_number).padStart(4, '0')}`;
+                          : `Paired w/ #${String(combinedOrder.order_number).padStart(4, '0')}`;
                         return (
                           <tr key={order.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 transition-colors">
                             <td className="px-6 py-4 align-top w-28">
@@ -526,7 +554,7 @@ const OrderManagement: React.FC = () => {
                             </td>
                             <td className="px-6 py-4 align-top">
                               <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border ${getStatusColor(order.status)}`}>
-                                {order.status}
+                                {getStatusLabel(order.status)}
                               </span>
                             </td>
                           </tr>
@@ -583,7 +611,7 @@ const OrderManagement: React.FC = () => {
                       const isCombined = order.admin_notes?.includes('[COMBINED SHIPPING]');
                       const pairingLabel = isCombined
                         ? `Paired w/ #${String(otherOrder?.order_number).padStart(4, '0')}`
-                        : `Combined w/ #${String(otherOrder?.order_number).padStart(4, '0')}`;
+                        : `Paired w/ #${String(otherOrder?.order_number).padStart(4, '0')}`;
                       return renderOrderRow(order, pairingLabel, 'bg-red-50/20 dark:bg-red-900/5 border-l-4 border-red-300 dark:border-red-800');
                     })}
                     {/* Spacer */}
