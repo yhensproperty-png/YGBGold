@@ -125,14 +125,17 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
     setOrderSuccess(null);
     setCombineCheckStatus('idle');
     setEligibleOrderNumber(null);
-    setBuyFormData(prev => ({
-      ...prev,
+    setBuyFormData({
+      customer_name: '',
+      customer_email: '',
+      customer_phone: '',
+      shipping_address: '',
+      shipping_country_group: '',
+      shipping_fee: 0,
       combine_shipping: false,
       previous_order_ref: '',
       paired_order_number: 0,
-      shipping_country_group: '',
-      shipping_fee: 0,
-    }));
+    });
   };
   const [buyFormData, setBuyFormData] = useState({
     customer_name: '',
