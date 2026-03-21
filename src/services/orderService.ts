@@ -91,7 +91,8 @@ export const OrderService = {
     };
 
     if (formData.combine_shipping) {
-      insertData.admin_notes = `[COMBINED SHIPPING] Customer requested to combine this item with previous order under email: ${formData.previous_order_ref || 'N/A'}`;
+      const pairedNum = String(formData.paired_order_number || 0).padStart(4, '0');
+      insertData.admin_notes = `[COMBINED SHIPPING] Paired with #${pairedNum} | email: ${formData.previous_order_ref || 'N/A'}`;
     }
 
     if (userId) {
@@ -144,7 +145,7 @@ export const OrderService = {
           <p><strong>Item:</strong> ${propertyTitle || 'Gold Item'}</p>
           <p><strong>Amount:</strong> ₱${(amount).toLocaleString()}</p>
           <p><strong>Shipping:</strong> ₱${formData.shipping_fee.toLocaleString()}</p>
-          <p><strong>Combine Shipping:</strong> ${formData.combine_shipping ? `YES (Check Dashboard)` : 'No'}</p>
+          <p><strong>Combine Shipping:</strong> ${formData.combine_shipping ? `YES — Paired with Order #${String(formData.paired_order_number || 0).padStart(4, '0')} (Check Dashboard)` : 'No'}</p>
           <br/>
           <a href="https://ygbgold.com/admin" style="display:inline-block; padding: 12px 24px; background:#eab308; color:#000; font-weight:bold; text-decoration:none; border-radius:8px;">View in Dashboard</a>
         </div>

@@ -127,7 +127,8 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
     shipping_country_group: '',
     shipping_fee: 0,
     combine_shipping: false,
-    previous_order_ref: ''
+    previous_order_ref: '',
+    paired_order_number: 0
   });
 
   useEffect(() => {
@@ -262,7 +263,7 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
       if (data !== null) {
         setEligibleOrderNumber(data);
         setCombineCheckStatus('eligible');
-        setBuyFormData(prev => ({ ...prev, shipping_fee: 0, shipping_country_group: 'combined' }));
+        setBuyFormData(prev => ({ ...prev, shipping_fee: 0, shipping_country_group: 'combined', paired_order_number: data }));
       } else {
         setCombineCheckStatus('not_eligible');
       }

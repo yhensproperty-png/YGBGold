@@ -87,4 +87,5 @@ export interface OrderFormData {
   shipping_fee: number;
   combine_shipping?: boolean;
   previous_order_ref?: string;
+  paired_order_number?: number;
 }
