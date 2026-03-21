@@ -20,6 +20,8 @@ const OrderManagement: React.FC = () => {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [trackingNumbers, setTrackingNumbers] = useState<Record<string, string>>({});
   const [shippingCarriers, setShippingCarriers] = useState<Record<string, string>>({});
+  const [pairTracking, setPairTracking] = useState<Record<string, string>>({});
+  const [pairCarrier, setPairCarrier] = useState<Record<string, string>>({});
   const [adminNotes, setAdminNotes] = useState<Record<string, string>>({});
 
   const initialFilter = (searchParams.get('filter') as OrderStatus | 'all' | 'combined') || 'all';
@@ -174,6 +176,88 @@ const OrderManagement: React.FC = () => {
     }
   };
 
+  const getPairKey = (pairOrders: Order[]) => pairOrders.map(o => o.id).sort().join('_');
+
+  const handleUpdatePair = async (pairOrders: Order[], status: OrderStatus) => {
+    const pairKey = getPairKey(pairOrders);
+    try {
+      setActionLoading(pairKey);
+      const tracking = pairTracking[pairKey];
+      const carrier = pairCarrier[pairKey];
+      if (status === OrderStatus.Shipped && (!tracking || !carrier)) {
+        showToast('Please enter both a tracking number and shipping carrier.', 'error');
+        return;
+      }
+      for (const order of pairOrders) {
+        await OrderService.updateOrderStatus(
+          order.id, status,
+          status === OrderStatus.Shipped ? tracking : order.tracking_number,
+          adminNotes[order.id],
+          status === OrderStatus.Shipped ? carrier : order.shipping_carrier
+        );
+      }
+      for (const order of pairOrders) {
+        if (status === OrderStatus.Confirmed) {
+          await OrderService.sendConfirmedEmail({
+            order_number: order.order_number,
+            customer_name: order.customer_name,
+            customer_email: order.customer_email,
+            property_title: order.property_title || 'Gold Item',
+          });
+        }
+        if (status === OrderStatus.Shipped && tracking && carrier) {
+          await OrderService.sendShippedEmail({
+            order_number: order.order_number,
+            customer_name: order.customer_name,
+            customer_email: order.customer_email,
+            property_title: order.property_title || 'Gold Item',
+            tracking_number: tracking,
+            shipping_carrier: carrier,
+          });
+        }
+        if (status === OrderStatus.Cancelled) {
+          await OrderService.sendCancelledEmail({
+            order_number: order.order_number,
+            customer_name: order.customer_name,
+            customer_email: order.customer_email,
+            property_title: order.property_title || 'Gold Item',
+          });
+        }
+      }
+      showToast(`Both orders marked as ${getStatusLabel(status as OrderStatus)}`);
+      await loadOrders();
+    } catch (error) {
+      console.error('Error updating pair:', error);
+      showToast('Failed to update orders.', 'error');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleRemindPair = async (pairOrders: Order[]) => {
+    const pairKey = getPairKey(pairOrders);
+    try {
+      setActionLoading(pairKey + '_remind');
+      for (const order of pairOrders) {
+        const daysSince = Math.floor((Date.now() - new Date(order.created_at).getTime()) / (1000 * 60 * 60 * 24));
+        await OrderService.sendReminderEmail({
+          order_number: order.order_number,
+          customer_name: order.customer_name,
+          customer_email: order.customer_email,
+          property_title: order.property_title || 'Gold Item',
+          amount: order.amount,
+          days_since_order: daysSince,
+        });
+      }
+      showToast('Payment reminder sent to both customers');
+    } catch (error) {
+      console.error('Error sending reminder:', error);
+      showToast('Failed to send reminders.', 'error');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const handleTrackingChange = (orderId: string, value: string) => {
     setTrackingNumbers(prev => ({ ...prev, [orderId]: value }));
   };
@@ -266,8 +350,65 @@ const OrderManagement: React.FC = () => {
 
   const isEmpty = filter === 'combined' ? combinedPairs.length === 0 : renderGroups.length === 0;
 
+  // Renders shared action buttons for a combined pair — pass colSpan to wrap in a <tr>
+  const renderPairActions = (pairOrders: Order[], colSpan?: number) => {
+    const pairKey = getPairKey(pairOrders);
+    const isLoadingPair = actionLoading === pairKey;
+    const status = pairOrders[0].status;
+    const inSync = pairOrders.every(o => o.status === status);
+
+    const content = !inSync ? (
+      <p className="text-xs text-amber-600 font-bold">⚠️ Orders are at different statuses — sync them before actioning as a pair.</p>
+    ) : status === OrderStatus.Pending ? (
+      <div className="flex flex-wrap gap-2 items-center">
+        <button onClick={() => handleUpdatePair(pairOrders, OrderStatus.Confirmed)} disabled={isLoadingPair}
+          className="text-xs font-bold px-3 py-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 inline-flex items-center gap-1">
+          <span className="material-icons text-[14px]">check</span> Confirm Both
+        </button>
+        <button onClick={() => handleRemindPair(pairOrders)} disabled={actionLoading === pairKey + '_remind'}
+          className="text-xs font-bold px-3 py-1.5 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 disabled:opacity-50 inline-flex items-center gap-1">
+          <span className="material-icons text-[14px]">notifications</span> Remind Both
+        </button>
+        <button onClick={() => handleUpdatePair(pairOrders, OrderStatus.Cancelled)} disabled={isLoadingPair}
+          className="text-xs font-bold px-2.5 py-1.5 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 disabled:opacity-50">
+          Cancel Both
+        </button>
+      </div>
+    ) : status === OrderStatus.Confirmed ? (
+      <button onClick={() => handleUpdatePair(pairOrders, OrderStatus.Ordered)} disabled={isLoadingPair}
+        className="text-xs font-bold px-3 py-1.5 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 disabled:opacity-50 inline-flex items-center gap-1">
+        <span className="material-icons text-[14px]">inventory_2</span> Mark Both as Ordered
+      </button>
+    ) : status === OrderStatus.Ordered ? (
+      <div className="flex flex-wrap items-center gap-2">
+        <input type="text" placeholder="Tracking #" value={pairTracking[pairKey] || ''}
+          onChange={e => setPairTracking(prev => ({ ...prev, [pairKey]: e.target.value }))}
+          className="text-xs px-2.5 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 focus:outline-none focus:border-violet-500 w-36" />
+        <input type="text" placeholder="Carrier (e.g. LBC, DHL)" value={pairCarrier[pairKey] || ''}
+          onChange={e => setPairCarrier(prev => ({ ...prev, [pairKey]: e.target.value }))}
+          className="text-xs px-2.5 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 focus:outline-none focus:border-violet-500 w-40" />
+        <button onClick={() => handleUpdatePair(pairOrders, OrderStatus.Shipped)}
+          disabled={isLoadingPair || !pairTracking[pairKey] || !pairCarrier[pairKey]}
+          className="text-xs font-bold px-3 py-1.5 bg-violet-500 text-white rounded-lg hover:bg-violet-600 disabled:opacity-50 inline-flex items-center gap-1">
+          <span className="material-icons text-[14px]">local_shipping</span> Ship Both
+        </button>
+      </div>
+    ) : status === OrderStatus.Shipped ? (
+      <p className="text-[10px] text-zinc-400 italic">Both shipped — waiting delivery</p>
+    ) : null;
+
+    if (colSpan) {
+      return (
+        <tr key={`actions-${pairKey}`} className="bg-red-50/40 dark:bg-red-900/10 border-l-4 border-red-400 dark:border-red-700">
+          <td colSpan={colSpan} className="px-6 py-3">{content}</td>
+        </tr>
+      );
+    }
+    return <div className="px-6 py-4 border-t border-red-100 dark:border-red-900/30">{content}</div>;
+  };
+
   // Renders a single order row for the main 7-column table
-  const renderOrderRow = (order: Order, pairingLabel?: string | null, rowClass?: string) => (
+  const renderOrderRow = (order: Order, pairingLabel?: string | null, rowClass?: string, hideActions?: boolean) => (
     <tr key={order.id} className={`hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 transition-colors ${rowClass || ''}`}>
       <td className="px-6 py-4 align-top w-28">
         <span className="text-[13px] font-black font-mono text-zinc-900 dark:text-white bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded-md shadow-sm border border-zinc-200 dark:border-zinc-700 select-all block w-max">
@@ -354,7 +495,7 @@ const OrderManagement: React.FC = () => {
       </td>
       <td className="px-6 py-4 align-top w-48">
         <div className="flex flex-col items-end gap-2">
-          {order.status === OrderStatus.Pending && (
+          {!hideActions && order.status === OrderStatus.Pending && (
             <div className="flex flex-col gap-1.5 w-full items-end">
               <div className="flex items-center gap-1.5 w-full justify-end">
                 <button
@@ -384,7 +525,7 @@ const OrderManagement: React.FC = () => {
               </button>
             </div>
           )}
-          {order.status === OrderStatus.Confirmed && (
+          {!hideActions && order.status === OrderStatus.Confirmed && (
             <button
               onClick={() => handleUpdateStatus(order.id, OrderStatus.Ordered)}
               disabled={actionLoading === order.id}
@@ -393,7 +534,7 @@ const OrderManagement: React.FC = () => {
               <span className="material-icons text-[14px] mr-1">inventory_2</span> Mark as Ordered
             </button>
           )}
-          {order.status === OrderStatus.Ordered && (
+          {!hideActions && order.status === OrderStatus.Ordered && (
             <div className="flex flex-col items-end gap-1.5 w-full">
               <input
                 type="text"
@@ -418,7 +559,7 @@ const OrderManagement: React.FC = () => {
               </button>
             </div>
           )}
-          {order.status === OrderStatus.Shipped && (
+          {!hideActions && order.status === OrderStatus.Shipped && (
             <p className="text-[10px] text-zinc-400 italic text-right whitespace-nowrap">Waiting delivery</p>
           )}
         </div>
@@ -563,6 +704,8 @@ const OrderManagement: React.FC = () => {
                     </tbody>
                   </table>
                 </div>
+                {/* Shared action footer */}
+                {renderPairActions(groupOrders)}
               </div>
             );
           })}
@@ -605,15 +748,14 @@ const OrderManagement: React.FC = () => {
                         </div>
                       </td>
                     </tr>
-                    {/* Order rows */}
+                    {/* Order rows — no individual actions */}
                     {groupOrders.map((order, orderIdx) => {
                       const otherOrder = groupOrders.find((_, i) => i !== orderIdx);
-                      const isCombined = order.admin_notes?.includes('[COMBINED SHIPPING]');
-                      const pairingLabel = isCombined
-                        ? `Paired w/ #${String(otherOrder?.order_number).padStart(4, '0')}`
-                        : `Paired w/ #${String(otherOrder?.order_number).padStart(4, '0')}`;
-                      return renderOrderRow(order, pairingLabel, 'bg-red-50/20 dark:bg-red-900/5 border-l-4 border-red-300 dark:border-red-800');
+                      const pairingLabel = `Paired w/ #${String(otherOrder?.order_number).padStart(4, '0')}`;
+                      return renderOrderRow(order, pairingLabel, 'bg-red-50/20 dark:bg-red-900/5 border-l-4 border-red-300 dark:border-red-800', true);
                     })}
+                    {/* Shared action footer */}
+                    {renderPairActions(groupOrders, 7)}
                     {/* Spacer */}
                     <tr><td colSpan={7} className="py-1 bg-transparent" /></tr>
                   </React.Fragment>
