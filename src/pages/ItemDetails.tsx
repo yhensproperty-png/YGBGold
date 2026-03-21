@@ -117,6 +117,8 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [isOrdering, setIsOrdering] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState<{ orderNumber: number } | null>(null);
+  const [combineCheckStatus, setCombineCheckStatus] = useState<'idle' | 'checking' | 'eligible' | 'not_eligible'>('idle');
+  const [eligibleOrderNumber, setEligibleOrderNumber] = useState<number | null>(null);
   const [buyFormData, setBuyFormData] = useState({
     customer_name: '',
     customer_email: '',
@@ -223,15 +225,13 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
     const { name, value, type, checked } = target;
 
     if (name === 'combine_shipping') {
-      setBuyFormData(prev => ({ 
-        ...prev, 
+      setCombineCheckStatus('idle');
+      setEligibleOrderNumber(null);
+      setBuyFormData(prev => ({
+        ...prev,
         combine_shipping: checked,
-        shipping_fee: checked ? 0 : (
-          prev.shipping_country_group === 'philippines' ? 300 :
-          prev.shipping_country_group === 'thkrjpau' ? 3500 :
-          prev.shipping_country_group === 'sghktw' ? 3000 :
-          prev.shipping_country_group === 'caus' ? 4000 : 0
-        )
+        previous_order_ref: '',
+        shipping_fee: 0
       }));
       return;
     }
@@ -250,17 +250,46 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
     }
   };
 
+  const handleCheckAvailability = async () => {
+    const emailToCheck = buyFormData.previous_order_ref.trim().toLowerCase();
+    if (!emailToCheck) return;
+
+    setCombineCheckStatus('checking');
+    try {
+      const { data, error } = await supabase.rpc('get_pending_order_number', { target_email: emailToCheck });
+      if (error) throw error;
+
+      if (data !== null) {
+        setEligibleOrderNumber(data);
+        setCombineCheckStatus('eligible');
+        setBuyFormData(prev => ({ ...prev, shipping_fee: 0, shipping_country_group: 'combined' }));
+      } else {
+        setCombineCheckStatus('not_eligible');
+      }
+    } catch {
+      setCombineCheckStatus('idle');
+      alert('Could not verify order. Please try again.');
+    }
+  };
+
   const handleBuySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!property) return;
 
-    if (!buyFormData.shipping_country_group) {
-      alert('Please select a shipping destination.');
-      return;
-    }
-    if (buyFormData.shipping_country_group === 'other') {
-      alert('Please contact us via WhatsApp/email for custom shipping.');
-      return;
+    if (buyFormData.combine_shipping) {
+      if (combineCheckStatus !== 'eligible') {
+        alert('Please check your combine shipping eligibility first.');
+        return;
+      }
+    } else {
+      if (!buyFormData.shipping_country_group) {
+        alert('Please select a shipping destination.');
+        return;
+      }
+      if (buyFormData.shipping_country_group === 'other') {
+        alert('Please contact us via WhatsApp/email for custom shipping.');
+        return;
+      }
     }
 
     const sanitizedPhone = buyFormData.customer_phone.replace(/[\s-]/g, '');
@@ -677,53 +706,96 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
                   required disabled={isOrdering}
                 />
               </div>
-              <div>
-                <label className="block text-[9px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-2 px-1">Shipping Destination</label>
-                <select
-                  name="shipping_country_group"
-                  value={buyFormData.shipping_country_group}
+              {/* Combine Shipping Checkbox */}
+              <label className="flex items-center gap-3 cursor-pointer bg-zinc-50 dark:bg-zinc-800 p-3 rounded-xl border border-zinc-100 dark:border-zinc-700 hover:border-primary transition-colors">
+                <input
+                  type="checkbox"
+                  name="combine_shipping"
+                  checked={buyFormData.combine_shipping}
                   onChange={handleBuyInputChange}
-                  className="w-full bg-zinc-50 dark:bg-zinc-800 border-zinc-100 dark:border-zinc-700 rounded-xl p-3 text-sm font-bold focus:ring-primary focus:border-primary transition-all text-zinc-900 dark:text-white"
-                  required disabled={isOrdering}
-                >
-                  <option value="">Select shipping destination</option>
-                  <option value="philippines">Philippines (Lbc) – ₱300</option>
-                  <option value="thkrjpau">Thailand / Korea / Japan / Australia – ₱3,500</option>
-                  <option value="sghktw">Singapore / Hong Kong / Taiwan – ₱3,000</option>
-                  <option value="caus">Canada / United States – ₱4,000</option>
-                  <option value="other">Other – Contact us</option>
-                </select>
-              </div>
-              
-              <div className="pt-2 pb-4">
-                <label className="flex items-center gap-3 mb-4 cursor-pointer bg-zinc-50 dark:bg-zinc-800 p-3 rounded-xl border border-zinc-100 dark:border-zinc-700 hover:border-primary transition-colors">
-                  <input 
-                    type="checkbox"
-                    name="combine_shipping"
-                    checked={buyFormData.combine_shipping}
+                  className="w-4 h-4 text-primary rounded focus:ring-primary bg-white dark:bg-zinc-900 border-zinc-300 dark:border-zinc-700"
+                  disabled={isOrdering}
+                />
+                <span className="text-sm font-bold text-zinc-700 dark:text-zinc-200">
+                  Combine with an open order (Free Shipping)
+                </span>
+              </label>
+
+              {/* Combine Shipping Check Flow */}
+              {buyFormData.combine_shipping ? (
+                <div className="space-y-3">
+                  {combineCheckStatus !== 'eligible' && (
+                    <>
+                      <div>
+                        <label className="block text-[9px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-2 px-1">Email from your previous order</label>
+                        <input
+                          name="previous_order_ref"
+                          value={buyFormData.previous_order_ref}
+                          onChange={handleBuyInputChange}
+                          placeholder="e.g. you@email.com"
+                          className="w-full bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/50 text-amber-900 dark:text-amber-100 rounded-xl p-3 text-sm font-bold focus:ring-primary focus:border-primary transition-all"
+                          type="email"
+                          disabled={isOrdering || combineCheckStatus === 'checking'}
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleCheckAvailability}
+                        disabled={!buyFormData.previous_order_ref || combineCheckStatus === 'checking' || isOrdering}
+                        className="w-full bg-amber-400 hover:bg-amber-500 text-amber-900 font-black py-3 rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                      >
+                        {combineCheckStatus === 'checking' ? (
+                          <><span className="material-icons animate-spin text-lg">sync</span> Checking...</>
+                        ) : (
+                          <><span className="material-icons text-lg">search</span> Check Availability</>
+                        )}
+                      </button>
+                      {combineCheckStatus === 'not_eligible' && (
+                        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
+                          <p className="text-sm font-bold text-red-600 dark:text-red-400 flex items-start gap-2">
+                            <span className="material-icons text-base mt-0.5">cancel</span>
+                            <span>No open pending order found for that email. Please uncheck "Combine" and select a shipping destination to pay the standard fee.</span>
+                          </p>
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {combineCheckStatus === 'eligible' && (
+                    <div className="bg-emerald-50 dark:bg-emerald-900/20 border-2 border-emerald-400 dark:border-emerald-600 rounded-xl p-4">
+                      <p className="text-sm font-black text-emerald-700 dark:text-emerald-400 flex items-center gap-2 mb-1">
+                        <span className="material-icons text-base">check_circle</span>
+                        Eligible! Free Shipping Applied.
+                      </p>
+                      <p className="text-xs text-emerald-600 dark:text-emerald-500 font-medium">
+                        This item will be combined with Order #{String(eligibleOrderNumber).padStart(4, '0')}. No shipping fee will be charged.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                /* Normal Shipping Destination selector */
+                <div>
+                  <label className="block text-[9px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-2 px-1">Shipping Destination</label>
+                  <select
+                    name="shipping_country_group"
+                    value={buyFormData.shipping_country_group}
                     onChange={handleBuyInputChange}
-                    className="w-4 h-4 text-primary rounded focus:ring-primary bg-white dark:bg-zinc-900 border-zinc-300 dark:border-zinc-700"
+                    className="w-full bg-zinc-50 dark:bg-zinc-800 border-zinc-100 dark:border-zinc-700 rounded-xl p-3 text-sm font-bold focus:ring-primary focus:border-primary transition-all text-zinc-900 dark:text-white"
+                    required
                     disabled={isOrdering}
-                  />
-                  <span className="text-sm font-bold text-zinc-700 dark:text-zinc-200">
-                    Combine this with an open order (Free Shipping)
-                  </span>
-                </label>
+                  >
+                    <option value="">Select shipping destination</option>
+                    <option value="philippines">Philippines (Lbc) – ₱300</option>
+                    <option value="thkrjpau">Thailand / Korea / Japan / Australia – ₱3,500</option>
+                    <option value="sghktw">Singapore / Hong Kong / Taiwan – ₱3,000</option>
+                    <option value="caus">Canada / United States – ₱4,000</option>
+                    <option value="other">Other – Contact us</option>
+                  </select>
+                </div>
+              )}
 
-                {buyFormData.combine_shipping && (
-                  <div className="mb-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <label className="block text-[9px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-2 px-1">Email Address from previous order</label>
-                    <input
-                      name="previous_order_ref"
-                      value={buyFormData.previous_order_ref}
-                      onChange={handleBuyInputChange}
-                      placeholder="e.g. you@email.com"
-                      className="w-full bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800/50 text-amber-900 dark:text-amber-100 rounded-xl p-3 text-sm font-bold focus:ring-primary focus:border-primary transition-all"
-                      type="email" required={buyFormData.combine_shipping} disabled={isOrdering}
-                    />
-                  </div>
-                )}
-
+              <div className="pt-2 pb-4">
                 <p className="text-lg font-black text-zinc-900 dark:text-white flex justify-between items-center bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-xl border border-zinc-100 dark:border-zinc-800">
                   <span>Total:</span>
                   <span className="text-primary">₱{(property.price + buyFormData.shipping_fee).toLocaleString()}</span>
@@ -732,7 +804,11 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
 
               <button
                 type="submit"
-                disabled={isOrdering || buyFormData.shipping_country_group === 'other'}
+                disabled={
+                  isOrdering ||
+                  buyFormData.shipping_country_group === 'other' ||
+                  (buyFormData.combine_shipping && combineCheckStatus !== 'eligible')
+                }
                 className="w-full bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-black py-4 rounded-xl shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-2 disabled:opacity-50"
               >
                 {isOrdering ? (
