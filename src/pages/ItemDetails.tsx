@@ -6,6 +6,7 @@ import { PropertyListing, PropertyType } from '../types.ts';
 import { supabase } from '../services/supabaseClient.ts';
 import { useAuth } from '../context/AuthContext.tsx';
 import { OrderService } from '../services/orderService.ts';
+import { getUSDPerPHP, phpToUSD } from '../utils/exchangeRate.ts';
 
 /**
  * CONFIGURATION:
@@ -105,6 +106,11 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [usdRate, setUsdRate] = useState<number | null>(null);
+
+  useEffect(() => {
+    getUSDPerPHP().then(setUsdRate);
+  }, []);
 
   const { user, profile } = useAuth();
   
@@ -841,6 +847,15 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
                 <div className="text-2xl sm:text-3xl lg:text-4xl font-black dark:text-white tracking-tighter">
                   ₱{property.price.toLocaleString()}
                 </div>
+                {usdRate && (
+                  <div className="flex items-center gap-1 mt-1">
+                    <span className="text-sm text-zinc-500 dark:text-zinc-400">≈ ${phpToUSD(property.price, usdRate)} USD</span>
+                    <span
+                      className="text-zinc-400 cursor-help text-xs"
+                      title="Reference only. All transactions are settled in PHP."
+                    >ⓘ</span>
+                  </div>
+                )}
               </div>
 
               <div className="h-12 w-px bg-zinc-200 dark:bg-zinc-800 hidden md:block"></div>

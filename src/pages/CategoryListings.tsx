@@ -338,7 +338,7 @@ const CategoryListings: React.FC<CategoryListingsProps> = ({ properties }) => {
               className="w-full h-full bg-white/5 border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/20 text-white/80 rounded-xl py-3 px-4 !appearance-none transition-all cursor-pointer text-sm font-medium pr-10"
             >
               <option value="" className="bg-zinc-900">Min Karat</option>
-              {[10, 14, 18, 21, 22, 24].map(n => <option key={n} value={n} className="bg-zinc-900">{n}K+</option>)}
+              {[18, 21, 24].map(n => <option key={n} value={n} className="bg-zinc-900">{n}K+</option>)}
             </select>
             <span className="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none text-lg">diamond</span>
           </div>

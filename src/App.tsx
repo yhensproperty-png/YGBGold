@@ -22,6 +22,9 @@ const MFAEnroll = lazy(() => import('./pages/MFAEnroll.tsx'));
 const MFAVerify = lazy(() => import('./pages/MFAVerify.tsx'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy.tsx'));
 const TermsOfService = lazy(() => import('./pages/TermsOfService.tsx'));
+const GuidePurity = lazy(() => import('./pages/GuidePurity.tsx'));
+const GuideShipping = lazy(() => import('./pages/GuideShipping.tsx'));
+const GuideOFW = lazy(() => import('./pages/GuideOFW.tsx'));
 
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center">
@@ -160,6 +163,9 @@ const AppContent: React.FC = () => {
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="/sitemap.xml" element={<Sitemap properties={properties} />} />
+            <Route path="/guides/purity" element={<GuidePurity />} />
+            <Route path="/guides/shipping" element={<GuideShipping />} />
+            <Route path="/guides/ofw" element={<GuideOFW />} />
           </Routes>
         </Suspense>
       </main>
@@ -221,6 +227,15 @@ const AppContent: React.FC = () => {
                 <ul className="space-y-4">
                   <li><Link to="/" className="text-sm font-bold text-zinc-600 dark:text-zinc-400 hover:text-primary transition-colors">Buy Items</Link></li>
                   <li><Link to="/about" className="text-sm font-bold text-zinc-600 dark:text-zinc-400 hover:text-primary transition-colors">Our Story</Link></li>
+                </ul>
+              </div>
+
+              <div className="min-w-[160px]">
+                <h3 className="font-bold text-[10px] uppercase tracking-[0.3em] text-zinc-400 mb-8">Resources</h3>
+                <ul className="space-y-4">
+                  <li><Link to="/guides/purity" className="text-sm font-bold text-zinc-600 dark:text-zinc-400 hover:text-primary transition-colors">Purity Guide</Link></li>
+                  <li><Link to="/guides/shipping" className="text-sm font-bold text-zinc-600 dark:text-zinc-400 hover:text-primary transition-colors">Shipping & Security</Link></li>
+                  <li><Link to="/guides/ofw" className="text-sm font-bold text-zinc-600 dark:text-zinc-400 hover:text-primary transition-colors">OFW Guide</Link></li>
                 </ul>
               </div>
 

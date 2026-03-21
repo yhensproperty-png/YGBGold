@@ -10,6 +10,7 @@ const Navbar: React.FC = () => {
   const isAddPage = location.pathname === '/add';
   const isManage = location.pathname === '/manage';
   const [isBuyOpen, setIsBuyOpen] = useState(false);
+  const [isResourcesOpen, setIsResourcesOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const logoUrl = "/Image/YGB_Logo_Trimmed.png";
@@ -63,7 +64,31 @@ const Navbar: React.FC = () => {
 
           <Link to="/sell" className="text-sm font-medium hover:text-primary transition-colors">Sell</Link>
 
-
+          {/* Resources Dropdown */}
+          <div className="relative group h-full flex items-center"
+            onMouseEnter={() => setIsResourcesOpen(true)}
+            onMouseLeave={() => setIsResourcesOpen(false)}>
+            <button className="flex items-center gap-1 text-sm font-medium hover:text-primary transition-colors py-2">
+              Resources
+              <span className={`material-icons text-xs transition-transform duration-200 ${isResourcesOpen ? 'rotate-180' : ''}`}>expand_more</span>
+            </button>
+            <div className={`absolute top-full left-0 w-56 pt-2 transition-all duration-200 origin-top-left ${isResourcesOpen ? 'opacity-100 scale-100 translate-y-0 visible' : 'opacity-0 scale-95 -translate-y-2 invisible'}`}>
+              <div className="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden py-2 p-1.5 ring-1 ring-black/5">
+                <Link to="/guides/purity" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 group/item transition-colors" onClick={() => setIsResourcesOpen(false)}>
+                  <div className="bg-primary/10 p-2 rounded-lg text-primary group-hover/item:bg-primary group-hover/item:text-zinc-900 transition-colors"><span className="material-icons text-sm">diamond</span></div>
+                  <span className="text-sm font-semibold dark:text-zinc-300">Purity Guide</span>
+                </Link>
+                <Link to="/guides/shipping" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 group/item transition-colors" onClick={() => setIsResourcesOpen(false)}>
+                  <div className="bg-primary/10 p-2 rounded-lg text-primary group-hover/item:bg-primary group-hover/item:text-zinc-900 transition-colors"><span className="material-icons text-sm">local_shipping</span></div>
+                  <span className="text-sm font-semibold dark:text-zinc-300">Shipping & Security</span>
+                </Link>
+                <Link to="/guides/ofw" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 group/item transition-colors" onClick={() => setIsResourcesOpen(false)}>
+                  <div className="bg-primary/10 p-2 rounded-lg text-primary group-hover/item:bg-primary group-hover/item:text-zinc-900 transition-colors"><span className="material-icons text-sm">flight</span></div>
+                  <span className="text-sm font-semibold dark:text-zinc-300">OFW Guide</span>
+                </Link>
+              </div>
+            </div>
+          </div>
 
           <Link to="/about" className="text-sm font-medium hover:text-primary transition-colors">About</Link>
           <Link to="/contact" className="text-sm font-medium hover:text-primary transition-colors">Contact</Link>
@@ -157,7 +182,26 @@ const Navbar: React.FC = () => {
 
           <Link to="/sell" className="block px-4 py-3 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 font-semibold text-sm" onClick={() => setIsMobileMenuOpen(false)}>Sell</Link>
 
-
+          <div>
+            <button onClick={() => setIsResourcesOpen(!isResourcesOpen)}
+              className="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
+              <span className="font-semibold text-sm">Resources</span>
+              <span className={`material-icons text-xs transition-transform ${isResourcesOpen ? 'rotate-180' : ''}`}>expand_more</span>
+            </button>
+            <div className={`overflow-hidden transition-all duration-200 ${isResourcesOpen ? 'max-h-48' : 'max-h-0'}`}>
+              <div className="pl-4 space-y-1 mt-1">
+                <Link to="/guides/purity" className="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800" onClick={() => setIsMobileMenuOpen(false)}>
+                  <span className="material-icons text-sm text-primary">diamond</span><span className="text-sm">Purity Guide</span>
+                </Link>
+                <Link to="/guides/shipping" className="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800" onClick={() => setIsMobileMenuOpen(false)}>
+                  <span className="material-icons text-sm text-primary">local_shipping</span><span className="text-sm">Shipping & Security</span>
+                </Link>
+                <Link to="/guides/ofw" className="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800" onClick={() => setIsMobileMenuOpen(false)}>
+                  <span className="material-icons text-sm text-primary">flight</span><span className="text-sm">OFW Guide</span>
+                </Link>
+              </div>
+            </div>
+          </div>
 
           <Link to="/about" className="block px-4 py-3 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 font-semibold text-sm" onClick={() => setIsMobileMenuOpen(false)}>About</Link>
           <Link to="/contact" className="block px-4 py-3 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 font-semibold text-sm" onClick={() => setIsMobileMenuOpen(false)}>Contact</Link>

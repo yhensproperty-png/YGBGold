@@ -1,8 +1,11 @@
 import { useEffect } from 'react';
 
+const DEFAULT_KEYWORDS = '21k Saudi Gold, 18k Japan Gold, 24k Investment Gold, gold jewelry Philippines, buy gold online Philippines, OFW gold investment, global gold sourcing Philippines';
+
 interface SEOProps {
   title: string;
   description: string;
+  keywords?: string;
   canonical?: string;
   ogType?: string;
   ogTitle?: string;
@@ -27,6 +30,7 @@ interface SEOProps {
 export const SEO: React.FC<SEOProps> = ({
   title,
   description,
+  keywords,
   canonical,
   ogType = 'website',
   ogTitle,
@@ -80,6 +84,7 @@ export const SEO: React.FC<SEOProps> = ({
     };
 
     setMetaTag('description', description);
+    setMetaTag('keywords', keywords || DEFAULT_KEYWORDS);
     if (canonical) setLinkTag('canonical', canonical);
 
     setMetaTag('fb:app_id', '1234567890', true);
