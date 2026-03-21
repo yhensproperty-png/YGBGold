@@ -8,4 +8,4 @@ Disallow: /login
 Disallow: /mfa-enroll
 Disallow: /mfa-verify
 
-Sitemap: https://yhensproperty.com/sitemap.xml
+Sitemap: https://ygbgold.com/sitemap.xml

@@ -29,7 +29,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-const baseUrl = 'https://yhensproperty.com';
+const baseUrl = 'https://ygbgold.com';
 
 interface Property {
   slug: string;
@@ -48,12 +48,16 @@ async function generateSitemap() {
     { url: '/about', priority: '0.8', changefreq: 'monthly' },
     { url: '/contact', priority: '0.7', changefreq: 'monthly' },
     { url: '/sell', priority: '0.8', changefreq: 'monthly' },
-    { url: '/category/buy-condos', priority: '0.7', changefreq: 'daily' },
-    { url: '/category/buy-houses', priority: '0.7', changefreq: 'daily' },
-    { url: '/category/buy-land', priority: '0.7', changefreq: 'daily' },
-    { url: '/category/rent', priority: '0.7', changefreq: 'daily' },
-    { url: '/privacy', priority: '0.3', changefreq: 'yearly' },
-    { url: '/terms', priority: '0.3', changefreq: 'yearly' },
+    { url: '/category/jewelry', priority: '0.7', changefreq: 'daily' },
+    { url: '/category/coins', priority: '0.7', changefreq: 'daily' },
+    { url: '/category/bars', priority: '0.7', changefreq: 'daily' },
+    { url: '/category/scrap-gold', priority: '0.7', changefreq: 'daily' },
+    { url: '/category/others', priority: '0.7', changefreq: 'daily' },
+    { url: '/guides/purity', priority: '0.8', changefreq: 'monthly' },
+    { url: '/guides/shipping', priority: '0.8', changefreq: 'monthly' },
+    { url: '/guides/ofw', priority: '0.8', changefreq: 'monthly' },
+    { url: '/privacy-policy', priority: '0.3', changefreq: 'yearly' },
+    { url: '/terms-of-service', priority: '0.3', changefreq: 'yearly' },
   ];
 
   let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
@@ -70,7 +74,7 @@ async function generateSitemap() {
   if (properties && properties.length > 0) {
     properties.forEach((property: Property) => {
       xml += '  <url>\n';
-      xml += `    <loc>${baseUrl}/property/${property.slug}</loc>\n`;
+      xml += `    <loc>${baseUrl}/item/${property.slug}</loc>\n`;
       xml += `    <lastmod>${new Date(property.updated_at).toISOString().split('T')[0]}</lastmod>\n`;
       xml += '    <changefreq>weekly</changefreq>\n';
       xml += '    <priority>0.8</priority>\n';
