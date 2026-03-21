@@ -29,6 +29,7 @@ interface InvoiceOrder {
   shipping_fee: number;
   property_title: string;
   paired_order_number?: number;
+  combined_order_numbers?: number[]; // full group (all orders including paired chain)
 }
 
 const emailHeader = `
@@ -67,9 +68,13 @@ export function getOrderInvoiceHTML(order: InvoiceOrder): string {
   const itemPrice = order.amount - order.shipping_fee;
   const grandTotal = order.amount;
   const isCombined = order.shipping_country_group === 'combined' || !!order.paired_order_number;
-  const shippingLabel = isCombined
-    ? `Free — Combined with Order #${String(order.paired_order_number || 0).padStart(4, '0')}`
-    : (SHIPPING_LABELS[order.shipping_country_group] || order.shipping_country_group);
+  const shippingLabel = SHIPPING_LABELS[order.shipping_country_group] || order.shipping_country_group;
+
+  // Build the full list of other order numbers in this combined group
+  const otherOrderNums: number[] = order.combined_order_numbers?.length
+    ? order.combined_order_numbers
+    : order.paired_order_number ? [order.paired_order_number] : [];
+  const otherOrdersLabel = otherOrderNums.map(n => `#${String(n).padStart(4, '0')}`).join(', ');
 
   const formatPHP = (val: number) =>
     `₱${val.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -109,7 +114,7 @@ export function getOrderInvoiceHTML(order: InvoiceOrder): string {
             <td style="font-size:15px;color:#111;padding:8px 0;text-align:right;">${formatPHP(itemPrice)}</td>
           </tr>
           <tr>
-            <td style="font-size:15px;color:#111;padding:8px 0;">${isCombined ? `📦 Combined Shipment — w/ Order #${String(order.paired_order_number || 0).padStart(4, '0')}` : `Shipping — ${shippingLabel}`}</td>
+            <td style="font-size:15px;color:#111;padding:8px 0;">${isCombined ? `📦 Combined Shipment — w/ ${otherOrdersLabel}` : `Shipping — ${shippingLabel}`}</td>
             <td style="font-size:15px;color:#111;padding:8px 0;text-align:right;">${isCombined ? '<span style="color:#38a169;font-weight:bold;">Free</span>' : formatPHP(order.shipping_fee)}</td>
           </tr>
           <tr>
@@ -192,7 +197,7 @@ export function getOrderInvoiceHTML(order: InvoiceOrder): string {
             <td>
               <p style="margin:0 0 4px;font-size:13px;font-weight:bold;color:#276749;text-transform:uppercase;letter-spacing:1px;">📦 Combined Shipment</p>
               <p style="margin:0;font-size:14px;color:#333;line-height:1.6;">
-                This item will be <strong>shipped together</strong> with your existing Order #${String(order.paired_order_number || 0).padStart(4, '0')} in one package — no extra shipping fee.
+                This item will be <strong>shipped together</strong> with ${otherOrdersLabel} in one package — no extra shipping fee.
               </p>
             </td>
           </tr>

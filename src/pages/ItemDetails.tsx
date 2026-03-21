@@ -119,6 +119,21 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
   const [orderSuccess, setOrderSuccess] = useState<{ orderNumber: number } | null>(null);
   const [combineCheckStatus, setCombineCheckStatus] = useState<'idle' | 'checking' | 'eligible' | 'not_eligible'>('idle');
   const [eligibleOrderNumber, setEligibleOrderNumber] = useState<number | null>(null);
+
+  const closeBuyModal = () => {
+    setShowBuyModal(false);
+    setOrderSuccess(null);
+    setCombineCheckStatus('idle');
+    setEligibleOrderNumber(null);
+    setBuyFormData(prev => ({
+      ...prev,
+      combine_shipping: false,
+      previous_order_ref: '',
+      paired_order_number: 0,
+      shipping_country_group: '',
+      shipping_fee: 0,
+    }));
+  };
   const [buyFormData, setBuyFormData] = useState({
     customer_name: '',
     customer_email: '',
@@ -635,7 +650,7 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-zinc-950/90 backdrop-blur-xl animate-in fade-in duration-300 p-3 sm:p-4">
           <div className="bg-white dark:bg-zinc-900 p-5 sm:p-7 rounded-2xl shadow-2xl w-full max-w-sm animate-in zoom-in-95 duration-500 relative border border-zinc-200 dark:border-zinc-800 max-h-[92vh] overflow-y-auto">
             <button
-              onClick={() => { setShowBuyModal(false); setOrderSuccess(null); }}
+              onClick={closeBuyModal}
               className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors"
             >
               <span className="material-icons">close</span>
@@ -649,7 +664,7 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
                 <h2 className="text-2xl font-black dark:text-white tracking-tighter mb-2">Order #{orderSuccess.orderNumber} Reserved!</h2>
                 <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6">Check your email for your official invoice and payment details.</p>
                 <button
-                  onClick={() => { setShowBuyModal(false); setOrderSuccess(null); }}
+                  onClick={closeBuyModal}
                   className="w-full bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-black py-4 rounded-xl shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all"
                 >
                   Done

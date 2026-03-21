@@ -112,6 +112,40 @@ export const OrderService = {
 
     const orderNumber: number = data.order_number;
 
+    // If combined, query all existing orders for this customer to build the full group
+    let combinedGroupNums: number[] = [];
+    const isCombinedOrder = formData.combine_shipping || formData.shipping_country_group === 'combined';
+    if (isCombinedOrder && formData.paired_order_number) {
+      const { data: customerOrders } = await supabase
+        .from('orders')
+        .select('order_number, admin_notes')
+        .eq('customer_email', formData.customer_email)
+        .neq('status', 'cancelled')
+        .neq('order_number', orderNumber);
+
+      if (customerOrders) {
+        // BFS to find all connected orders
+        const seen = new Set<number>([formData.paired_order_number]);
+        const queue = [formData.paired_order_number];
+        while (queue.length > 0) {
+          const num = queue.shift()!;
+          for (const co of customerOrders) {
+            const match = (co.admin_notes as string | null)?.match(/Paired with #(\d+)/);
+            const pairedN = match ? parseInt(match[1], 10) : null;
+            if (!seen.has(co.order_number) && (co.order_number === num || pairedN === num)) {
+              seen.add(co.order_number);
+              queue.push(co.order_number);
+            }
+            if (co.order_number === num && pairedN && !seen.has(pairedN)) {
+              seen.add(pairedN);
+              queue.push(pairedN);
+            }
+          }
+        }
+        combinedGroupNums = Array.from(seen).sort((a, b) => a - b);
+      }
+    }
+
     // Send invoice email to customer
     const invoiceHtml = getOrderInvoiceHTML({
       order_number: orderNumber,
@@ -124,6 +158,7 @@ export const OrderService = {
       shipping_fee: formData.shipping_fee,
       property_title: propertyTitle || 'Gold Item',
       paired_order_number: formData.paired_order_number,
+      combined_order_numbers: combinedGroupNums.length ? combinedGroupNums : undefined,
     });
 
     try {
@@ -139,6 +174,12 @@ export const OrderService = {
       });
 
       // 2. Build Admin Alert HTML
+      const combinedNote = isCombinedOrder && combinedGroupNums.length
+        ? `YES — Group: ${combinedGroupNums.map(n => `#${String(n).padStart(4, '0')}`).join(', ')} (Check Dashboard)`
+        : isCombinedOrder
+        ? `YES — Paired with Order #${String(formData.paired_order_number || 0).padStart(4, '0')} (Check Dashboard)`
+        : 'No';
+
       const adminAlertHtml = `
         <div style="font-family: sans-serif; padding: 20px; background: #fafafa;">
           <h2 style="color: #2F2F2F;">New Order Received! (#${orderNumber})</h2>
@@ -149,7 +190,7 @@ export const OrderService = {
           <p><strong>Item:</strong> ${propertyTitle || 'Gold Item'}</p>
           <p><strong>Amount:</strong> ₱${(amount).toLocaleString()}</p>
           <p><strong>Shipping:</strong> ₱${formData.shipping_fee.toLocaleString()}</p>
-          <p><strong>Combine Shipping:</strong> ${formData.combine_shipping ? `YES — Paired with Order #${String(formData.paired_order_number || 0).padStart(4, '0')} (Check Dashboard)` : 'No'}</p>
+          <p><strong>Combine Shipping:</strong> ${combinedNote}</p>
           <br/>
           <a href="https://ygbgold.com/manage?filter=pending" style="display:inline-block; padding: 12px 24px; background:#eab308; color:#000; font-weight:bold; text-decoration:none; border-radius:8px;">View Pending Orders</a>
         </div>
@@ -166,24 +207,27 @@ export const OrderService = {
         }),
       });
 
-      // 4. If combined, send a dedicated combined shipment summary to admin
-      if (formData.combine_shipping || formData.shipping_country_group === 'combined') {
-        const pairedNum = String(formData.paired_order_number).padStart(4, '0');
+      // 4. If combined, send dedicated combined shipment summary to admin
+      if (isCombinedOrder) {
         const newNum = String(orderNumber).padStart(4, '0');
+        const allGroupNums = combinedGroupNums.length ? combinedGroupNums : (formData.paired_order_number ? [formData.paired_order_number] : []);
+        const groupRows = allGroupNums.map((n, i) =>
+          `<tr style="background:${i % 2 === 0 ? '#fff' : '#fafafa'};">
+            <td style="padding:8px 12px;font-weight:bold;">#${String(n).padStart(4, '0')} (existing)</td>
+            <td style="padding:8px 12px;">Existing order in group</td>
+          </tr>`
+        ).join('');
         const combinedSummaryHtml = `
           <div style="font-family:sans-serif;padding:24px;background:#fff5f5;border-radius:8px;">
             <h2 style="color:#c53030;margin:0 0 16px;">📦 Combined Shipment Alert</h2>
-            <p style="margin:0 0 8px;">The following 2 orders must be <strong>shipped together in one package</strong>:</p>
+            <p style="margin:0 0 8px;">The following ${allGroupNums.length + 1} orders must be <strong>shipped together in one package</strong>:</p>
             <table style="width:100%;border-collapse:collapse;margin:16px 0;">
               <tr style="background:#fed7d7;">
                 <th style="padding:8px 12px;text-align:left;font-size:13px;">Order</th>
                 <th style="padding:8px 12px;text-align:left;font-size:13px;">Details</th>
               </tr>
-              <tr style="background:#fff;">
-                <td style="padding:8px 12px;font-weight:bold;">#${pairedNum} (existing)</td>
-                <td style="padding:8px 12px;">Original order — already pending</td>
-              </tr>
-              <tr style="background:#fafafa;">
+              ${groupRows}
+              <tr style="background:#fff3f3;">
                 <td style="padding:8px 12px;font-weight:bold;">#${newNum} (new)</td>
                 <td style="padding:8px 12px;">${propertyTitle || 'Gold Item'} — ₱${amount.toLocaleString()} (free shipping)</td>
               </tr>
@@ -193,12 +237,13 @@ export const OrderService = {
             <a href="https://ygbgold.com/manage?filter=combined" style="display:inline-block;padding:12px 24px;background:#c53030;color:#fff;font-weight:bold;text-decoration:none;border-radius:8px;">View Combined Orders</a>
           </div>
         `;
+        const allNumsLabel = [...allGroupNums.map(n => `#${String(n).padStart(4, '0')}`), `#${newNum}`].join(' + ');
         await fetch('/send-invoice', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             to: 'Contact@mail.ygbgold.com',
-            subject: `📦 COMBINED SHIPMENT: Orders #${pairedNum} + #${newNum} — ${formData.customer_name}`,
+            subject: `📦 COMBINED SHIPMENT: Orders ${allNumsLabel} — ${formData.customer_name}`,
             html: combinedSummaryHtml,
           }),
         });

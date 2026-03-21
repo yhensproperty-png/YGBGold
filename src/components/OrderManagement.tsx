@@ -419,21 +419,21 @@ const OrderManagement: React.FC = () => {
       <div className="flex flex-wrap gap-2 items-center">
         <button onClick={() => handleUpdatePair(pairOrders, OrderStatus.Confirmed)} disabled={isLoadingPair}
           className="text-xs font-bold px-3 py-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 inline-flex items-center gap-1">
-          <span className="material-icons text-[14px]">check</span> Confirm Both
+          <span className="material-icons text-[14px]">check</span> Confirm All
         </button>
         <button onClick={() => handleRemindPair(pairOrders)} disabled={actionLoading === pairKey + '_remind'}
           className="text-xs font-bold px-3 py-1.5 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 disabled:opacity-50 inline-flex items-center gap-1">
-          <span className="material-icons text-[14px]">notifications</span> Remind Both
+          <span className="material-icons text-[14px]">notifications</span> Remind All
         </button>
         <button onClick={() => handleUpdatePair(pairOrders, OrderStatus.Cancelled)} disabled={isLoadingPair}
           className="text-xs font-bold px-2.5 py-1.5 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 disabled:opacity-50">
-          Cancel Both
+          Cancel All
         </button>
       </div>
     ) : status === OrderStatus.Confirmed ? (
       <button onClick={() => handleUpdatePair(pairOrders, OrderStatus.Ordered)} disabled={isLoadingPair}
         className="text-xs font-bold px-3 py-1.5 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 disabled:opacity-50 inline-flex items-center gap-1">
-        <span className="material-icons text-[14px]">inventory_2</span> Mark Both as Ordered
+        <span className="material-icons text-[14px]">inventory_2</span> Mark All as Ordered
       </button>
     ) : status === OrderStatus.Ordered ? (
       <div className="flex flex-wrap items-center gap-2">
@@ -446,11 +446,11 @@ const OrderManagement: React.FC = () => {
         <button onClick={() => handleUpdatePair(pairOrders, OrderStatus.Shipped)}
           disabled={isLoadingPair || !pairTracking[pairKey] || !pairCarrier[pairKey]}
           className="text-xs font-bold px-3 py-1.5 bg-violet-500 text-white rounded-lg hover:bg-violet-600 disabled:opacity-50 inline-flex items-center gap-1">
-          <span className="material-icons text-[14px]">local_shipping</span> Ship Both
+          <span className="material-icons text-[14px]">local_shipping</span> Ship All
         </button>
       </div>
     ) : status === OrderStatus.Shipped ? (
-      <p className="text-[10px] text-zinc-400 italic">Both shipped — waiting delivery</p>
+      <p className="text-[10px] text-zinc-400 italic">All orders shipped — waiting delivery</p>
     ) : null;
 
     if (colSpan) {
@@ -784,29 +784,36 @@ const OrderManagement: React.FC = () => {
                   return renderOrderRow(group.order, pairingLabel);
                 }
 
-                // Combined group — header row + both order rows
+                // Combined group — wrapped in red card box
                 const groupOrders = group.orders;
                 return (
                   <React.Fragment key={`combined-group-${groupIdx}`}>
-                    {/* Group header */}
-                    <tr className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500">
-                      <td colSpan={7} className="px-6 py-2">
-                        <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
-                          <span className="material-icons text-base">call_merge</span>
-                          <span className="text-xs font-black uppercase tracking-wider">
-                            Combined Shipment — Ship these {groupOrders.length} items together!
-                          </span>
+                    <tr>
+                      <td colSpan={7} className="px-3 py-2">
+                        <div className="border-2 border-red-500 rounded-2xl overflow-hidden shadow-lg shadow-red-500/10">
+                          {/* Group header */}
+                          <div className="bg-red-50 dark:bg-red-900/20 px-6 py-3 border-b border-red-100 dark:border-red-900/50 flex items-center gap-2">
+                            <span className="material-icons text-red-500">call_merge</span>
+                            <span className="text-xs font-black uppercase tracking-wider text-red-600 dark:text-red-400">
+                              Combined Shipment — Ship these {groupOrders.length} items together!
+                            </span>
+                          </div>
+                          {/* Order rows — no individual actions */}
+                          <table className="w-full">
+                            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                              {groupOrders.map((order, orderIdx) => {
+                                const otherNums = groupOrders
+                                  .filter((_, i) => i !== orderIdx)
+                                  .map(o => `#${String(o.order_number).padStart(4, '0')}`).join(', ');
+                                return renderOrderRow(order, `Paired w/ ${otherNums}`, 'bg-red-50/10 dark:bg-red-900/5', true);
+                              })}
+                            </tbody>
+                          </table>
+                          {/* Shared action footer */}
+                          {renderPairActions(groupOrders)}
                         </div>
                       </td>
                     </tr>
-                    {/* Order rows — no individual actions */}
-                    {groupOrders.map((order, orderIdx) => {
-                      const otherOrder = groupOrders.find((_, i) => i !== orderIdx);
-                      const pairingLabel = `Paired w/ #${String(otherOrder?.order_number).padStart(4, '0')}`;
-                      return renderOrderRow(order, pairingLabel, 'bg-red-50/20 dark:bg-red-900/5 border-l-4 border-red-300 dark:border-red-800', true);
-                    })}
-                    {/* Shared action footer */}
-                    {renderPairActions(groupOrders, 7)}
                     {/* Spacer */}
                     <tr><td colSpan={7} className="py-1 bg-transparent" /></tr>
                   </React.Fragment>
