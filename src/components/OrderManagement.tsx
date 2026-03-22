@@ -706,20 +706,12 @@ const OrderManagement: React.FC = () => {
                   <table className="w-full">
                     <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
                       {groupOrders.map((order) => {
-                        const otherNums = groupOrders
-                          .filter(o => o.order_number !== order.order_number)
-                          .map(o => `#${String(o.order_number).padStart(4, '0')}`).join(', ');
-                        const pairingLabel = otherNums ? `Paired w/ ${otherNums}` : '';
                         return (
                           <tr key={order.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 transition-colors">
                             <td className="px-6 py-4 align-top w-28">
                               <span className="text-[13px] font-black font-mono text-zinc-900 dark:text-white bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded-md shadow-sm border border-zinc-200 dark:border-zinc-700 select-all block w-max">
                                 #{String(order.order_number).padStart(4, '0')}
                               </span>
-                              <div className="mt-2 bg-red-500 text-white text-[9px] font-black uppercase tracking-widest px-2 py-1.5 rounded-lg flex items-center gap-1 w-max">
-                                <span className="material-icons text-[12px]">call_merge</span>
-                                {pairingLabel}
-                              </div>
                             </td>
                             <td className="px-6 py-4 align-top min-w-[200px]">
                               {order.property_slug ? (
@@ -801,11 +793,8 @@ const OrderManagement: React.FC = () => {
                           {/* Order rows — no individual actions */}
                           <table className="w-full">
                             <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                              {groupOrders.map((order, orderIdx) => {
-                                const otherNums = groupOrders
-                                  .filter((_, i) => i !== orderIdx)
-                                  .map(o => `#${String(o.order_number).padStart(4, '0')}`).join(', ');
-                                return renderOrderRow(order, `Paired w/ ${otherNums}`, 'bg-red-50/10 dark:bg-red-900/5', true);
+                              {groupOrders.map((order) => {
+                                return renderOrderRow(order, null, 'bg-red-50/10 dark:bg-red-900/5', true);
                               })}
                             </tbody>
                           </table>

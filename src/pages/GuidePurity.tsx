@@ -15,9 +15,9 @@ const GuidePurity: React.FC = () => {
   return (
     <>
       <SEO
-        title="Gold Purity Guide — 18K Japan, 21K Saudi, 24K Hong Kong | YGB Gold"
-        description="Understand the three tiers YGB Gold sells: 18K Japan Gold, 21K Saudi Gold, and 24K Hong Kong Chuk Kam. Includes a gold calculator and hallmark guide."
-        keywords="18k Japan gold, 21k Saudi gold, 24k Hong Kong Chuk Kam, gold purity guide Philippines, gold hallmark 750 875 999"
+        title="Gold Purity Guide — 18K Saudi, Japan & Chinese, 21K Saudi, 24K Hong Kong | YGB Gold"
+        description="Understand the five types YGB Gold sells: 18K Saudi, 18K Japan, 18K Chinese, 21K Saudi, and 24K Hong Kong Gold. Includes a gold calculator and hallmark guide."
+        keywords="18k Saudi gold, 18k Japan gold, 18k Chinese gold, 21k Saudi gold, 24k Hong Kong gold, gold purity guide Philippines, gold hallmark 750 875 999"
         ogUrl="https://ygbgold.com/guides/purity"
       />
       <div className="w-full bg-white dark:bg-zinc-950 min-h-screen">
@@ -32,7 +32,7 @@ const GuidePurity: React.FC = () => {
               Gold Purity <span className="text-primary italic">Guide</span>
             </h1>
             <p className="text-zinc-500 dark:text-zinc-400 text-lg font-medium">
-              YGB Gold sources from four world-renowned regions. We offer three focused tiers — giving investors clear, trusted choices with no confusion.
+              YGB Gold sources from world-renowned regions. We offer five types across three karat levels — giving investors clear, trusted choices with no confusion.
             </p>
           </div>
 
@@ -40,8 +40,22 @@ const GuidePurity: React.FC = () => {
 
             {/* The Three Tiers */}
             <section>
-              <h2 className="text-2xl font-black dark:text-white tracking-tight mb-6">The Three Tiers We Sell</h2>
+              <h2 className="text-2xl font-black dark:text-white tracking-tight mb-6">The Five Types We Sell</h2>
               <div className="space-y-4">
+
+                {/* 18K Saudi */}
+                <div className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-2xl p-6">
+                  <div className="flex items-start gap-4 mb-3">
+                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <span className="text-xl font-black text-primary">18K</span>
+                    </div>
+                    <div>
+                      <p className="font-black dark:text-white text-lg leading-tight">Saudi Gold <span className="text-sm font-bold text-zinc-400">18K</span></p>
+                      <p className="text-xs font-bold text-primary uppercase tracking-widest">75% Pure · Wearable Elegance</p>
+                    </div>
+                  </div>
+                  <p className="text-sm">Saudi 18K gold carries the hallmark craftsmanship of the region in a more durable, everyday-wearable form. At 75% purity, it balances the deep golden colour Saudi gold is known for with added strength — perfect for those who love Saudi-style designs and want to wear them daily without worry.</p>
+                </div>
 
                 {/* 18K Japan */}
                 <div className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-2xl p-6">
@@ -50,11 +64,25 @@ const GuidePurity: React.FC = () => {
                       <span className="text-xl font-black text-primary">18K</span>
                     </div>
                     <div>
-                      <p className="font-black dark:text-white text-lg leading-tight">Japan Gold</p>
+                      <p className="font-black dark:text-white text-lg leading-tight">Japan Gold <span className="text-sm font-bold text-zinc-400">18K</span></p>
                       <p className="text-xs font-bold text-primary uppercase tracking-widest">75% Pure · Daily Luxury</p>
                     </div>
                   </div>
-                  <p className="text-sm">Japanese gold is celebrated for its precision craftsmanship and refined finish. At 75% purity, 18K is the perfect balance of durability and richness — ideal for everyday jewelry that holds its beauty and value over decades. If you want gold you can wear and cherish daily without worry, this is your tier.</p>
+                  <p className="text-sm">Japanese gold is celebrated for its precision craftsmanship and refined finish. At 75% purity, 18K Japan gold is the perfect balance of durability and richness — ideal for everyday jewelry that holds its beauty and value over decades. If you want gold you can wear and cherish daily without worry, this is your tier.</p>
+                </div>
+
+                {/* 18K Chinese */}
+                <div className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-2xl p-6">
+                  <div className="flex items-start gap-4 mb-3">
+                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <span className="text-xl font-black text-primary">18K</span>
+                    </div>
+                    <div>
+                      <p className="font-black dark:text-white text-lg leading-tight">Chinese Gold <span className="text-sm font-bold text-zinc-400">18K</span></p>
+                      <p className="text-xs font-bold text-primary uppercase tracking-widest">75% Pure · Fine Craftsmanship</p>
+                    </div>
+                  </div>
+                  <p className="text-sm">Chinese 18K gold is renowned for its intricate designs and consistent quality. China's gold manufacturing standards are among the most stringent globally, producing pieces that combine artistic detail with reliable purity. A popular choice for those seeking beautifully crafted jewelry at the 18K level.</p>
                 </div>
 
                 {/* 21K Saudi */}
@@ -64,32 +92,32 @@ const GuidePurity: React.FC = () => {
                       <span className="text-xl font-black text-primary">21K</span>
                     </div>
                     <div>
-                      <p className="font-black dark:text-white text-lg leading-tight">Saudi Arabia Gold</p>
+                      <p className="font-black dark:text-white text-lg leading-tight">Saudi Gold <span className="text-sm font-bold text-zinc-400">21K</span></p>
                       <p className="text-xs font-bold text-primary uppercase tracking-widest">87.5% Pure · Investment Standard</p>
                     </div>
                   </div>
                   <p className="text-sm">Saudi 21K is the global standard for investment-grade jewelry. Renowned for its deep, rich yellow colour and ability to hold intricate designs while retaining high intrinsic value. Universally recognized and easy to resell worldwide — the most popular choice among OFWs and serious collectors. Every gram carries real wealth.</p>
                 </div>
 
-                {/* 24K HK/China */}
+                {/* 24K Hong Kong */}
                 <div className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-2xl p-6">
                   <div className="flex items-start gap-4 mb-3">
                     <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
                       <span className="text-xl font-black text-primary">24K</span>
                     </div>
                     <div>
-                      <p className="font-black dark:text-white text-lg leading-tight">Hong Kong & China Gold <span className="text-sm font-bold text-zinc-400">(足金 Chuk Kam)</span></p>
+                      <p className="font-black dark:text-white text-lg leading-tight">Hong Kong Gold <span className="text-sm font-bold text-zinc-400">(足金 Chuk Kam)</span></p>
                       <p className="text-xs font-bold text-primary uppercase tracking-widest">99.9–99.99% Pure · Pure Wealth</p>
                     </div>
                   </div>
-                  <p className="text-sm">Chuk Kam — meaning "pure gold" in Cantonese — is the ultimate tier for serious investors and heritage pieces. Strictly 99.9% to 99.99% purity, sourced from Hong Kong and China where gold standards are among the strictest in the world. Its vivid, warm colour is unmistakable. If preserving generational wealth is your goal, this is the pinnacle.</p>
+                  <p className="text-sm">Chuk Kam — meaning "pure gold" in Cantonese — is the ultimate tier for serious investors and heritage pieces. Strictly 99.9% to 99.99% purity, sourced from Hong Kong where gold standards are among the strictest in the world. Its vivid, warm colour is unmistakable. If preserving generational wealth is your goal, this is the pinnacle.</p>
                 </div>
 
               </div>
 
               <div className="mt-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl px-5 py-4">
                 <p className="text-sm text-amber-800 dark:text-amber-300 font-medium">
-                  <strong>Note:</strong> YGB Gold strictly sells 18K, 21K, and 24K. We do not sell 22K — this keeps our sourcing focused and gives investors three clear, trusted tiers to choose from.
+                  <strong>Note:</strong> YGB Gold strictly sells 18K, 21K, and 24K. We do not sell 22K — this keeps our sourcing focused and gives investors five clear, trusted options to choose from.
                 </p>
               </div>
             </section>
@@ -100,9 +128,9 @@ const GuidePurity: React.FC = () => {
               <p className="text-sm mb-4">Genuine gold is stamped with a hallmark. Here's what you'll see on YGB Gold pieces:</p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {[
-                  { karat: '18K Japan', stamp: '750', sub: 'Stamped "750" — 750 parts per 1000', color: 'from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-900/10', border: 'border-blue-200 dark:border-blue-800', text: 'text-blue-700 dark:text-blue-300' },
+                  { karat: '18K Saudi, Japan & Chinese', stamp: '750', sub: 'Stamped "750" — 750 parts per 1000', color: 'from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-900/10', border: 'border-blue-200 dark:border-blue-800', text: 'text-blue-700 dark:text-blue-300' },
                   { karat: '21K Saudi', stamp: '875 / 21K', sub: 'Stamped "875" or "21K"', color: 'from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-900/10', border: 'border-yellow-200 dark:border-yellow-800', text: 'text-yellow-700 dark:text-yellow-300' },
-                  { karat: '24K HK/China', stamp: '999 / 足金', sub: 'Stamped "999" or "足金" (Chuk Kam)', color: 'from-primary/5 to-primary/10', border: 'border-primary/20', text: 'text-primary' },
+                  { karat: '24K Hong Kong', stamp: '999 / 足金', sub: 'Stamped "999" or "足金" (Chuk Kam)', color: 'from-primary/5 to-primary/10', border: 'border-primary/20', text: 'text-primary' },
                 ].map(({ karat, stamp, sub, color, border, text }) => (
                   <div key={karat} className={`bg-gradient-to-br ${color} border ${border} rounded-2xl p-5 text-center`}>
                     <p className={`text-3xl font-black ${text} mb-2`}>{stamp}</p>
