@@ -192,7 +192,7 @@ export const OrderService = {
           <p><strong>Shipping:</strong> ₱${formData.shipping_fee.toLocaleString()}</p>
           <p><strong>Combine Shipping:</strong> ${combinedNote}</p>
           <br/>
-          <a href="https://ygbgold.com/manage?filter=pending" style="display:inline-block; padding: 12px 24px; background:#eab308; color:#000; font-weight:bold; text-decoration:none; border-radius:8px;">View Pending Orders</a>
+          <a href="https://ygbgold.com/manage?tab=orders&filter=pending" style="display:inline-block; padding: 12px 24px; background:#eab308; color:#000; font-weight:bold; text-decoration:none; border-radius:8px;">View Pending Orders</a>
         </div>
       `;
 

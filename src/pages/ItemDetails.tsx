@@ -117,14 +117,17 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [isOrdering, setIsOrdering] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState<{ orderNumber: number } | null>(null);
-  const [combineCheckStatus, setCombineCheckStatus] = useState<'idle' | 'checking' | 'eligible' | 'not_eligible'>('idle');
+  const [combineCheckStatus, setCombineCheckStatus] = useState<'idle' | 'checking' | 'eligible' | 'not_eligible' | 'pick'>('idle');
   const [eligibleOrderNumber, setEligibleOrderNumber] = useState<number | null>(null);
+  const [eligibleOrders, setEligibleOrders] = useState<{order_number: number; property_title: string; shipping_address: string}[]>([]);
 
   const closeBuyModal = () => {
     setShowBuyModal(false);
     setOrderSuccess(null);
     setCombineCheckStatus('idle');
     setEligibleOrderNumber(null);
+    setPhoneCountryCode('+63');
+    setEligibleOrders([]);
     setBuyFormData({
       customer_name: '',
       customer_email: '',
@@ -169,6 +172,8 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
     marketingConsent: false
   });
 
+  const [showInquiryForm, setShowInquiryForm] = useState(false);
+  const [phoneCountryCode, setPhoneCountryCode] = useState('+63');
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [copied, setCopied] = useState(false);
   const shareRef = useRef<HTMLDivElement>(null);
@@ -246,6 +251,7 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
     if (name === 'combine_shipping') {
       setCombineCheckStatus('idle');
       setEligibleOrderNumber(null);
+      setEligibleOrders([]);
       setBuyFormData(prev => ({
         ...prev,
         combine_shipping: checked,
@@ -275,20 +281,30 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
 
     setCombineCheckStatus('checking');
     try {
-      const { data, error } = await supabase.rpc('get_pending_order_number', { target_email: emailToCheck });
+      const { data, error } = await supabase.rpc('get_pending_orders_for_combine', { target_email: emailToCheck });
       if (error) throw error;
 
-      if (data !== null) {
-        setEligibleOrderNumber(data);
-        setCombineCheckStatus('eligible');
-        setBuyFormData(prev => ({ ...prev, shipping_fee: 0, shipping_country_group: 'combined', paired_order_number: data }));
-      } else {
+      const orders = (data as {order_number: number; property_title: string; shipping_address: string}[]) || [];
+      if (orders.length === 0) {
         setCombineCheckStatus('not_eligible');
+      } else if (orders.length === 1) {
+        setEligibleOrderNumber(orders[0].order_number);
+        setCombineCheckStatus('eligible');
+        setBuyFormData(prev => ({ ...prev, shipping_fee: 0, shipping_country_group: 'combined', paired_order_number: orders[0].order_number }));
+      } else {
+        setEligibleOrders(orders);
+        setCombineCheckStatus('pick');
       }
     } catch {
       setCombineCheckStatus('idle');
       alert('Could not verify order. Please try again.');
     }
+  };
+
+  const handleSelectCombineOrder = (orderNumber: number) => {
+    setEligibleOrderNumber(orderNumber);
+    setCombineCheckStatus('eligible');
+    setBuyFormData(prev => ({ ...prev, shipping_fee: 0, shipping_country_group: 'combined', paired_order_number: orderNumber }));
   };
 
   const handleBuySubmit = async (e: React.FormEvent) => {
@@ -311,10 +327,10 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
       }
     }
 
-    const sanitizedPhone = buyFormData.customer_phone.replace(/[\s-]/g, '');
-    const phoneRegex = /^\+?[0-9]{10,15}$/;
+    const sanitizedPhone = `${phoneCountryCode.replace('-CA', '')} ${buyFormData.customer_phone.replace(/[\s-]/g, '')}`;
+    const phoneRegex = /^\+[0-9]{1,4} [0-9]{6,14}$/;
     if (!phoneRegex.test(sanitizedPhone)) {
-      alert('Please enter a valid international phone number (10 to 15 digits).');
+      alert('Please enter a valid phone number.');
       return;
     }
 
@@ -707,13 +723,113 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
               </div>
               <div>
                 <label className="block text-[9px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-2 px-1">Phone Number</label>
-                <input
-                  name="customer_phone"
-                  value={buyFormData.customer_phone}
-                  onChange={handleBuyInputChange}
-                  className="w-full bg-zinc-50 dark:bg-zinc-800 border-zinc-100 dark:border-zinc-700 rounded-xl p-3 text-sm font-bold focus:ring-primary focus:border-primary transition-all placeholder:text-zinc-300"
-                  type="tel" required disabled={isOrdering}
-                />
+                <div className="flex gap-2">
+                  <select
+                    value={phoneCountryCode}
+                    onChange={e => setPhoneCountryCode(e.target.value)}
+                    disabled={isOrdering}
+                    className="bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 rounded-xl px-2 py-3 text-sm font-bold focus:ring-primary focus:border-primary transition-all w-28 shrink-0"
+                  >
+                    <optgroup label="Common">
+                      <option value="+63">🇵🇭 +63</option>
+                      <option value="+1">🇺🇸 +1</option>
+                      <option value="+44">🇬🇧 +44</option>
+                      <option value="+61">🇦🇺 +61</option>
+                      <option value="+65">🇸🇬 +65</option>
+                      <option value="+852">🇭🇰 +852</option>
+                      <option value="+971">🇦🇪 +971</option>
+                      <option value="+966">🇸🇦 +966</option>
+                      <option value="+81">🇯🇵 +81</option>
+                      <option value="+82">🇰🇷 +82</option>
+                      <option value="+86">🇨🇳 +86</option>
+                      <option value="+60">🇲🇾 +60</option>
+                      <option value="+62">🇮🇩 +62</option>
+                      <option value="+66">🇹🇭 +66</option>
+                      <option value="+64">🇳🇿 +64</option>
+                      <option value="+1-CA">🇨🇦 +1</option>
+                    </optgroup>
+                    <optgroup label="All Countries">
+                      <option value="+93">🇦🇫 +93</option>
+                      <option value="+355">🇦🇱 +355</option>
+                      <option value="+213">🇩🇿 +213</option>
+                      <option value="+54">🇦🇷 +54</option>
+                      <option value="+43">🇦🇹 +43</option>
+                      <option value="+880">🇧🇩 +880</option>
+                      <option value="+32">🇧🇪 +32</option>
+                      <option value="+55">🇧🇷 +55</option>
+                      <option value="+359">🇧🇬 +359</option>
+                      <option value="+56">🇨🇱 +56</option>
+                      <option value="+57">🇨🇴 +57</option>
+                      <option value="+385">🇭🇷 +385</option>
+                      <option value="+357">🇨🇾 +357</option>
+                      <option value="+420">🇨🇿 +420</option>
+                      <option value="+45">🇩🇰 +45</option>
+                      <option value="+20">🇪🇬 +20</option>
+                      <option value="+372">🇪🇪 +372</option>
+                      <option value="+251">🇪🇹 +251</option>
+                      <option value="+358">🇫🇮 +358</option>
+                      <option value="+33">🇫🇷 +33</option>
+                      <option value="+49">🇩🇪 +49</option>
+                      <option value="+233">🇬🇭 +233</option>
+                      <option value="+30">🇬🇷 +30</option>
+                      <option value="+36">🇭🇺 +36</option>
+                      <option value="+91">🇮🇳 +91</option>
+                      <option value="+98">🇮🇷 +98</option>
+                      <option value="+964">🇮🇶 +964</option>
+                      <option value="+353">🇮🇪 +353</option>
+                      <option value="+972">🇮🇱 +972</option>
+                      <option value="+39">🇮🇹 +39</option>
+                      <option value="+962">🇯🇴 +962</option>
+                      <option value="+254">🇰🇪 +254</option>
+                      <option value="+965">🇰🇼 +965</option>
+                      <option value="+371">🇱🇻 +371</option>
+                      <option value="+961">🇱🇧 +961</option>
+                      <option value="+218">🇱🇾 +218</option>
+                      <option value="+370">🇱🇹 +370</option>
+                      <option value="+352">🇱🇺 +352</option>
+                      <option value="+356">🇲🇹 +356</option>
+                      <option value="+52">🇲🇽 +52</option>
+                      <option value="+212">🇲🇦 +212</option>
+                      <option value="+31">🇳🇱 +31</option>
+                      <option value="+234">🇳🇬 +234</option>
+                      <option value="+47">🇳🇴 +47</option>
+                      <option value="+968">🇴🇲 +968</option>
+                      <option value="+92">🇵🇰 +92</option>
+                      <option value="+507">🇵🇦 +507</option>
+                      <option value="+51">🇵🇪 +51</option>
+                      <option value="+48">🇵🇱 +48</option>
+                      <option value="+351">🇵🇹 +351</option>
+                      <option value="+974">🇶🇦 +974</option>
+                      <option value="+40">🇷🇴 +40</option>
+                      <option value="+7">🇷🇺 +7</option>
+                      <option value="+966">🇸🇦 +966</option>
+                      <option value="+381">🇷🇸 +381</option>
+                      <option value="+27">🇿🇦 +27</option>
+                      <option value="+34">🇪🇸 +34</option>
+                      <option value="+94">🇱🇰 +94</option>
+                      <option value="+46">🇸🇪 +46</option>
+                      <option value="+41">🇨🇭 +41</option>
+                      <option value="+886">🇹🇼 +886</option>
+                      <option value="+255">🇹🇿 +255</option>
+                      <option value="+90">🇹🇷 +90</option>
+                      <option value="+380">🇺🇦 +380</option>
+                      <option value="+256">🇺🇬 +256</option>
+                      <option value="+598">🇺🇾 +598</option>
+                      <option value="+58">🇻🇪 +58</option>
+                      <option value="+84">🇻🇳 +84</option>
+                      <option value="+967">🇾🇪 +967</option>
+                      <option value="+260">🇿🇲 +260</option>
+                      <option value="+263">🇿🇼 +263</option>
+                    </optgroup>
+                  </select>
+                  <input
+                    name="customer_phone"
+                    value={buyFormData.customer_phone}
+                    onChange={handleBuyInputChange}
+                    className="flex-1 bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 rounded-xl p-3 text-sm font-bold focus:ring-primary focus:border-primary transition-all placeholder:text-zinc-300"
+                    type="tel" placeholder="9171234567" required disabled={isOrdering}
+                  />
+                </div>
               </div>
               <div>
                 <label className="block text-[9px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-2 px-1">Shipping Address</label>
@@ -778,6 +894,29 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
                         </div>
                       )}
                     </>
+                  )}
+
+                  {combineCheckStatus === 'pick' && (
+                    <div className="bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-400 dark:border-amber-700 rounded-xl p-4 space-y-3">
+                      <p className="text-sm font-black text-amber-700 dark:text-amber-400 flex items-center gap-2">
+                        <span className="material-icons text-base">call_split</span>
+                        Which order do you want to combine with?
+                      </p>
+                      {eligibleOrders.map(o => (
+                        <button
+                          key={o.order_number}
+                          type="button"
+                          onClick={() => handleSelectCombineOrder(o.order_number)}
+                          className="w-full text-left bg-white dark:bg-zinc-800 border border-amber-200 dark:border-amber-700 hover:border-amber-400 rounded-xl p-3 transition-all"
+                        >
+                          <p className="text-sm font-black text-zinc-800 dark:text-zinc-100">Order #{String(o.order_number).padStart(4, '0')} — {o.property_title}</p>
+                          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 flex items-center gap-1">
+                            <span className="material-icons text-xs">location_on</span>
+                            {o.shipping_address}
+                          </p>
+                        </button>
+                      ))}
+                    </div>
                   )}
 
                   {combineCheckStatus === 'eligible' && (
@@ -1200,13 +1339,18 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
                 <span className="text-lg">Buy Now</span>
               </button>
 
-              <div className="flex items-center gap-3 mb-6">
-                <div className="h-px bg-zinc-200 dark:bg-zinc-800 flex-1"></div>
-                <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Or Inquiry</span>
-                <div className="h-px bg-zinc-200 dark:bg-zinc-800 flex-1"></div>
+              <div className="text-center mt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowInquiryForm(v => !v)}
+                  className="text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors underline underline-offset-4"
+                >
+                  {showInquiryForm ? 'Hide inquiry form' : 'Not ready? Send an inquiry instead →'}
+                </button>
               </div>
 
-              <form className="space-y-4" onSubmit={handleInquirySubmit}>
+              {showInquiryForm && (
+              <form className="space-y-4 mt-6 pt-6 border-t border-zinc-100 dark:border-zinc-800" onSubmit={handleInquirySubmit}>
                 <div>
                   <label className="block text-[9px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-2 px-1">Full Name</label>
                   <input
@@ -1321,6 +1465,7 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
                   </button>
                 </div>
               </form>
+              )}
             </div>
           </div>
         </div>

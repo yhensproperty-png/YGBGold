@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { PropertyListing } from '../types.ts';
 import { useAuth } from '../context/AuthContext.tsx';
 import OrderManagement from '../components/OrderManagement.tsx';
@@ -274,8 +274,10 @@ function PropertyTable({
 
 const ManageListings: React.FC<ManageListingsProps> = ({ properties, onUpdate, onDelete }) => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { isAdmin } = useAuth();
-  const [activeView, setActiveView] = useState<View>('active');
+  const initialView = (searchParams.get('tab') as View) || 'active';
+  const [activeView, setActiveView] = useState<View>(isAdmin && initialView === 'orders' ? 'orders' : initialView);
 
   const activeListings = useMemo(() => properties.filter(p => p.status === 'active' || p.status === 'draft'), [properties]);
   const soldListings = useMemo(() => properties.filter(p => p.status === 'sold'), [properties]);
