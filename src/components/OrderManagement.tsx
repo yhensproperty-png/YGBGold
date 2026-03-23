@@ -226,16 +226,16 @@ const OrderManagement: React.FC = () => {
           status === OrderStatus.Shipped ? carrier : order.shipping_carrier
         );
       }
-      for (const order of pairOrders) {
-        if (status === OrderStatus.Confirmed) {
-          await OrderService.sendConfirmedEmail({
-            order_number: order.order_number,
-            customer_name: order.customer_name,
-            customer_email: order.customer_email,
-            property_title: order.property_title || 'Gold Item',
-          });
-        }
-        if (status === OrderStatus.Shipped && tracking && carrier) {
+      if (status === OrderStatus.Confirmed) {
+        await OrderService.sendGroupConfirmedEmail(pairOrders.map(order => ({
+          order_number: order.order_number,
+          customer_name: order.customer_name,
+          customer_email: order.customer_email,
+          property_title: order.property_title || 'Gold Item',
+        })));
+      }
+      if (status === OrderStatus.Shipped && tracking && carrier) {
+        for (const order of pairOrders) {
           await OrderService.sendShippedEmail({
             order_number: order.order_number,
             customer_name: order.customer_name,
@@ -246,7 +246,9 @@ const OrderManagement: React.FC = () => {
             shipping_address: order.shipping_address,
           });
         }
-        if (status === OrderStatus.Cancelled) {
+      }
+      if (status === OrderStatus.Cancelled) {
+        for (const order of pairOrders) {
           await OrderService.sendCancelledEmail({
             order_number: order.order_number,
             customer_name: order.customer_name,

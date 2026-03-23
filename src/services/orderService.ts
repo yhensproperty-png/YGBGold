@@ -1,6 +1,6 @@
 import { supabase } from './supabaseClient.ts';
 import { Order, OrderFormData, OrderStatus } from '../types.ts';
-import { getOrderInvoiceHTML, getOrderConfirmedHTML, getOrderShippedHTML, getOrderCancelledHTML, getOrderReminderHTML, ConfirmedOrderData, ShippedOrderData, CancelledOrderData, ReminderOrderData } from '../utils/emailTemplates.ts';
+import { getOrderInvoiceHTML, getOrderConfirmedHTML, getOrderGroupConfirmedHTML, getOrderShippedHTML, getOrderCancelledHTML, getOrderReminderHTML, ConfirmedOrderData, ShippedOrderData, CancelledOrderData, ReminderOrderData } from '../utils/emailTemplates.ts';
 
 
 export const OrderService = {
@@ -243,6 +243,27 @@ export const OrderService = {
     }
 
     return orderNumber;
+  },
+
+  /**
+   * Send one confirmation email covering all orders in a combined group.
+   */
+  async sendGroupConfirmedEmail(orders: ConfirmedOrderData[]): Promise<void> {
+    if (!orders.length) return;
+    const orderNums = orders.map(o => `#${o.order_number}`).join(' + ');
+    try {
+      await fetch('/send-invoice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: orders[0].customer_email,
+          subject: `Orders ${orderNums} Confirmed — YGB Gold`,
+          html: getOrderGroupConfirmedHTML(orders),
+        }),
+      });
+    } catch (err) {
+      console.error('Group confirmed email failed to send:', err);
+    }
   },
 
   /**

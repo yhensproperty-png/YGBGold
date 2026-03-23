@@ -494,6 +494,66 @@ export function getOrderReminderHTML(order: ReminderOrderData): string {
     </tr>`);
 }
 
+export function getOrderGroupConfirmedHTML(orders: ConfirmedOrderData[]): string {
+  const orderNums = orders.map(o => `#${o.order_number}`).join(', ');
+  const itemRows = orders.map(o =>
+    `<tr><td style="padding:6px 12px;font-weight:bold;color:#d4af37;">#${o.order_number}</td><td style="padding:6px 12px;color:#333;">${o.property_title}</td></tr>`
+  ).join('');
+  return emailWrapper(`
+    <tr>
+      <td style="padding:36px 40px 0;text-align:center;">
+        <div style="width:64px;height:64px;background:#e8f5e9;border-radius:50%;display:inline-block;line-height:64px;text-align:center;margin-bottom:16px;">
+          <span style="font-size:32px;line-height:64px;">✅</span>
+        </div>
+        <h1 style="margin:0;font-size:24px;color:#111;">Payments Confirmed!</h1>
+        <p style="color:#666;margin:8px 0 0;font-size:14px;">Orders <strong>${orderNums}</strong></p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:28px 40px 0;">
+        <p style="font-size:15px;color:#333;line-height:1.7;margin:0 0 16px;">
+          Dear <strong>${orders[0].customer_name}</strong>,
+        </p>
+        <p style="font-size:15px;color:#333;line-height:1.7;margin:0 0 16px;">
+          Thank you for your orders! We are delighted to confirm that payment has been received in full for all ${orders.length} items below, which will be <strong>shipped together in one package</strong>.
+        </p>
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:0 0 16px;">
+          <tr style="background:#f5f5f5;">
+            <th style="padding:8px 12px;text-align:left;font-size:12px;color:#999;text-transform:uppercase;letter-spacing:1px;">Order</th>
+            <th style="padding:8px 12px;text-align:left;font-size:12px;color:#999;text-transform:uppercase;letter-spacing:1px;">Item</th>
+          </tr>
+          ${itemRows}
+        </table>
+        <p style="font-size:15px;color:#333;line-height:1.7;margin:0;">
+          We will now begin processing your items. Once dispatched you will receive a follow-up email with your <strong>shipment tracking number</strong>.
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:28px 40px;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background:#fffbea;border-left:4px solid #d4af37;border-radius:4px;padding:16px;">
+          <tr><td>
+            <p style="margin:0;font-size:14px;color:#333;line-height:1.6;">
+              <strong>What happens next?</strong><br/>
+              1. We source &amp; prepare your gold items (3–5 business days).<br/>
+              2. We ship all items together and send you a tracking number.<br/>
+              3. Your items arrive safely at your door.
+            </p>
+          </td></tr>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:0 40px 32px;">
+        <p style="font-size:15px;color:#333;line-height:1.7;margin:0;">
+          Warm regards,<br/>
+          <strong style="color:#111;">The YGB Gold Team</strong><br/>
+          <a href="https://ygbgold.com" style="color:#d4af37;text-decoration:none;font-size:13px;">ygbgold.com</a>
+        </p>
+      </td>
+    </tr>`);
+}
+
 export function getOrderConfirmedHTML(order: ConfirmedOrderData): string {
   return emailWrapper(`
     <!-- Title -->
