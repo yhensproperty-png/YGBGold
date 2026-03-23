@@ -515,6 +515,19 @@ const OrderManagement: React.FC = () => {
           <p className="text-xs text-zinc-600 dark:text-zinc-400 break-words mt-0.5 w-48 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg p-2 border border-zinc-100 dark:border-zinc-800">
             {order.shipping_address}
           </p>
+          {order.shipping_country_group === 'combined' ? (
+            <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold mt-1">📦 Free — Combined Shipment</p>
+          ) : order.shipping_country_group ? (
+            <p className="text-[10px] text-amber-600 dark:text-amber-400 font-bold mt-1">
+              {({
+                philippines: '🇵🇭 Philippines (LBC)',
+                thkrjpau: '🌏 TH / KR / JP / AU',
+                sghktw: '🌏 SG / HK / TW',
+                caus: '🌎 CA / US',
+                other: '🌍 Other',
+              } as Record<string, string>)[order.shipping_country_group] || order.shipping_country_group}
+            </p>
+          ) : null}
         </div>
       </td>
       <td className="px-6 py-4 align-top">
@@ -540,6 +553,13 @@ const OrderManagement: React.FC = () => {
         <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
           ₱{order.amount.toLocaleString()}
         </span>
+        {order.shipping_fee != null && (
+          <p className="text-[10px] text-zinc-400 mt-0.5">
+            {order.shipping_fee === 0
+              ? '+ Free shipping'
+              : `+ ₱${order.shipping_fee.toLocaleString()} shipping`}
+          </p>
+        )}
         <p className="text-[10px] text-zinc-400 mt-1">
           {new Date(order.created_at).toLocaleDateString()}
         </p>
