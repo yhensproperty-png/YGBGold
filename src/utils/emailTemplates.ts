@@ -214,6 +214,7 @@ export interface ShippedOrderData {
   property_title: string;
   tracking_number: string;
   shipping_carrier: string;
+  shipping_address: string;
 }
 
 export function getOrderShippedHTML(order: ShippedOrderData): string {
@@ -263,6 +264,20 @@ export function getOrderShippedHTML(order: ShippedOrderData): string {
         <p style="font-size:14px;color:#555;line-height:1.7;margin:0;">
           You can use the tracking number above on the <strong>${order.shipping_carrier}</strong> website or app to monitor your delivery status in real time.
         </p>
+      </td>
+    </tr>
+
+    <!-- Shipping Address -->
+    <tr>
+      <td style="padding:0 40px 24px;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background:#f9f9f9;border-left:4px solid #d4af37;border-radius:4px;padding:16px 20px;">
+          <tr>
+            <td>
+              <p style="margin:0 0 6px;font-size:12px;color:#999;text-transform:uppercase;letter-spacing:1px;">Delivering To</p>
+              <p style="margin:0;font-size:14px;color:#333;line-height:1.6;">${order.shipping_address}</p>
+            </td>
+          </tr>
+        </table>
       </td>
     </tr>
 

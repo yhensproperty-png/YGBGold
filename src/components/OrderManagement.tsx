@@ -42,7 +42,7 @@ const OrderManagement: React.FC = () => {
       const initialTracking: Record<string, string> = {};
       const initialCarriers: Record<string, string> = {};
       data.forEach(o => {
-        if (o.admin_notes) initialNotes[o.id] = o.admin_notes;
+        if (o.admin_notes) initialNotes[o.id] = o.admin_notes.replace(/^\[COMBINED SHIPPING\][^\n]*\n?/, '').trimStart();
         if (o.tracking_number) initialTracking[o.id] = o.tracking_number;
         if (o.shipping_carrier) initialCarriers[o.id] = o.shipping_carrier;
       });
@@ -142,6 +142,7 @@ const OrderManagement: React.FC = () => {
             property_title: order.property_title || 'Gold Item',
             tracking_number: trackingNumber,
             shipping_carrier: shippingCarrier,
+            shipping_address: order.shipping_address,
           });
         }
         if (status === OrderStatus.Cancelled) {
@@ -169,7 +170,11 @@ const OrderManagement: React.FC = () => {
   const handleSaveNote = async (order: Order) => {
     try {
       setActionLoading(order.id + '_note');
-      await OrderService.updateOrderStatus(order.id, order.status, order.tracking_number, adminNotes[order.id]);
+      const combinedPrefix = order.admin_notes?.match(/^\[COMBINED SHIPPING\][^\n]*/)?.[0];
+      const noteToSave = combinedPrefix
+        ? `${combinedPrefix}\n${adminNotes[order.id] || ''}`.trimEnd()
+        : (adminNotes[order.id] || '');
+      await OrderService.updateOrderStatus(order.id, order.status, order.tracking_number, noteToSave);
       showToast('Admin note saved successfully');
       await loadOrders();
     } catch (error) {
@@ -238,6 +243,7 @@ const OrderManagement: React.FC = () => {
             property_title: order.property_title || 'Gold Item',
             tracking_number: tracking,
             shipping_carrier: carrier,
+            shipping_address: order.shipping_address,
           });
         }
         if (status === OrderStatus.Cancelled) {
@@ -519,7 +525,7 @@ const OrderManagement: React.FC = () => {
             placeholder="Add private note (e.g. WA chat, payment proof)..."
             className={`w-full text-xs p-2 rounded-lg border ${pairingLabel ? 'border-red-400 bg-red-50/50 dark:bg-red-900/10' : 'border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800'} focus:outline-none focus:border-primary resize-none h-24`}
           />
-          {adminNotes[order.id] !== (order.admin_notes || '') && (
+          {(adminNotes[order.id] || '') !== (order.admin_notes?.replace(/^\[COMBINED SHIPPING\][^\n]*\n?/, '').trimStart() || '') && (
             <button
               onClick={() => handleSaveNote(order)}
               disabled={actionLoading === order.id + '_note'}
