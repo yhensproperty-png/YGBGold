@@ -180,6 +180,33 @@ export const OrderService = {
         ? `YES — Paired with Order #${String(formData.paired_order_number || 0).padStart(4, '0')} (Check Dashboard)`
         : 'No';
 
+      const newNum = String(orderNumber).padStart(4, '0');
+      const allGroupNums = combinedGroupNums.length ? combinedGroupNums : (formData.paired_order_number ? [formData.paired_order_number] : []);
+      const allNumsLabel = isCombinedOrder ? [...allGroupNums.map(n => `#${String(n).padStart(4, '0')}`), `#${newNum}`].join(' + ') : null;
+
+      const combinedSection = isCombinedOrder ? `
+        <div style="margin-top:20px;padding:16px;background:#fff5f5;border-left:4px solid #c53030;border-radius:4px;">
+          <h3 style="color:#c53030;margin:0 0 10px;">📦 Combined Shipment — Ship Together</h3>
+          <p style="margin:0 0 8px;font-size:14px;">This order must be shipped in <strong>one package</strong> with:</p>
+          <table style="width:100%;border-collapse:collapse;margin:10px 0;">
+            <tr style="background:#fed7d7;">
+              <th style="padding:6px 10px;text-align:left;font-size:12px;">Order</th>
+              <th style="padding:6px 10px;text-align:left;font-size:12px;">Status</th>
+            </tr>
+            ${allGroupNums.map((n, i) => `
+              <tr style="background:${i % 2 === 0 ? '#fff' : '#fafafa'};">
+                <td style="padding:6px 10px;font-weight:bold;">#${String(n).padStart(4, '0')}</td>
+                <td style="padding:6px 10px;">Existing order</td>
+              </tr>`).join('')}
+            <tr style="background:#fff3f3;">
+              <td style="padding:6px 10px;font-weight:bold;">#${newNum} (this order)</td>
+              <td style="padding:6px 10px;">New — free shipping</td>
+            </tr>
+          </table>
+          <a href="https://ygbgold.com/manage?tab=orders&filter=combined" style="display:inline-block;padding:10px 20px;background:#c53030;color:#fff;font-weight:bold;text-decoration:none;border-radius:6px;font-size:13px;">View Combined Orders</a>
+        </div>
+      ` : '';
+
       const adminAlertHtml = `
         <div style="font-family: sans-serif; padding: 20px; background: #fafafa;">
           <h2 style="color: #2F2F2F;">New Order Received! (#${orderNumber})</h2>
@@ -191,63 +218,24 @@ export const OrderService = {
           <p><strong>Amount:</strong> ₱${(amount).toLocaleString()}</p>
           <p><strong>Shipping:</strong> ₱${formData.shipping_fee.toLocaleString()}</p>
           <p><strong>Combine Shipping:</strong> ${combinedNote}</p>
+          ${combinedSection}
           <br/>
           <a href="https://ygbgold.com/manage?tab=orders&filter=pending" style="display:inline-block; padding: 12px 24px; background:#eab308; color:#000; font-weight:bold; text-decoration:none; border-radius:8px;">View Pending Orders</a>
         </div>
       `;
 
-      // 3. Send Alert to Admin via Resend
+      // 3. Send single admin alert (includes combined section if applicable)
       await fetch('/send-invoice', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           to: 'Contact@mail.ygbgold.com',
-          subject: `🚨 NEW YGB ORDER: #${orderNumber} (${propertyTitle || 'Gold Item'})`,
+          subject: isCombinedOrder
+            ? `🚨📦 NEW COMBINED ORDER: #${orderNumber} — Group ${allNumsLabel} (${formData.customer_name})`
+            : `🚨 NEW YGB ORDER: #${orderNumber} (${propertyTitle || 'Gold Item'})`,
           html: adminAlertHtml,
         }),
       });
-
-      // 4. If combined, send dedicated combined shipment summary to admin
-      if (isCombinedOrder) {
-        const newNum = String(orderNumber).padStart(4, '0');
-        const allGroupNums = combinedGroupNums.length ? combinedGroupNums : (formData.paired_order_number ? [formData.paired_order_number] : []);
-        const groupRows = allGroupNums.map((n, i) =>
-          `<tr style="background:${i % 2 === 0 ? '#fff' : '#fafafa'};">
-            <td style="padding:8px 12px;font-weight:bold;">#${String(n).padStart(4, '0')} (existing)</td>
-            <td style="padding:8px 12px;">Existing order in group</td>
-          </tr>`
-        ).join('');
-        const combinedSummaryHtml = `
-          <div style="font-family:sans-serif;padding:24px;background:#fff5f5;border-radius:8px;">
-            <h2 style="color:#c53030;margin:0 0 16px;">📦 Combined Shipment Alert</h2>
-            <p style="margin:0 0 8px;">The following ${allGroupNums.length + 1} orders must be <strong>shipped together in one package</strong>:</p>
-            <table style="width:100%;border-collapse:collapse;margin:16px 0;">
-              <tr style="background:#fed7d7;">
-                <th style="padding:8px 12px;text-align:left;font-size:13px;">Order</th>
-                <th style="padding:8px 12px;text-align:left;font-size:13px;">Details</th>
-              </tr>
-              ${groupRows}
-              <tr style="background:#fff3f3;">
-                <td style="padding:8px 12px;font-weight:bold;">#${newNum} (new)</td>
-                <td style="padding:8px 12px;">${propertyTitle || 'Gold Item'} — ₱${amount.toLocaleString()} (free shipping)</td>
-              </tr>
-            </table>
-            <p style="margin:0 0 8px;"><strong>Customer:</strong> ${formData.customer_name} (${formData.customer_email})</p>
-            <p style="margin:0 0 16px;"><strong>Ship To:</strong> ${formData.shipping_address}</p>
-            <a href="https://ygbgold.com/manage?filter=combined" style="display:inline-block;padding:12px 24px;background:#c53030;color:#fff;font-weight:bold;text-decoration:none;border-radius:8px;">View Combined Orders</a>
-          </div>
-        `;
-        const allNumsLabel = [...allGroupNums.map(n => `#${String(n).padStart(4, '0')}`), `#${newNum}`].join(' + ');
-        await fetch('/send-invoice', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            to: 'Contact@mail.ygbgold.com',
-            subject: `📦 COMBINED SHIPMENT: Orders ${allNumsLabel} — ${formData.customer_name}`,
-            html: combinedSummaryHtml,
-          }),
-        });
-      }
 
     } catch (emailError) {
       // Don't fail the order if email fails
