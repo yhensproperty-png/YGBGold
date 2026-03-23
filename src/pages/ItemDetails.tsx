@@ -119,7 +119,7 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
   const [orderSuccess, setOrderSuccess] = useState<{ orderNumber: number } | null>(null);
   const [combineCheckStatus, setCombineCheckStatus] = useState<'idle' | 'checking' | 'eligible' | 'not_eligible' | 'pick'>('idle');
   const [eligibleOrderNumber, setEligibleOrderNumber] = useState<number | null>(null);
-  const [eligibleOrders, setEligibleOrders] = useState<{order_number: number; property_title: string; shipping_address: string}[]>([]);
+  const [eligibleOrders, setEligibleOrders] = useState<{order_number: number; property_title: string; shipping_address: string; shipping_country_group: string}[]>([]);
 
   const closeBuyModal = () => {
     setShowBuyModal(false);
@@ -275,6 +275,18 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
     }
   };
 
+  const shippingGroupLabel = (group: string) => {
+    const map: Record<string, string> = {
+      philippines: '🇵🇭 Philippines (LBC)',
+      thkrjpau: '🌏 Thailand / Korea / Japan / Australia',
+      sghktw: '🌏 Singapore / Hong Kong / Taiwan',
+      caus: '🌎 Canada / United States',
+      combined: '📦 Combined Shipment',
+      other: '🌍 Other',
+    };
+    return map[group] || group;
+  };
+
   const handleCheckAvailability = async () => {
     const emailToCheck = buyFormData.previous_order_ref.trim().toLowerCase();
     if (!emailToCheck) return;
@@ -284,7 +296,7 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
       const { data, error } = await supabase.rpc('get_pending_orders_for_combine', { target_email: emailToCheck });
       if (error) throw error;
 
-      const orders = (data as {order_number: number; property_title: string; shipping_address: string}[]) || [];
+      const orders = (data as {order_number: number; property_title: string; shipping_address: string; shipping_country_group: string}[]) || [];
       if (orders.length === 0) {
         setCombineCheckStatus('not_eligible');
       } else if (orders.length === 1) {
@@ -913,6 +925,9 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ properties }) => {
                           <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 flex items-center gap-1">
                             <span className="material-icons text-xs">location_on</span>
                             {o.shipping_address}
+                          </p>
+                          <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5 font-medium">
+                            {shippingGroupLabel(o.shipping_country_group)}
                           </p>
                         </button>
                       ))}
